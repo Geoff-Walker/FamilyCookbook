@@ -1,0 +1,18 @@
+# Development Dockerfile for the WalkerFCB .NET backend.
+# Mounts source from the host via docker-compose volumes so that
+# dotnet watch can detect file changes and hot-reload the API.
+#
+# This image is for LOCAL DEVELOPMENT ONLY.
+# Production images are defined separately (WAL-29).
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /app
+
+# Expose the port the API listens on (matches ASPNETCORE_URLS in docker-compose.yml)
+EXPOSE 5000
+
+# The source tree is mounted at /app by docker-compose.
+# On first start dotnet watch will restore packages, then build and run.
+# Subsequent file changes trigger automatic recompilation without a container restart.
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000"]
