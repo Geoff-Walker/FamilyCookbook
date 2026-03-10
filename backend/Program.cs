@@ -24,7 +24,8 @@ var dataSource = dataSourceBuilder.Build();
 
 builder.Services.AddDbContext<WalkerDbContext>(options =>
     options.UseNpgsql(dataSource, npgsqlOptions =>
-        npgsqlOptions.UseVector()));
+        npgsqlOptions.UseVector())
+           .UseSnakeCaseNamingConvention());
 
 // ---------------------------------------------------------------------------
 // CORS
