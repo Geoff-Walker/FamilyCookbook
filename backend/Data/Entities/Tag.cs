@@ -1,7 +1,8 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A recipe tag belonging to a <see cref="TagCategory"/> (e.g. "Italian" in "Cuisine").
+/// <see cref="Slug"/> is URL-safe and unique. Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class Tag
 {

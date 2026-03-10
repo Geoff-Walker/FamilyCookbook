@@ -1,7 +1,10 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// Joins an <see cref="Ingredient"/> to a <see cref="Recipe"/>, optionally scoped to
+/// a specific <see cref="RecipeStage"/>. <see cref="Amount"/> is TEXT for flexibility
+/// (e.g. "a pinch", "2–3"). <see cref="Unit"/> is nullable.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class RecipeIngredient
 {

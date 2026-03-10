@@ -1,7 +1,8 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// Represents a family member who can leave reviews on recipes.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class User
 {

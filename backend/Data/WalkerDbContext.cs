@@ -5,8 +5,9 @@ namespace WalkerFcb.Api.Data;
 
 /// <summary>
 /// EF Core database context for the WalkerFCB application.
-/// Full entity configurations are completed in WAL-27; this file carries
-/// the model configuration needed to generate the InitialSchema migration (WAL-25).
+/// All entity configurations use Fluent API only — no data annotations on entity classes.
+/// Table and column names are controlled by <c>UseSnakeCaseNamingConvention()</c> applied
+/// at registration time in <c>Program.cs</c> and in <see cref="WalkerDbContextFactory"/>.
 /// </summary>
 public class WalkerDbContext : DbContext
 {
@@ -56,6 +57,9 @@ public class WalkerDbContext : DbContext
             e.Property(r => r.Embedding).HasColumnType("vector(1536)");
             e.Property(r => r.CreatedAt).HasDefaultValueSql("now()");
             e.Property(r => r.UpdatedAt).HasDefaultValueSql("now()");
+
+            // Soft delete — all queries automatically exclude deleted recipes
+            e.HasQueryFilter(r => r.DeletedAt == null);
         });
 
         // -----------------------------------------------------------------------

@@ -1,8 +1,9 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
-/// Join table with composite PK (RecipeId, TagId).
+/// Many-to-many join table between <see cref="Recipe"/> and <see cref="Tag"/>.
+/// Composite PK <c>(RecipeId, TagId)</c> — no surrogate key.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class RecipeTag
 {
