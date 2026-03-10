@@ -7,9 +7,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Docker build cache
-.dockerignore
-
 # .NET build output
 backend/bin/
 backend/obj/
