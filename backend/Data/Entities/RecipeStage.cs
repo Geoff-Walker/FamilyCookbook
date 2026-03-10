@@ -1,7 +1,10 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A named stage within a recipe (e.g. "Make the pastry", "Prepare the filling").
+/// <see cref="SubRecipeId"/> optionally references another recipe whose stages are
+/// substituted for this stage's steps; SET NULL on delete.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class RecipeStage
 {

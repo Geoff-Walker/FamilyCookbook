@@ -3,7 +3,9 @@ using Pgvector;
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A family recipe. Soft-deleted via <see cref="DeletedAt"/>; never hard-deleted.
+/// <see cref="Embedding"/> stores a 1536-dimension pgvector for semantic search.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class Recipe
 {

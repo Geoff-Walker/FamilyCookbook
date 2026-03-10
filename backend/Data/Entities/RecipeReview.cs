@@ -1,7 +1,9 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A family member's review of a recipe. <see cref="Rating"/> is constrained 1–5
+/// by a CHECK constraint in the migration. <see cref="MadeOn"/> records when they
+/// cooked it. Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class RecipeReview
 {

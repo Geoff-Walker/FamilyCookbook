@@ -1,7 +1,8 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A single instructional step within a <see cref="RecipeStage"/>.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class RecipeStep
 {

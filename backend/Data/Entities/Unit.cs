@@ -1,7 +1,9 @@
 namespace WalkerFcb.Api.Data.Entities;
 
 /// <summary>
-/// Minimal stub — full entity definition in WAL-27.
+/// A measurement unit (e.g. "gram", "ml", "tbsp"). Grouped by <see cref="UnitType"/>
+/// (e.g. "weight", "volume", "count"). FK from <see cref="RecipeIngredient"/> is SET NULL.
+/// Fluent API configuration is in <see cref="WalkerDbContext"/>.
 /// </summary>
 public class Unit
 {
