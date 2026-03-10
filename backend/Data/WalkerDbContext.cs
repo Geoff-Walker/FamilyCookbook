@@ -42,6 +42,11 @@ public class WalkerDbContext : DbContext
             e.HasKey(u => u.Id);
             e.Property(u => u.Id).UseIdentityByDefaultColumn();
             e.Property(u => u.Name).IsRequired();
+
+            e.HasData(
+                new User { Id = 1, Name = "Geoff" },
+                new User { Id = 2, Name = "Helen" }
+            );
         });
 
         // -----------------------------------------------------------------------
@@ -121,6 +126,26 @@ public class WalkerDbContext : DbContext
             e.Property(u => u.Id).UseIdentityByDefaultColumn();
             e.Property(u => u.Name).IsRequired();
             e.Property(u => u.UnitType).IsRequired();
+
+            e.HasData(
+                // mass
+                new Unit { Id =  1, Name = "gram",       Abbreviation = "g",          UnitType = "mass"      },
+                new Unit { Id =  2, Name = "kilogram",   Abbreviation = "kg",         UnitType = "mass"      },
+                new Unit { Id =  3, Name = "ounce",      Abbreviation = "oz",         UnitType = "mass"      },
+                new Unit { Id =  4, Name = "pound",      Abbreviation = "lb",         UnitType = "mass"      },
+                // volume
+                new Unit { Id =  5, Name = "millilitre", Abbreviation = "ml",         UnitType = "volume"    },
+                new Unit { Id =  6, Name = "litre",      Abbreviation = "l",          UnitType = "volume"    },
+                new Unit { Id =  7, Name = "teaspoon",   Abbreviation = "tsp",        UnitType = "volume"    },
+                new Unit { Id =  8, Name = "tablespoon", Abbreviation = "tbsp",       UnitType = "volume"    },
+                new Unit { Id =  9, Name = "cup",        Abbreviation = "cup",        UnitType = "volume"    },
+                // arbitrary
+                new Unit { Id = 10, Name = "pinch",      Abbreviation = "pinch",      UnitType = "arbitrary" },
+                new Unit { Id = 11, Name = "handful",    Abbreviation = "handful",    UnitType = "arbitrary" },
+                new Unit { Id = 12, Name = "to taste",   Abbreviation = "to taste",   UnitType = "arbitrary" },
+                // count
+                new Unit { Id = 13, Name = "whole",      Abbreviation = "x",          UnitType = "count"     }
+            );
         });
 
         // -----------------------------------------------------------------------
@@ -169,6 +194,13 @@ public class WalkerDbContext : DbContext
             e.Property(tc => tc.Id).UseIdentityByDefaultColumn();
             e.Property(tc => tc.Name).IsRequired();
             e.HasIndex(tc => tc.Name).IsUnique();
+
+            e.HasData(
+                new TagCategory { Id = 1, Name = "Cuisine"  },
+                new TagCategory { Id = 2, Name = "Dietary"  },
+                new TagCategory { Id = 3, Name = "Occasion" },
+                new TagCategory { Id = 4, Name = "Season"   }
+            );
         });
 
         // -----------------------------------------------------------------------
@@ -188,6 +220,35 @@ public class WalkerDbContext : DbContext
              .WithMany(tc => tc.Tags)
              .HasForeignKey(t => t.CategoryId)
              .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasData(
+                // Cuisine (category_id = 1)
+                new Tag { Id =  1, CategoryId = 1, Name = "Italian",          Slug = "italian"           },
+                new Tag { Id =  2, CategoryId = 1, Name = "Chinese",          Slug = "chinese"           },
+                new Tag { Id =  3, CategoryId = 1, Name = "Indian",           Slug = "indian"            },
+                new Tag { Id =  4, CategoryId = 1, Name = "Mexican",          Slug = "mexican"           },
+                new Tag { Id =  5, CategoryId = 1, Name = "French",           Slug = "french"            },
+                new Tag { Id =  6, CategoryId = 1, Name = "Thai",             Slug = "thai"              },
+                new Tag { Id =  7, CategoryId = 1, Name = "Japanese",         Slug = "japanese"          },
+                new Tag { Id =  8, CategoryId = 1, Name = "British",          Slug = "british"           },
+                // Dietary (category_id = 2)
+                new Tag { Id =  9, CategoryId = 2, Name = "Vegetarian",       Slug = "vegetarian"        },
+                new Tag { Id = 10, CategoryId = 2, Name = "Vegan",            Slug = "vegan"             },
+                new Tag { Id = 11, CategoryId = 2, Name = "Gluten-Free",      Slug = "gluten-free"       },
+                new Tag { Id = 12, CategoryId = 2, Name = "Dairy-Free",       Slug = "dairy-free"        },
+                new Tag { Id = 13, CategoryId = 2, Name = "Nut-Free",         Slug = "nut-free"          },
+                // Occasion (category_id = 3)
+                new Tag { Id = 14, CategoryId = 3, Name = "Weeknight",        Slug = "weeknight"         },
+                new Tag { Id = 15, CategoryId = 3, Name = "Weekend",          Slug = "weekend"           },
+                new Tag { Id = 16, CategoryId = 3, Name = "Special Occasion", Slug = "special-occasion"  },
+                new Tag { Id = 17, CategoryId = 3, Name = "Batch Cook",       Slug = "batch-cook"        },
+                new Tag { Id = 18, CategoryId = 3, Name = "Quick",            Slug = "quick"             },
+                // Season (category_id = 4)
+                new Tag { Id = 19, CategoryId = 4, Name = "Spring",           Slug = "spring"            },
+                new Tag { Id = 20, CategoryId = 4, Name = "Summer",           Slug = "summer"            },
+                new Tag { Id = 21, CategoryId = 4, Name = "Autumn",           Slug = "autumn"            },
+                new Tag { Id = 22, CategoryId = 4, Name = "Winter",           Slug = "winter"            }
+            );
         });
 
         // -----------------------------------------------------------------------
