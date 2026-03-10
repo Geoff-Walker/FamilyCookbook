@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using WalkerFcb.Api.Data;
+using WalkerFcb.Api.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,11 @@ builder.Services.AddDbContext<WalkerDbContext>(options =>
     options.UseNpgsql(dataSource, npgsqlOptions =>
         npgsqlOptions.UseVector())
            .UseSnakeCaseNamingConvention());
+
+// ---------------------------------------------------------------------------
+// Repositories
+// ---------------------------------------------------------------------------
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 
 // ---------------------------------------------------------------------------
 // CORS
