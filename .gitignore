@@ -1,0 +1,25 @@
+# Environment secrets — never commit
+.env
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Docker build cache
+.dockerignore
+
+# .NET build output
+backend/bin/
+backend/obj/
+backend/*.user
+
+# Angular build output
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Logs
+*.log
+npm-debug.log*

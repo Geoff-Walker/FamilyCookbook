@@ -1,0 +1,31 @@
+# Development Dockerfile for the WalkerFCB Angular frontend.
+# Mounts source from the host via docker-compose volumes so that
+# the Angular dev server can detect file changes and hot-reload the app.
+#
+# node_modules is kept inside the container (anonymous volume mount in
+# docker-compose.yml) so that host-platform binaries do not conflict.
+#
+# This image is for LOCAL DEVELOPMENT ONLY.
+# Production images are defined separately (WAL-30).
+
+FROM node:20-alpine
+
+# Install the Angular CLI globally
+RUN npm install -g @angular/cli
+
+WORKDIR /app
+
+# Install dependencies before the source is mounted so that the node_modules
+# layer is cached. When WAL-6 scaffolds the Angular project, package.json will
+# be present and this step will populate node_modules on image build.
+# Until then, this is a no-op if no package.json exists yet.
+COPY package*.json ./
+RUN if [ -f package.json ]; then npm install; fi
+
+# Expose the Angular dev server port
+EXPOSE 4200
+
+# --host 0.0.0.0 makes the dev server reachable from outside the container
+# --poll 500 enables polling-based file watching which is required for
+# reliable hot reload when source files are on a Docker volume mount
+CMD ["ng", "serve", "--host", "0.0.0.0", "--poll", "500"]
