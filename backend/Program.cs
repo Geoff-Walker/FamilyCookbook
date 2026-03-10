@@ -132,5 +132,6 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
 
 // Feature endpoints
 app.MapRecipeEndpoints();
+app.MapReferenceDataEndpoints();
 
 app.Run();
