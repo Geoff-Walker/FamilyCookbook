@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using WalkerFcb.Api.Data;
 using WalkerFcb.Api.Data.Repositories;
+using WalkerFcb.Api.Endpoints;
+using WalkerFcb.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,12 @@ builder.Services.AddDbContext<WalkerDbContext>(options =>
 // Repositories
 // ---------------------------------------------------------------------------
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+
+// ---------------------------------------------------------------------------
+// Services
+// ---------------------------------------------------------------------------
+builder.Services.AddScoped<RecipeEmbeddingService>();
+builder.Services.AddScoped<RecipeService>();
 
 // ---------------------------------------------------------------------------
 // CORS
@@ -122,6 +130,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
    .WithTags("Health")
    .WithSummary("Health check");
 
-// Feature endpoints are registered in Endpoints/ (WAL-17 onwards)
+// Feature endpoints
+app.MapRecipeEndpoints();
 
 app.Run();
