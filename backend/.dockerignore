@@ -1,0 +1,13 @@
+# Exclude development secrets and settings from Docker image builds.
+# Production configuration is supplied entirely via environment variables.
+
+appsettings.Development.json
+
+# Build artefacts — not needed in the image build context
+bin/
+obj/
+
+# IDE files
+*.user
+.vs/
+.vscode/
