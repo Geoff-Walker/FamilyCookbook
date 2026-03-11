@@ -1,0 +1,13 @@
+<div class="user-toggle" role="group" aria-label="Active user">
+  @for (user of users; track user.id) {
+    <button
+      type="button"
+      class="user-toggle__segment"
+      [class.user-toggle__segment--active]="isActive(user)"
+      [attr.aria-pressed]="isActive(user)"
+      (click)="selectUser(user)"
+    >
+      {{ user.name }}
+    </button>
+  }
+</div>

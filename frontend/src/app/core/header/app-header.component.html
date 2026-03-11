@@ -1,0 +1,51 @@
+<header class="app-header">
+
+  <!-- List mode: app title (h1) + toggle -->
+  @if (isListMode) {
+    <div class="app-header__slot app-header__slot--left">
+      <h1 class="app-header__title">
+        <span class="app-header__title-main">Walker</span>
+        <span class="app-header__title-sub">Family Cookbook</span>
+      </h1>
+    </div>
+    <div class="app-header__slot app-header__slot--right">
+      <app-user-toggle />
+    </div>
+  }
+
+  <!-- Detail mode: back button + recipe title + toggle -->
+  @if (isDetailMode) {
+    <div class="app-header__slot app-header__slot--left">
+      <button
+        type="button"
+        class="app-header__back-btn"
+        aria-label="Back to recipe list"
+        (click)="goBack()"
+      >
+        <span class="app-header__back-icon" aria-hidden="true">&#8592;</span>
+      </button>
+    </div>
+    <div class="app-header__slot app-header__slot--centre">
+      @if (pageTitle) {
+        <span class="app-header__page-title">{{ pageTitle }}</span>
+      }
+    </div>
+    <div class="app-header__slot app-header__slot--right">
+      <app-user-toggle />
+    </div>
+  }
+
+  <!-- Form mode: app title (span) + toggle -->
+  @if (!isListMode && !isDetailMode) {
+    <div class="app-header__slot app-header__slot--left">
+      <span class="app-header__title">
+        <span class="app-header__title-main">Walker</span>
+        <span class="app-header__title-sub">Family Cookbook</span>
+      </span>
+    </div>
+    <div class="app-header__slot app-header__slot--right">
+      <app-user-toggle />
+    </div>
+  }
+
+</header>
