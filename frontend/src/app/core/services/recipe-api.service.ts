@@ -2,7 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { RecipeSummaryDto, RecipeDetailDto } from '../models/recipe.models';
+import { HttpParams } from '@angular/common/http';
+import {
+  RecipeSummaryDto,
+  RecipeDetailDto,
+  IngredientOptionDto,
+  UnitOptionDto,
+  TagOptionDto,
+  SaveRecipePayload
+} from '../models/recipe.models';
 
 @Injectable({
   providedIn: 'root'
@@ -20,15 +28,28 @@ export class RecipeApiService {
     return this.http.get<RecipeDetailDto>(`${this.baseUrl}/recipes/${id}`);
   }
 
-  createRecipe(dto: any): Observable<RecipeDetailDto> {
+  createRecipe(dto: SaveRecipePayload): Observable<RecipeDetailDto> {
     return this.http.post<RecipeDetailDto>(`${this.baseUrl}/recipes`, dto);
   }
 
-  updateRecipe(id: number, dto: any): Observable<RecipeDetailDto> {
+  updateRecipe(id: number, dto: SaveRecipePayload): Observable<RecipeDetailDto> {
     return this.http.put<RecipeDetailDto>(`${this.baseUrl}/recipes/${id}`, dto);
   }
 
   deleteRecipe(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/recipes/${id}`);
+  }
+
+  searchIngredients(term: string): Observable<IngredientOptionDto[]> {
+    const params = new HttpParams().set('search', term);
+    return this.http.get<IngredientOptionDto[]>(`${this.baseUrl}/ingredients`, { params });
+  }
+
+  getUnits(): Observable<UnitOptionDto[]> {
+    return this.http.get<UnitOptionDto[]>(`${this.baseUrl}/units`);
+  }
+
+  getTags(): Observable<TagOptionDto[]> {
+    return this.http.get<TagOptionDto[]>(`${this.baseUrl}/tags`);
   }
 }

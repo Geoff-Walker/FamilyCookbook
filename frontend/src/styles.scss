@@ -30,8 +30,14 @@
   --color-rating-fill:     #F5A623;
   --color-rating-empty:    #D6E0EC;
 
+  --color-surface-inverse: #1A2B4A;
+  --color-on-secondary:    #FFFFFF;
+  --color-error:           #C62828;
+
   --shadow-1:              0 1px 3px rgba(26, 37, 53, 0.08);
   --shadow-2:              0 4px 16px rgba(26, 37, 53, 0.14);
+  --shadow-3:              0 8px 24px rgba(26, 37, 53, 0.18);
+  --shadow-4:              0 16px 40px rgba(26, 37, 53, 0.22);
 }
 
 /* ---------- Helen theme (warm / terracotta) ---------- */
@@ -60,8 +66,14 @@
   --color-rating-fill:     #F5A623;
   --color-rating-empty:    #E8D9CF;
 
+  --color-surface-inverse: #D4623A;
+  --color-on-secondary:    #FFFFFF;
+  --color-error:           #B3261E;
+
   --shadow-1:              0 1px 3px rgba(45, 31, 21, 0.08);
   --shadow-2:              0 4px 16px rgba(45, 31, 21, 0.14);
+  --shadow-3:              0 8px 24px rgba(45, 31, 21, 0.18);
+  --shadow-4:              0 16px 40px rgba(45, 31, 21, 0.22);
 }
 
 /* ---------- Shared tokens (not theme-dependent) ---------- */
@@ -87,6 +99,7 @@
   --radius-sm:   6px;
   --radius-md:   12px;
   --radius-lg:   16px;
+  --radius-xl:   24px;
   --radius-full: 9999px;
 
   /* Typography */
