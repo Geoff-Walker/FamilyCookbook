@@ -12,7 +12,8 @@ namespace WalkerFcb.Api.Services;
 /// <summary>
 /// Semantic search: embeds the query via OpenAI text-embedding-3-small,
 /// then ranks recipes using pgvector cosine similarity with a per-user rating boost.
-/// Optionally filters results to recipes containing all specified ingredient IDs (AC10).
+/// Optionally filters results by ingredient IDs (all must match) and/or tag IDs
+/// (AND across categories, OR within same category).
 /// </summary>
 public class SearchService
 {
@@ -37,10 +38,16 @@ public class SearchService
     /// Embeds <paramref name="query"/> and returns the top-ranked recipes for
     /// <paramref name="userId"/> ordered by cosine similarity * rating boost.
     /// When <paramref name="ingredientIds"/> is provided the results are restricted to
-    /// recipes that contain ALL of the specified ingredients (AC10 combined search).
+    /// recipes that contain ALL of the specified ingredients.
+    /// When <paramref name="tagIds"/> is provided the results are further restricted using
+    /// AND-across-categories / OR-within-category tag logic (AC9, AC11).
     /// Throws <see cref="SearchUnavailableException"/> if the OpenAI call fails.
     /// </summary>
-    public async Task<List<RecipeSummaryDto>> SearchAsync(string query, int userId, List<int>? ingredientIds = null)
+    public async Task<List<RecipeSummaryDto>> SearchAsync(
+        string query,
+        int userId,
+        List<int>? ingredientIds = null,
+        List<int>? tagIds = null)
     {
         // 1. Guard: no OpenAI client means the key is not configured.
         if (_openAi is null)
@@ -69,6 +76,57 @@ public class SearchService
                 return [];
         }
 
+        // 2b. If tag IDs are provided, apply AND-across-categories / OR-within-category logic.
+        HashSet<int>? tagFilteredIds = null;
+        if (tagIds is { Count: > 0 })
+        {
+            var requestedTags = await _db.Tags
+                .AsNoTracking()
+                .Where(t => tagIds.Contains(t.Id))
+                .Select(t => new { t.Id, t.CategoryId })
+                .ToListAsync();
+
+            var tagsByCategory = requestedTags
+                .GroupBy(t => t.CategoryId)
+                .Select(g => g.Select(t => t.Id).ToList())
+                .ToList();
+
+            HashSet<int>? accumulator = null;
+            foreach (var categoryTagIds in tagsByCategory)
+            {
+                var recipeIdsForCategory = await _db.RecipeTags
+                    .AsNoTracking()
+                    .Where(rt => categoryTagIds.Contains(rt.TagId))
+                    .Select(rt => rt.RecipeId)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (accumulator is null)
+                    accumulator = recipeIdsForCategory.ToHashSet();
+                else
+                    accumulator.IntersectWith(recipeIdsForCategory);
+
+                if (accumulator.Count == 0)
+                    return [];
+            }
+
+            tagFilteredIds = accumulator;
+        }
+
+        // 2c. Combine ingredient and tag filter sets into a single constraint.
+        HashSet<int>? combinedFilterIds = null;
+        if (ingredientFilteredIds is not null && tagFilteredIds is not null)
+        {
+            ingredientFilteredIds.IntersectWith(tagFilteredIds);
+            combinedFilterIds = ingredientFilteredIds;
+            if (combinedFilterIds.Count == 0)
+                return [];
+        }
+        else
+        {
+            combinedFilterIds = ingredientFilteredIds ?? tagFilteredIds;
+        }
+
         // 3. Embed the query via OpenAI.
         float[] queryVector;
         try
@@ -94,9 +152,9 @@ public class SearchService
             .AsNoTracking()
             .Where(r => r.Embedding != null);
 
-        // Apply ingredient filter to the vector search when provided (AC10)
-        if (ingredientFilteredIds is not null)
-            baseQuery = baseQuery.Where(r => ingredientFilteredIds.Contains(r.Id));
+        // Apply combined filter constraint to the vector search when provided
+        if (combinedFilterIds is not null)
+            baseQuery = baseQuery.Where(r => combinedFilterIds.Contains(r.Id));
 
         var rankedIds = await baseQuery
             .OrderBy(r => r.Embedding!.CosineDistance(queryVec))

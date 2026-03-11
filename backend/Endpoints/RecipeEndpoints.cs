@@ -21,9 +21,9 @@ public static class RecipeEndpoints
             .WithSummary("List all recipes")
             .Produces<List<RecipeSummaryDto>>(StatusCodes.Status200OK);
 
-        // GET /api/recipes/filter?ingredientIds=1,2,3
-        group.MapGet("/filter", FilterByIngredients)
-            .WithSummary("Filter recipes by ingredient IDs (returns recipes containing ALL specified ingredients)")
+        // GET /api/recipes/filter?ingredientIds=1,2,3&tagIds=4,5
+        group.MapGet("/filter", FilterByIngredientsAndTags)
+            .WithSummary("Filter recipes by ingredient IDs and/or tag IDs (ingredientIds: ALL must match; tagIds: AND across categories, OR within same category)")
             .Produces<List<RecipeSummaryDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest);
 
@@ -66,44 +66,128 @@ public static class RecipeEndpoints
     }
 
     /// <summary>
-    /// Returns recipes that contain ALL of the specified ingredient IDs.
-    /// The ingredientIds query parameter accepts a comma-separated list of integers,
-    /// e.g. GET /api/recipes/filter?ingredientIds=1,2,3
+    /// Returns recipes matching optional ingredient IDs and/or tag IDs.
+    ///
+    /// Ingredient logic: recipe must contain ALL specified ingredient IDs.
+    /// Tag logic (AC9): tags from different categories are ANDed; tags within the
+    /// same category are ORed. Example: "Italian"(cuisine) + "French"(cuisine)
+    /// + "Vegetarian"(dietary) → (Italian OR French) AND Vegetarian.
+    ///
+    /// At least one of ingredientIds or tagIds must be provided.
+    /// e.g. GET /api/recipes/filter?ingredientIds=1,2&tagIds=3,4
     /// </summary>
-    private static async Task<IResult> FilterByIngredients(
+    private static async Task<IResult> FilterByIngredientsAndTags(
         string? ingredientIds,
+        string? tagIds,
         WalkerDbContext db)
     {
-        if (string.IsNullOrWhiteSpace(ingredientIds))
-            return Results.BadRequest(new { error = "ingredientIds is required" });
+        // At least one filter is required
+        if (string.IsNullOrWhiteSpace(ingredientIds) && string.IsNullOrWhiteSpace(tagIds))
+            return Results.BadRequest(new { error = "At least one of ingredientIds or tagIds is required" });
 
-        // Parse comma-separated list; reject on any non-integer token
-        var rawTokens = ingredientIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var ids = new List<int>(rawTokens.Length);
-        foreach (var token in rawTokens)
+        // ---- Parse ingredient IDs ----
+        List<int>? parsedIngredientIds = null;
+        if (!string.IsNullOrWhiteSpace(ingredientIds))
         {
-            if (!int.TryParse(token, out var id) || id <= 0)
-                return Results.BadRequest(new { error = $"Invalid ingredient ID: '{token}'" });
-            ids.Add(id);
+            parsedIngredientIds = new List<int>();
+            foreach (var token in ingredientIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (!int.TryParse(token, out var id) || id <= 0)
+                    return Results.BadRequest(new { error = $"Invalid ingredient ID: '{token}'" });
+                parsedIngredientIds.Add(id);
+            }
         }
 
-        if (ids.Count == 0)
-            return Results.BadRequest(new { error = "ingredientIds must contain at least one valid ID" });
+        // ---- Parse tag IDs ----
+        List<int>? parsedTagIds = null;
+        if (!string.IsNullOrWhiteSpace(tagIds))
+        {
+            parsedTagIds = new List<int>();
+            foreach (var token in tagIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (!int.TryParse(token, out var id) || id <= 0)
+                    return Results.BadRequest(new { error = $"Invalid tag ID: '{token}'" });
+                parsedTagIds.Add(id);
+            }
+        }
 
-        // Find recipe IDs that contain ALL specified ingredients.
-        // We count distinct matching ingredient IDs per recipe and keep only recipes
-        // where the count equals the number of requested IDs.
-        var matchingRecipeIds = await db.RecipeIngredients
-            .AsNoTracking()
-            .Where(ri => ids.Contains(ri.IngredientId))
-            .GroupBy(ri => ri.RecipeId)
-            .Where(g => g.Select(ri => ri.IngredientId).Distinct().Count() == ids.Count)
-            .Select(g => g.Key)
-            .ToListAsync();
+        // ---- Ingredient filter: recipe must contain ALL specified ingredients ----
+        HashSet<int>? ingredientFilteredIds = null;
+        if (parsedIngredientIds is { Count: > 0 })
+        {
+            var matchingIds = await db.RecipeIngredients
+                .AsNoTracking()
+                .Where(ri => parsedIngredientIds.Contains(ri.IngredientId))
+                .GroupBy(ri => ri.RecipeId)
+                .Where(g => g.Select(ri => ri.IngredientId).Distinct().Count() == parsedIngredientIds.Count)
+                .Select(g => g.Key)
+                .ToListAsync();
 
-        if (matchingRecipeIds.Count == 0)
+            if (matchingIds.Count == 0)
+                return Results.Ok(new List<RecipeSummaryDto>());
+
+            ingredientFilteredIds = matchingIds.ToHashSet();
+        }
+
+        // ---- Tag filter: AND across categories, OR within same category ----
+        // Load the requested tags with their category IDs so we can group them.
+        HashSet<int>? tagFilteredIds = null;
+        if (parsedTagIds is { Count: > 0 })
+        {
+            // Load requested tags to discover their categories
+            var requestedTags = await db.Tags
+                .AsNoTracking()
+                .Where(t => parsedTagIds.Contains(t.Id))
+                .Select(t => new { t.Id, t.CategoryId })
+                .ToListAsync();
+
+            // Group by category: within each category, a recipe matches if it has ANY of the tags.
+            // Across categories, the recipe must satisfy ALL category groups.
+            var tagsByCategory = requestedTags
+                .GroupBy(t => t.CategoryId)
+                .Select(g => g.Select(t => t.Id).ToList())
+                .ToList();
+
+            // Start with all recipe IDs, then intersect per category group.
+            HashSet<int>? accumulator = null;
+            foreach (var categoryTagIds in tagsByCategory)
+            {
+                var recipeIdsForCategory = await db.RecipeTags
+                    .AsNoTracking()
+                    .Where(rt => categoryTagIds.Contains(rt.TagId))
+                    .Select(rt => rt.RecipeId)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (accumulator is null)
+                    accumulator = recipeIdsForCategory.ToHashSet();
+                else
+                    accumulator.IntersectWith(recipeIdsForCategory);
+
+                if (accumulator.Count == 0)
+                    return Results.Ok(new List<RecipeSummaryDto>());
+            }
+
+            tagFilteredIds = accumulator;
+        }
+
+        // ---- Intersect ingredient and tag result sets ----
+        HashSet<int>? combinedIds = null;
+
+        if (ingredientFilteredIds is not null && tagFilteredIds is not null)
+        {
+            ingredientFilteredIds.IntersectWith(tagFilteredIds);
+            combinedIds = ingredientFilteredIds;
+        }
+        else
+        {
+            combinedIds = ingredientFilteredIds ?? tagFilteredIds;
+        }
+
+        if (combinedIds is null || combinedIds.Count == 0)
             return Results.Ok(new List<RecipeSummaryDto>());
 
+        // ---- Load and project matching recipes ----
         var recipes = await db.Recipes
             .AsNoTracking()
             .Include(r => r.RecipeTags)
@@ -111,7 +195,7 @@ public static class RecipeEndpoints
                     .ThenInclude(t => t.Category)
             .Include(r => r.Reviews)
                 .ThenInclude(rv => rv.User)
-            .Where(r => matchingRecipeIds.Contains(r.Id))
+            .Where(r => combinedIds.Contains(r.Id))
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
 
