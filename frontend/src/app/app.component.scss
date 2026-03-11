@@ -1,0 +1,7 @@
+.app-content {
+  padding-top: 56px;
+
+  @media (min-width: 768px) {
+    padding-top: 64px;
+  }
+}

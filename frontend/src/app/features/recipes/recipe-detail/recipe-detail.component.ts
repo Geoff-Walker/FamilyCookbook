@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,6 +7,7 @@ import { RecipeDetailDto, RecipeDetailReviewDto, RecipeDetailTagDto, RecipeDetai
 import { RecipeHeroComponent } from '../recipe-hero/recipe-hero.component';
 import { IngredientListComponent } from '../ingredient-list/ingredient-list.component';
 import { MethodStepsComponent } from '../method-steps/method-steps.component';
+import { HeaderStateService } from '../../../core/services/header-state.service';
 
 type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
 
@@ -17,7 +18,7 @@ type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
-export class RecipeDetailComponent implements OnInit {
+export class RecipeDetailComponent implements OnInit, OnDestroy {
   viewState: ViewState = 'loading';
   recipe: RecipeDetailDto | null = null;
   recipeId!: number;
@@ -25,12 +26,17 @@ export class RecipeDetailComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly recipeApi: RecipeApiService
+    private readonly recipeApi: RecipeApiService,
+    private readonly headerState: HeaderStateService
   ) {}
 
   ngOnInit(): void {
     this.recipeId = Number(this.route.snapshot.paramMap.get('id'));
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.headerState.setPageTitle(null);
   }
 
   load(): void {
@@ -39,9 +45,11 @@ export class RecipeDetailComponent implements OnInit {
       next: (data) => {
         this.recipe = data;
         this.viewState = 'loaded';
+        this.headerState.setPageTitle(data.title);
       },
       error: (err: HttpErrorResponse) => {
         this.viewState = err.status === 404 ? 'notFound' : 'error';
+        this.headerState.setPageTitle(null);
       }
     });
   }

@@ -1,3 +1,11 @@
+/* ---- User DTOs ---- */
+
+export interface UserDto {
+  id: number;
+  name: string;
+  themeName: string;
+}
+
 /* ---- Reference data DTOs ---- */
 
 export interface IngredientOptionDto {
