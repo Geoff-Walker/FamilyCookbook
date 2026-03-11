@@ -1,0 +1,50 @@
+<article
+  class="recipe-card"
+  (click)="navigate()"
+  (keydown.enter)="navigate()"
+  (keydown.space)="navigate()"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="recipe.title"
+>
+  <!-- Thumbnail placeholder -->
+  <div class="card-thumb" aria-hidden="true">
+    <span class="thumb-icon">🍽️</span>
+  </div>
+
+  <div class="card-body">
+    <h3 class="card-title">{{ recipe.title }}</h3>
+
+    @if (totalTimeMinutes) {
+      <p class="card-time">{{ formatTime(totalTimeMinutes) }}</p>
+    }
+
+    <!-- Tags -->
+    @if (recipe.tags.length > 0) {
+      <div class="card-tags">
+        @for (tag of visibleTags; track tag.id) {
+          <span class="tag-chip">{{ tag.name }}</span>
+        }
+        @if (overflowTagCount > 0) {
+          <span class="tag-chip tag-chip--overflow">+{{ overflowTagCount }}</span>
+        }
+      </div>
+    }
+
+    <!-- Ratings -->
+    <div class="card-ratings">
+      <div class="rating-row">
+        <span class="rating-label">Geoff</span>
+        <span class="rating-value" [class.rating-value--empty]="geoffRating === null">
+          {{ formatRating(geoffRating) }}
+        </span>
+      </div>
+      <div class="rating-row">
+        <span class="rating-label">Helen</span>
+        <span class="rating-value" [class.rating-value--empty]="helenRating === null">
+          {{ formatRating(helenRating) }}
+        </span>
+      </div>
+    </div>
+  </div>
+</article>
