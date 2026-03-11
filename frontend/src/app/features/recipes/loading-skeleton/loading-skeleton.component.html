@@ -1,0 +1,19 @@
+<div class="skeleton-grid" aria-busy="true" aria-label="Loading recipes">
+  @for (card of skeletonCards; track $index) {
+    <div class="skeleton-card">
+      <div class="skeleton-thumb shimmer"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-title shimmer"></div>
+        <div class="skeleton-subtitle shimmer"></div>
+        <div class="skeleton-tags">
+          <div class="skeleton-tag shimmer"></div>
+          <div class="skeleton-tag shimmer"></div>
+        </div>
+        <div class="skeleton-ratings">
+          <div class="skeleton-rating-row shimmer"></div>
+          <div class="skeleton-rating-row shimmer"></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

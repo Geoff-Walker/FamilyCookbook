@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { RecipeSummaryDto } from '../models/recipe.models';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ export class RecipeApiService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getRecipes(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/recipes`);
+  getRecipes(): Observable<RecipeSummaryDto[]> {
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/recipes`);
   }
 
   getRecipe(id: number): Observable<any> {

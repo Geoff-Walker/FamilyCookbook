@@ -1,0 +1,35 @@
+<div class="recipe-list-page">
+  <!-- Header -->
+  <header class="page-header">
+    <h1 class="page-title">Recipes</h1>
+    <button class="btn-add" (click)="navigateToAdd()" type="button">
+      + Add Recipe
+    </button>
+  </header>
+
+  <!-- Loading -->
+  @if (viewState === 'loading') {
+    <app-loading-skeleton />
+  }
+
+  <!-- Populated -->
+  @if (viewState === 'populated') {
+    <app-recipe-grid [recipes]="recipes" />
+  }
+
+  <!-- Empty -->
+  @if (viewState === 'empty') {
+    <div class="state-panel state-panel--empty">
+      <p class="state-message">No recipes yet.</p>
+      <a routerLink="/recipes/new" class="state-link">Add your first recipe</a>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (viewState === 'error') {
+    <div class="state-panel state-panel--error">
+      <p class="state-message">Could not load recipes. Please try again.</p>
+      <button class="btn-retry" (click)="load()" type="button">Retry</button>
+    </div>
+  }
+</div>
