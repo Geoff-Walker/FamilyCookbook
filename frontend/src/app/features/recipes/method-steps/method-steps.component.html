@@ -1,0 +1,18 @@
+<ol class="step-list" role="list">
+  @for (step of steps; track step.id; let i = $index) {
+    <li
+      class="step-item"
+      [class.step-item--active]="getState(step.id) === 'active'"
+      [class.step-item--complete]="getState(step.id) === 'complete'"
+      (click)="tap(step.id)"
+      (keydown.enter)="tap(step.id)"
+      (keydown.space)="tap(step.id)"
+      tabindex="0"
+      role="button"
+      [attr.aria-pressed]="getState(step.id) !== 'normal'"
+    >
+      <span class="step-number" aria-hidden="true">{{ displayNumber(i) }}</span>
+      <p class="step-instruction">{{ step.instruction }}</p>
+    </li>
+  }
+</ol>

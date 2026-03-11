@@ -1,0 +1,29 @@
+@if (stageName) {
+  <h3 class="stage-name">{{ stageName }}</h3>
+}
+
+<ul class="ingredient-list" role="list">
+  @for (ing of ingredients; track ing.id) {
+    <li
+      class="ingredient-row"
+      [class.ingredient-row--checked]="isChecked(ing.id)"
+      (click)="toggle(ing.id)"
+      (keydown.enter)="toggle(ing.id)"
+      (keydown.space)="toggle(ing.id)"
+      tabindex="0"
+      role="checkbox"
+      [attr.aria-checked]="isChecked(ing.id)"
+    >
+      <div class="ingredient-check" aria-hidden="true">
+        @if (isChecked(ing.id)) { ✓ }
+      </div>
+      <span class="ingredient-name">{{ ing.ingredientName }}</span>
+      <span class="ingredient-amount">
+        {{ formatAmount(ing) }}
+        @if (ing.notes) {
+          <span class="ingredient-notes">, {{ ing.notes }}</span>
+        }
+      </span>
+    </li>
+  }
+</ul>
