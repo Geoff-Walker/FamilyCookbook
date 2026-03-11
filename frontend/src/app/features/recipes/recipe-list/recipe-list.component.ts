@@ -10,6 +10,10 @@ import {
   IngredientFilterPanelComponent,
   IngredientFilterState
 } from '../ingredient-filter-panel/ingredient-filter-panel.component';
+import {
+  TagFilterComponent,
+  TagFilterState
+} from '../tag-filter/tag-filter.component';
 import { UserStateService } from '../../../core/services/user-state.service';
 
 type ViewState = 'loading' | 'populated' | 'empty' | 'error';
@@ -23,7 +27,8 @@ type ViewState = 'loading' | 'populated' | 'empty' | 'error';
     RecipeGridComponent,
     LoadingSkeletonComponent,
     SemanticSearchComponent,
-    IngredientFilterPanelComponent
+    IngredientFilterPanelComponent,
+    TagFilterComponent
   ],
   templateUrl: './recipe-list.component.html',
   styleUrl: './recipe-list.component.scss'
@@ -40,12 +45,16 @@ export class RecipeListComponent implements OnInit {
   searchQuery = '';
   searchError = false; // shown as a banner, list preserved on error
 
-  // Ingredient filter state (AC5–AC10)
-  filterError = false; // AC7: filter API error banner
-  filterEmptyMessage = false; // AC6: no results for filter combination
+  // Filter error / empty state flags (shared across ingredient and tag filters)
+  filterError = false;       // AC5/AC7: filter API error banner
+  filterEmptyMessage = false; // AC4/AC6: no results for filter combination
+
+  // Tag-specific empty state (AC4)
+  tagFilterEmptyMessage = false;
 
   private activeSearch: SearchResult = { state: 'idle', recipes: [], query: '' };
   private activeFilter: IngredientFilterState = { hasFilters: false, ingredientIds: [] };
+  private activeTagFilter: TagFilterState = { hasFilters: false, tagIds: [] };
 
   constructor(
     private readonly recipeApi: RecipeApiService,
@@ -95,19 +104,31 @@ export class RecipeListComponent implements OnInit {
   }
 
   // -------------------------------------------------------------------------
-  // Combined filter logic (AC5, AC6, AC7, AC8, AC10)
+  // Tag filter integration (WAL-13)
+  // -------------------------------------------------------------------------
+
+  onTagFilterStateChange(state: TagFilterState): void {
+    this.activeTagFilter = state;
+    this.applyFilters();
+  }
+
+  // -------------------------------------------------------------------------
+  // Combined filter logic (AC11 — all three filters combine correctly)
   // -------------------------------------------------------------------------
 
   private applyFilters(): void {
     this.filterError = false;
     this.filterEmptyMessage = false;
+    this.tagFilterEmptyMessage = false;
     this.searchError = false;
 
-    const searchActive = this.activeSearch.state !== 'idle';
-    const filterActive = this.activeFilter.hasFilters;
+    const searchActive        = this.activeSearch.state !== 'idle';
+    const ingredientActive    = this.activeFilter.hasFilters;
+    const tagActive           = this.activeTagFilter.hasFilters;
+    const anyFilterActive     = ingredientActive || tagActive;
 
-    if (!searchActive && !filterActive) {
-      // AC8: nothing active — restore full list
+    // Nothing active — restore full list
+    if (!searchActive && !anyFilterActive) {
       this.isSearchActive = false;
       this.searchQuery = '';
       this.recipes = this.baseRecipes;
@@ -115,63 +136,43 @@ export class RecipeListComponent implements OnInit {
       return;
     }
 
+    // Search in-flight — show loading
     if (this.activeSearch.state === 'loading') {
-      // Search in-flight — show loading, keep filter state pending
       this.isSearchActive = true;
       this.searchQuery = this.activeSearch.query;
       this.viewState = 'loading';
       return;
     }
 
+    // Search errored — show error banner, preserve list
     if (this.activeSearch.state === 'error') {
-      // AC6 (search): show error banner; list preserved
       this.searchError = true;
       return;
     }
 
-    // AC10: Both semantic search results AND ingredient filters active
-    if (searchActive && filterActive && this.activeSearch.state === 'results') {
-      const userId = this.userState.activeUserId;
+    const userId = this.userState.activeUserId;
+
+    // -----------------------------------------------------------------------
+    // Semantic search active + one or both static filters active (AC11)
+    // -----------------------------------------------------------------------
+    if (searchActive && anyFilterActive && this.activeSearch.state === 'results') {
       if (userId <= 0) return;
 
       this.isSearchActive = true;
       this.searchQuery = this.activeSearch.query;
       this.viewState = 'loading';
 
-      this.recipeApi
-        .searchWithIngredients(this.activeSearch.query, userId, this.activeFilter.ingredientIds)
-        .subscribe({
-          next: (results) => {
-            this.recipes = results;
-            if (results.length === 0) {
-              // AC6: combined search + filter returned empty
-              this.filterEmptyMessage = true;
-              this.viewState = 'empty';
-            } else {
-              this.viewState = 'populated';
-            }
-          },
-          error: () => {
-            // AC7: combined request failed — show error banner; list preserved
-            this.filterError = true;
-            this.viewState = 'populated';
-          }
-        });
+      const obs = this.recipeApi.searchWithFilters(
+        this.activeSearch.query,
+        userId,
+        this.activeFilter.ingredientIds,
+        this.activeTagFilter.tagIds
+      );
 
-      return;
-    }
-
-    // Only ingredient filter active (search idle or empty)
-    if (filterActive && !searchActive) {
-      this.isSearchActive = false;
-      this.searchQuery = '';
-      this.viewState = 'loading';
-
-      this.recipeApi.filterRecipes(this.activeFilter.ingredientIds).subscribe({
+      obs.subscribe({
         next: (results) => {
           this.recipes = results;
           if (results.length === 0) {
-            // AC6: no recipes found with selected ingredients
             this.filterEmptyMessage = true;
             this.viewState = 'empty';
           } else {
@@ -179,7 +180,6 @@ export class RecipeListComponent implements OnInit {
           }
         },
         error: () => {
-          // AC7: filter API error — show banner; preserve previous list
           this.filterError = true;
           this.viewState = 'populated';
         }
@@ -188,8 +188,59 @@ export class RecipeListComponent implements OnInit {
       return;
     }
 
-    // Only semantic search active (no ingredient filter)
-    if (searchActive && !filterActive) {
+    // -----------------------------------------------------------------------
+    // Static filters only (no active semantic search)
+    // -----------------------------------------------------------------------
+    if (anyFilterActive && !searchActive) {
+      this.isSearchActive = false;
+      this.searchQuery = '';
+      this.viewState = 'loading';
+
+      let obs$;
+
+      if (ingredientActive && tagActive) {
+        // Both filters active
+        obs$ = this.recipeApi.filterByIngredientsAndTags(
+          this.activeFilter.ingredientIds,
+          this.activeTagFilter.tagIds
+        );
+      } else if (tagActive) {
+        // Tag filter only (AC3)
+        obs$ = this.recipeApi.filterByTags(this.activeTagFilter.tagIds);
+      } else {
+        // Ingredient filter only
+        obs$ = this.recipeApi.filterRecipes(this.activeFilter.ingredientIds);
+      }
+
+      obs$.subscribe({
+        next: (results) => {
+          this.recipes = results;
+          if (results.length === 0) {
+            // AC4: tag-only empty; AC6: ingredient/combined empty
+            if (tagActive && !ingredientActive) {
+              this.tagFilterEmptyMessage = true;
+            } else {
+              this.filterEmptyMessage = true;
+            }
+            this.viewState = 'empty';
+          } else {
+            this.viewState = 'populated';
+          }
+        },
+        error: () => {
+          // AC5: tag filter error; AC7: ingredient filter error
+          this.filterError = true;
+          this.viewState = 'populated';
+        }
+      });
+
+      return;
+    }
+
+    // -----------------------------------------------------------------------
+    // Only semantic search active (no static filters)
+    // -----------------------------------------------------------------------
+    if (searchActive && !anyFilterActive) {
       this.isSearchActive = true;
       this.searchQuery = this.activeSearch.query;
 
