@@ -65,18 +65,56 @@ export class RecipeApiService {
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
   }
 
-  /** AC5/AC8: Filter recipes by ingredient IDs — returns recipes containing ALL specified ingredients. */
+  /** Filter recipes by ingredient IDs — returns recipes containing ALL specified ingredients. */
   filterRecipes(ingredientIds: number[]): Observable<RecipeSummaryDto[]> {
     const params = new HttpParams().set('ingredientIds', ingredientIds.join(','));
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/recipes/filter`, { params });
   }
 
-  /** AC10: Combined semantic search + ingredient filter. */
+  /** Filter recipes by tag IDs — AND across categories, OR within same category (AC9). */
+  filterByTags(tagIds: number[]): Observable<RecipeSummaryDto[]> {
+    const params = new HttpParams().set('tagIds', tagIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/recipes/filter`, { params });
+  }
+
+  /** Filter recipes by ingredient IDs AND tag IDs combined. */
+  filterByIngredientsAndTags(ingredientIds: number[], tagIds: number[]): Observable<RecipeSummaryDto[]> {
+    let params = new HttpParams();
+    if (ingredientIds.length > 0) params = params.set('ingredientIds', ingredientIds.join(','));
+    if (tagIds.length > 0) params = params.set('tagIds', tagIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/recipes/filter`, { params });
+  }
+
+  /** Combined semantic search + ingredient filter. */
   searchWithIngredients(query: string, userId: number, ingredientIds: number[]): Observable<RecipeSummaryDto[]> {
     const params = new HttpParams()
       .set('query', query)
       .set('userId', userId.toString())
       .set('ingredientIds', ingredientIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  /** Combined semantic search + tag filter (AC11). */
+  searchWithTags(query: string, userId: number, tagIds: number[]): Observable<RecipeSummaryDto[]> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('userId', userId.toString())
+      .set('tagIds', tagIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  /** Combined semantic search + ingredient filter + tag filter (AC11). */
+  searchWithFilters(
+    query: string,
+    userId: number,
+    ingredientIds: number[],
+    tagIds: number[]
+  ): Observable<RecipeSummaryDto[]> {
+    let params = new HttpParams()
+      .set('query', query)
+      .set('userId', userId.toString());
+    if (ingredientIds.length > 0) params = params.set('ingredientIds', ingredientIds.join(','));
+    if (tagIds.length > 0) params = params.set('tagIds', tagIds.join(','));
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
   }
 }

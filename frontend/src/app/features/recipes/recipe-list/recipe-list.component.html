@@ -10,9 +10,14 @@
   <!-- Semantic search box — always visible on this route (WAL-11 AC1) -->
   <app-semantic-search (searchStateChange)="onSearchStateChange($event)" />
 
-  <!-- Ingredient filter panel — AC1: visible on list route -->
+  <!-- Ingredient filter panel — WAL-12 AC1: visible on list route -->
   <div class="filter-panel-row">
     <app-ingredient-filter-panel (filterStateChange)="onFilterStateChange($event)" />
+  </div>
+
+  <!-- Tag filter panel — WAL-13 AC1: visible on list route -->
+  <div class="filter-panel-row">
+    <app-tag-filter (tagFilterStateChange)="onTagFilterStateChange($event)" />
   </div>
 
   <!-- AC6 (WAL-11): Search error banner — shown above the preserved list -->
@@ -22,7 +27,7 @@
     </div>
   }
 
-  <!-- AC7: Ingredient filter error banner — list preserved -->
+  <!-- AC5/AC7: Filter error banner (ingredient or tag filter) — list preserved -->
   @if (filterError) {
     <div class="search-error-banner" role="alert">
       Filter failed. Please try again.
@@ -39,7 +44,14 @@
     <app-recipe-grid [recipes]="recipes" />
   }
 
-  <!-- AC6: No recipes for filter combination -->
+  <!-- AC4 (WAL-13): No recipes for tag filter -->
+  @if (viewState === 'empty' && tagFilterEmptyMessage) {
+    <div class="state-panel state-panel--empty">
+      <p class="state-message">No recipes found for those tags.</p>
+    </div>
+  }
+
+  <!-- AC6 (WAL-12): No recipes for ingredient filter combination -->
   @if (viewState === 'empty' && filterEmptyMessage) {
     <div class="state-panel state-panel--empty">
       <p class="state-message">No recipes found with those ingredients.</p>
@@ -47,14 +59,14 @@
   }
 
   <!-- Empty — no search results (WAL-11 AC5) -->
-  @if (viewState === 'empty' && isSearchActive && !filterEmptyMessage) {
+  @if (viewState === 'empty' && isSearchActive && !filterEmptyMessage && !tagFilterEmptyMessage) {
     <div class="state-panel state-panel--empty">
       <p class="state-message">No recipes found for &ldquo;{{ searchQuery }}&rdquo;</p>
     </div>
   }
 
   <!-- Empty — no recipes at all (initial load, no active filters or search) -->
-  @if (viewState === 'empty' && !isSearchActive && !filterEmptyMessage) {
+  @if (viewState === 'empty' && !isSearchActive && !filterEmptyMessage && !tagFilterEmptyMessage) {
     <div class="state-panel state-panel--empty">
       <p class="state-message">No recipes yet.</p>
       <a routerLink="/recipes/new" class="state-link">Add your first recipe</a>
