@@ -85,7 +85,9 @@
   --color-text-on-dark: #FFFFFF;
 
   /* Z-index scale */
-  --z-header: 200;
+  --z-header:  200;
+  --z-sticky:  100;
+  --z-drawer:  300;
 
   /* Spacing — 4px grid */
   --space-1:  4px;
