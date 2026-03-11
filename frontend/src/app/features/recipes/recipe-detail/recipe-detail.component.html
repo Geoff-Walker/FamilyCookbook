@@ -1,0 +1,165 @@
+<!-- Loading -->
+@if (viewState === 'loading') {
+  <div class="state-loading" aria-busy="true" aria-label="Loading recipe">
+    <div class="hero-skeleton shimmer"></div>
+    <div class="content-skeleton">
+      <div class="line-skeleton shimmer" style="width: 60%"></div>
+      <div class="line-skeleton shimmer" style="width: 40%"></div>
+      <div class="line-skeleton shimmer" style="width: 80%"></div>
+    </div>
+  </div>
+}
+
+<!-- Not found -->
+@if (viewState === 'notFound') {
+  <div class="state-panel">
+    <p class="state-message">Recipe not found.</p>
+    <a routerLink="/" class="state-link">← Back to recipes</a>
+  </div>
+}
+
+<!-- Error -->
+@if (viewState === 'error') {
+  <div class="state-panel">
+    <p class="state-message">Could not load recipe. Please try again.</p>
+    <button class="btn-retry" (click)="load()" type="button">Retry</button>
+  </div>
+}
+
+<!-- Loaded -->
+@if (viewState === 'loaded' && recipe) {
+  <article class="recipe-detail">
+
+    <!-- Hero -->
+    <app-recipe-hero
+      [title]="recipe.title"
+      (back)="goBack()"
+      (edit)="goEdit()"
+    />
+
+    <!-- Metadata bar -->
+    <div class="metadata-bar">
+      <div class="metadata-items">
+        @if (recipe.prepTimeMinutes) {
+          <div class="metadata-item">
+            <span class="metadata-label">Prep</span>
+            <span class="metadata-value">{{ formatTime(recipe.prepTimeMinutes) }}</span>
+          </div>
+        }
+        @if (recipe.cookTimeMinutes) {
+          <div class="metadata-item">
+            <span class="metadata-label">Cook</span>
+            <span class="metadata-value">{{ formatTime(recipe.cookTimeMinutes) }}</span>
+          </div>
+        }
+        @if (recipe.servings) {
+          <div class="metadata-item">
+            <span class="metadata-label">Serves</span>
+            <span class="metadata-value">{{ recipe.servings }}</span>
+          </div>
+        }
+        @if (recipe.source) {
+          <div class="metadata-item">
+            <span class="metadata-label">Source</span>
+            <span class="metadata-value">{{ recipe.source }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Tags -->
+      @if (recipe.tags.length > 0) {
+        <div class="tag-groups">
+          @for (cat of tagCategories; track cat) {
+            <div class="tag-group">
+              @for (tag of tagsByCategory[cat]; track tag.id) {
+                <span class="tag-chip">{{ tag.name }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Description -->
+    @if (recipe.description) {
+      <div class="description-section">
+        <p class="description-text">{{ recipe.description }}</p>
+      </div>
+    }
+
+    <!-- Stages: single or multi -->
+    <div class="stages-wrapper">
+      @for (stage of recipe.stages; track stage.id) {
+        <section class="stage-section">
+
+          <!-- Stage heading (multi-stage only) -->
+          @if (isMultiStage) {
+            <h2 class="stage-heading">{{ stage.name }}</h2>
+            @if (stage.description) {
+              <p class="stage-description">{{ stage.description }}</p>
+            }
+          }
+
+          <!-- Two-column content grid -->
+          <div class="stage-content">
+
+            <!-- Ingredients column -->
+            @if (stage.ingredients.length > 0) {
+              <div class="ingredients-col">
+                <div class="ingredients-card">
+                  <h2 class="section-heading">Ingredients</h2>
+                  <app-ingredient-list
+                    [ingredients]="stage.ingredients"
+                  />
+                </div>
+              </div>
+            }
+
+            <!-- Steps column -->
+            @if (stage.steps.length > 0) {
+              <div class="steps-col">
+                <h2 class="section-heading">Method</h2>
+                <app-method-steps
+                  [steps]="stage.steps"
+                  [startNumber]="stepsStartNumber(stage)"
+                />
+              </div>
+            }
+
+          </div>
+        </section>
+      }
+    </div>
+
+    <!-- Reviews -->
+    <section class="reviews-section">
+      <h2 class="section-heading">Reviews</h2>
+
+      @if (recipe.reviews.length === 0) {
+        <p class="reviews-empty">No reviews yet. Be the first to cook this recipe!</p>
+      } @else {
+        @for (userGroup of reviewsByUser; track userGroup.userName) {
+          <div class="user-reviews">
+            <h3 class="reviewer-name">{{ userGroup.userName }}</h3>
+            @for (review of userGroup.reviews; track review.id) {
+              <div class="review-card">
+                <div class="review-header">
+                  <span class="review-stars" [attr.aria-label]="review.rating + ' out of 5 stars'">
+                    {{ starDisplay(review.rating) }}
+                  </span>
+                  @if (review.madeOn) {
+                    <span class="review-date">{{ formatDate(review.madeOn) }}</span>
+                  }
+                </div>
+                @if (review.notes) {
+                  <p class="review-notes">{{ review.notes }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </section>
+
+  </article>
+}
