@@ -9,7 +9,7 @@ import { RecipeApiService } from '../../../core/services/recipe-api.service';
 import { TagFilterService, TagFilterState } from '../../../core/services/tag-filter.service';
 import { TagOptionDto } from '../../../core/models/recipe.models';
 
-export { TagFilterState };
+export type { TagFilterState };
 
 /** Tags grouped under a single category name for rendering (AC8). */
 export interface TagGroup {
