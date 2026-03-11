@@ -1,3 +1,23 @@
+/* ---- Review DTOs (for RatingReviewComponent / WAL-14) ---- */
+
+export interface ReviewDto {
+  id: number;
+  recipeId: number;
+  userId: number;
+  userName: string;
+  rating: number;
+  notes: string | null;
+  madeOn: string | null;
+  createdAt: string;
+}
+
+export interface CreateReviewPayload {
+  userId: number;
+  rating: number;
+  notes: string | null;
+  madeOn: string | null;
+}
+
 /* ---- User DTOs ---- */
 
 export interface UserDto {
