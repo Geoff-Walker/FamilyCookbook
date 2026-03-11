@@ -10,7 +10,9 @@ import {
   UnitOptionDto,
   TagOptionDto,
   SaveRecipePayload,
-  UserDto
+  UserDto,
+  ReviewDto,
+  CreateReviewPayload
 } from '../models/recipe.models';
 
 @Injectable({
@@ -101,6 +103,16 @@ export class RecipeApiService {
       .set('userId', userId.toString())
       .set('tagIds', tagIds.join(','));
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  /** List all reviews for a recipe, ordered by createdAt descending. */
+  getReviews(recipeId: number): Observable<ReviewDto[]> {
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/recipes/${recipeId}/reviews`);
+  }
+
+  /** Create a new review for a recipe (always POSTs — backend stores multiple per user per date). */
+  createReview(recipeId: number, dto: CreateReviewPayload): Observable<ReviewDto> {
+    return this.http.post<ReviewDto>(`${this.baseUrl}/recipes/${recipeId}/reviews`, dto);
   }
 
   /** Combined semantic search + ingredient filter + tag filter (AC11). */

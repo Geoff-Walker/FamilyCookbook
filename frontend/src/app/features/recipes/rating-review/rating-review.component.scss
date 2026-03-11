@@ -1,0 +1,343 @@
+/* ============================================================
+   RatingReviewComponent styles — WAL-14
+   Cards maintain their own colour regardless of the active
+   global theme. Per-user tokens are applied via
+   [data-user-theme="geoff|helen"] on each card.
+   All sizing/spacing uses global design tokens.
+   ============================================================ */
+
+/* ---- Per-user theme colour maps ---- */
+
+/* Geoff card (steel blue) */
+.rr-card[data-user-theme="geoff"] {
+  --card-surface:          #F4F6F9;
+  --card-shadow:           0 1px 3px rgba(26, 37, 53, 0.08);
+  --card-label-color:      #3D4C60;
+  --card-star-filled:      #1E5FA8;
+  --card-star-empty:       #D6E0EC;
+  --card-notes-bg:         #F4F6F9;
+  --card-notes-border:     #C2CCE0;
+  --card-notes-focus:      #1E5FA8;
+  --card-save-bg:          #1E5FA8;
+  --card-save-text:        #FFFFFF;
+  --card-save-bg-hover:    #174D8A;
+  --card-text-tertiary:    #6B7C95;
+}
+
+/* Helen card (warm terracotta) */
+.rr-card[data-user-theme="helen"] {
+  --card-surface:          #EDE4D6;
+  --card-shadow:           0 1px 3px rgba(45, 31, 21, 0.08);
+  --card-label-color:      #5C4033;
+  --card-star-filled:      #D4623A;
+  --card-star-empty:       #C5AD97;
+  --card-notes-bg:         #EDE4D6;
+  --card-notes-border:     #C5AD97;
+  --card-notes-focus:      #D4623A;
+  --card-save-bg:          #D4623A;
+  --card-save-text:        #FFFFFF;
+  --card-save-bg-hover:    #B84F2E;
+  --card-text-tertiary:    #8C6A55;
+}
+
+/* ---- Loading skeleton ---- */
+.rr-loading {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rr-card-skeleton {
+  height: 220px;
+  border-radius: var(--radius-lg);
+}
+
+/* ---- Load error state ---- */
+.rr-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.rr-error-text {
+  font: var(--type-body);
+  color: var(--color-text-secondary);
+}
+
+.rr-retry-btn {
+  background: none;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  font: var(--type-label);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Two-column grid — AC-D1 ---- */
+.rr-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+}
+
+/* ---- Card surface — AC-D2 ---- */
+.rr-card {
+  position: relative;
+  background: var(--card-surface);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---- Toast — AC-D8 ---- */
+.rr-toast {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: var(--card-save-bg);
+  color: var(--card-save-text);
+  font: var(--type-label);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  animation: rr-toast-in 0.15s ease;
+  z-index: 10;
+}
+
+@keyframes rr-toast-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- User name label — AC-D3 ---- */
+.rr-user-label {
+  font: var(--type-label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--card-label-color);
+}
+
+/* ---- Stars row ---- */
+.rr-stars {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+/* Interactive stars — AC-D4, AC-D5 */
+.rr-stars--interactive {
+  /* hover styling delegated to child buttons */
+}
+
+.rr-star-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 44px;    /* touch target AC-D4 */
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--card-star-empty);
+  transition: color 100ms ease;
+
+  &.rr-star-btn--filled {
+    color: var(--card-star-filled);
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--card-star-filled);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--card-notes-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+}
+
+/* Read-only stars — AC-D9 */
+.rr-stars--readonly {
+  pointer-events: none;
+}
+
+.rr-star-readonly {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--card-star-empty);
+
+  &.rr-star-readonly--filled {
+    color: var(--card-star-filled);
+  }
+
+  @media (min-width: 768px) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Shared star SVG sizing */
+.rr-star-icon {
+  width: 32px;
+  height: 32px;
+  fill: currentColor;
+  display: block;
+
+  @media (min-width: 768px) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ---- "No rating yet" label — AC-D9 ---- */
+.rr-no-rating {
+  font: var(--type-caption);
+  color: var(--card-text-tertiary);
+}
+
+/* ---- Last cooked — AC-D10 ---- */
+.rr-last-cooked {
+  font: var(--type-caption);
+  color: var(--card-text-tertiary);
+}
+
+/* ---- Cook notes textarea — AC-D6 ---- */
+.rr-notes-input {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  background: var(--card-notes-bg);
+  border: 1px solid var(--card-notes-border);
+  border-radius: var(--radius-md);
+  font: var(--type-body);
+  padding: var(--space-3);
+  color: var(--color-text-primary, inherit);
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+
+  &::placeholder {
+    color: var(--card-label-color);
+    opacity: 0.6;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--card-notes-focus);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--card-notes-focus) 25%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* ---- Read-only notes display — AC-D9 ---- */
+.rr-notes-display {
+  font: var(--type-body);
+  color: var(--card-label-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---- Inline error — AC7 ---- */
+.rr-error-inline {
+  font: var(--type-caption);
+  color: var(--color-error, #C62828);
+}
+
+/* ---- Save button — AC-D7, AC8 ---- */
+.rr-save-btn {
+  height: 48px;
+  background: var(--card-save-bg);
+  color: var(--card-save-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font: var(--type-label);
+  padding: 0 var(--space-5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: background 0.15s ease;
+  align-self: flex-start;
+
+  &:hover:not(:disabled) {
+    background: var(--card-save-bg-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--card-notes-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* ---- Loading spinner (inside save button) — AC8 ---- */
+.rr-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: rr-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes rr-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Screen reader only utility ---- */
+.rr-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -131,34 +131,10 @@
       }
     </div>
 
-    <!-- Reviews -->
+    <!-- Ratings & Reviews — WAL-14 -->
     <section class="reviews-section">
-      <h2 class="section-heading">Reviews</h2>
-
-      @if (recipe.reviews.length === 0) {
-        <p class="reviews-empty">No reviews yet. Be the first to cook this recipe!</p>
-      } @else {
-        @for (userGroup of reviewsByUser; track userGroup.userName) {
-          <div class="user-reviews">
-            <h3 class="reviewer-name">{{ userGroup.userName }}</h3>
-            @for (review of userGroup.reviews; track review.id) {
-              <div class="review-card">
-                <div class="review-header">
-                  <span class="review-stars" [attr.aria-label]="review.rating + ' out of 5 stars'">
-                    {{ starDisplay(review.rating) }}
-                  </span>
-                  @if (review.madeOn) {
-                    <span class="review-date">{{ formatDate(review.madeOn) }}</span>
-                  }
-                </div>
-                @if (review.notes) {
-                  <p class="review-notes">{{ review.notes }}</p>
-                }
-              </div>
-            }
-          </div>
-        }
-      }
+      <h2 class="section-heading">Ratings &amp; Reviews</h2>
+      <app-rating-review [recipeId]="recipeId" />
     </section>
 
   </article>
