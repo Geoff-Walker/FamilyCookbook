@@ -12,6 +12,7 @@ namespace WalkerFcb.Api.Services;
 /// <summary>
 /// Semantic search: embeds the query via OpenAI text-embedding-3-small,
 /// then ranks recipes using pgvector cosine similarity with a per-user rating boost.
+/// Optionally filters results to recipes containing all specified ingredient IDs (AC10).
 /// </summary>
 public class SearchService
 {
@@ -35,9 +36,11 @@ public class SearchService
     /// <summary>
     /// Embeds <paramref name="query"/> and returns the top-ranked recipes for
     /// <paramref name="userId"/> ordered by cosine similarity * rating boost.
+    /// When <paramref name="ingredientIds"/> is provided the results are restricted to
+    /// recipes that contain ALL of the specified ingredients (AC10 combined search).
     /// Throws <see cref="SearchUnavailableException"/> if the OpenAI call fails.
     /// </summary>
-    public async Task<List<RecipeSummaryDto>> SearchAsync(string query, int userId)
+    public async Task<List<RecipeSummaryDto>> SearchAsync(string query, int userId, List<int>? ingredientIds = null)
     {
         // 1. Guard: no OpenAI client means the key is not configured.
         if (_openAi is null)
@@ -46,7 +49,27 @@ public class SearchService
             throw new SearchUnavailableException("Semantic search is not available: OpenAI API key is not configured.");
         }
 
-        // 2. Embed the query via OpenAI.
+        // 2. If ingredient IDs are provided, resolve the set of recipe IDs that
+        //    contain ALL of those ingredients. This set constrains the vector search.
+        HashSet<int>? ingredientFilteredIds = null;
+        if (ingredientIds is { Count: > 0 })
+        {
+            var matchingIds = await _db.RecipeIngredients
+                .AsNoTracking()
+                .Where(ri => ingredientIds.Contains(ri.IngredientId))
+                .GroupBy(ri => ri.RecipeId)
+                .Where(g => g.Select(ri => ri.IngredientId).Distinct().Count() == ingredientIds.Count)
+                .Select(g => g.Key)
+                .ToListAsync();
+
+            ingredientFilteredIds = matchingIds.ToHashSet();
+
+            // Short-circuit: no recipes match the ingredient filter.
+            if (ingredientFilteredIds.Count == 0)
+                return [];
+        }
+
+        // 3. Embed the query via OpenAI.
         float[] queryVector;
         try
         {
@@ -60,16 +83,22 @@ public class SearchService
             throw new SearchUnavailableException("Embedding service unavailable.", ex);
         }
 
-        // 3. Rank recipes by cosine similarity * per-user rating boost.
+        // 4. Rank recipes by cosine similarity * per-user rating boost.
         //    Unrated recipes default to 0.6 weight.
         //    We retrieve the top N recipe IDs ordered by score, then load
         //    full data for those recipes in a separate query to keep the
         //    EF Core translation simple.
         var queryVec = new Vector(queryVector);
 
-        var rankedIds = await _db.Recipes
+        var baseQuery = _db.Recipes
             .AsNoTracking()
-            .Where(r => r.Embedding != null)
+            .Where(r => r.Embedding != null);
+
+        // Apply ingredient filter to the vector search when provided (AC10)
+        if (ingredientFilteredIds is not null)
+            baseQuery = baseQuery.Where(r => ingredientFilteredIds.Contains(r.Id));
+
+        var rankedIds = await baseQuery
             .OrderBy(r => r.Embedding!.CosineDistance(queryVec))
             .Take(ResultLimit * 3) // over-fetch before rating boost re-sort
             .Select(r => new
@@ -83,7 +112,7 @@ public class SearchService
             })
             .ToListAsync();
 
-        // 4. Apply rating boost in-process and take the final top N.
+        // 5. Apply rating boost in-process and take the final top N.
         var topIds = rankedIds
             .Select(r => new
             {
@@ -99,7 +128,7 @@ public class SearchService
         if (topIds.Count == 0)
             return [];
 
-        // 5. Load full recipe data for the ranked IDs.
+        // 6. Load full recipe data for the ranked IDs.
         var recipes = await _db.Recipes
             .AsNoTracking()
             .Include(r => r.RecipeTags)
@@ -110,7 +139,7 @@ public class SearchService
             .Where(r => topIds.Contains(r.Id))
             .ToListAsync();
 
-        // 6. Return in ranked order, mapped to summary DTOs.
+        // 7. Return in ranked order, mapped to summary DTOs.
         return topIds
             .Select(id => recipes.First(r => r.Id == id))
             .Select(r => new RecipeSummaryDto
