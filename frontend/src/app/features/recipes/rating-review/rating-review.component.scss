@@ -116,27 +116,6 @@
   gap: var(--space-3);
 }
 
-/* ---- Toast — AC-D8 ---- */
-.rr-toast {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  background: var(--card-save-bg);
-  color: var(--card-save-text);
-  font: var(--type-label);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  pointer-events: none;
-  animation: rr-toast-in 0.15s ease;
-  z-index: 10;
-}
-
-@keyframes rr-toast-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 /* ---- User name label — AC-D3 ---- */
 .rr-user-label {
   font: var(--type-label);
