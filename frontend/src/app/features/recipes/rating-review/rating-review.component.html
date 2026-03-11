@@ -1,0 +1,144 @@
+<!-- Loading state -->
+@if (isLoading) {
+  <div class="rr-loading" aria-busy="true" aria-label="Loading ratings">
+    <div class="rr-card-skeleton shimmer"></div>
+    <div class="rr-card-skeleton shimmer"></div>
+  </div>
+}
+
+<!-- Load error -->
+@if (!isLoading && loadError) {
+  <div class="rr-error-state">
+    <p class="rr-error-text">Could not load ratings.</p>
+    <button type="button" class="rr-retry-btn" (click)="retryLoad()">Retry</button>
+  </div>
+}
+
+<!-- Cards -->
+@if (!isLoading && !loadError) {
+  <div class="rr-grid">
+    @for (card of cards; track card.user.id) {
+      <div
+        class="rr-card"
+        [attr.data-user-theme]="card.user.themeName"
+        [class.rr-card--active]="isActiveUser(card)"
+      >
+
+        <!-- Toast (success message) — AC-D8 -->
+        @if (card.showToast) {
+          <div class="rr-toast" role="status" aria-live="polite">Rating saved</div>
+        }
+
+        <!-- User name label — AC-D3 -->
+        <span class="rr-user-label">{{ card.user.name }}</span>
+
+        <!-- ---- Interactive card (active user) ---- -->
+        @if (isActiveUser(card)) {
+
+          <!-- Stars — AC2, AC-D4, AC-D5 -->
+          <div
+            class="rr-stars rr-stars--interactive"
+            (mouseleave)="onStarLeave(card)"
+            [attr.aria-label]="'Your rating: ' + card.pendingRating + ' out of 5'"
+          >
+            @for (star of starValues; track star) {
+              <button
+                type="button"
+                class="rr-star-btn"
+                [class.rr-star-btn--filled]="starFilled(card, star)"
+                [attr.aria-label]="star + ' star'"
+                [disabled]="card.saveState === 'saving'"
+                (click)="onStarClick(card, star)"
+                (mouseenter)="onStarHover(card, star)"
+              >
+                <svg class="rr-star-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  @if (starFilled(card, star)) {
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  } @else {
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  }
+                </svg>
+              </button>
+            }
+          </div>
+
+          <!-- Last cooked — AC-D10 -->
+          <p class="rr-last-cooked">Last cooked: {{ formatLastCooked(card.latestReview) }}</p>
+
+          <!-- Cook notes textarea — AC5, AC-D6 -->
+          <textarea
+            class="rr-notes-input"
+            [attr.aria-label]="'Cook notes for ' + card.user.name"
+            placeholder="How did it go? Any tweaks?"
+            [(ngModel)]="card.pendingNotes"
+            [disabled]="card.saveState === 'saving'"
+            rows="3"
+          ></textarea>
+
+          <!-- Error message — AC7 -->
+          @if (card.saveState === 'error' && card.errorMessage) {
+            <p class="rr-error-inline" role="alert">{{ card.errorMessage }}</p>
+          }
+
+          <!-- Save button — AC-D7, AC8 -->
+          <button
+            type="button"
+            class="rr-save-btn"
+            [disabled]="!canSave(card)"
+            (click)="saveRating(card)"
+            [attr.aria-label]="card.saveState === 'saving' ? 'Saving rating…' : 'Save rating'"
+          >
+            @if (card.saveState === 'saving') {
+              <span class="rr-spinner" aria-hidden="true"></span>
+              <span class="rr-sr-only">Saving…</span>
+            } @else {
+              Save rating
+            }
+          </button>
+
+        }
+
+        <!-- ---- Read-only card (other user) ---- -->
+        @if (!isActiveUser(card)) {
+
+          <!-- Stars — AC4, AC-D9 -->
+          <div
+            class="rr-stars rr-stars--readonly"
+            [attr.aria-label]="card.user.name + ' rating: ' + (card.latestReview?.rating ?? 0) + ' out of 5'"
+          >
+            @for (star of starValues; track star) {
+              <span
+                class="rr-star-readonly"
+                [class.rr-star-readonly--filled]="readonlyStarFilled(card, star)"
+                aria-hidden="true"
+              >
+                <svg class="rr-star-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  @if (readonlyStarFilled(card, star)) {
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  } @else {
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  }
+                </svg>
+              </span>
+            }
+          </div>
+
+          <!-- No rating label — AC-D9 -->
+          @if (!card.latestReview) {
+            <p class="rr-no-rating">No rating yet</p>
+          }
+
+          <!-- Last cooked — AC-D10 -->
+          <p class="rr-last-cooked">Last cooked: {{ formatLastCooked(card.latestReview) }}</p>
+
+          <!-- Notes (read-only display) — AC-D9 -->
+          @if (card.latestReview?.notes) {
+            <p class="rr-notes-display">{{ card.latestReview!.notes }}</p>
+          }
+
+        }
+
+      </div>
+    }
+  </div>
+}

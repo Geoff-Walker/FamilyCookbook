@@ -7,6 +7,7 @@ import { RecipeDetailDto, RecipeDetailReviewDto, RecipeDetailTagDto, RecipeDetai
 import { RecipeHeroComponent } from '../recipe-hero/recipe-hero.component';
 import { IngredientListComponent } from '../ingredient-list/ingredient-list.component';
 import { MethodStepsComponent } from '../method-steps/method-steps.component';
+import { RatingReviewComponent } from '../rating-review/rating-review.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
 
 type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
@@ -14,7 +15,7 @@ type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent],
+  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent, RatingReviewComponent],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
