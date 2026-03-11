@@ -1,0 +1,151 @@
+@if (pageState === 'loading') {
+  <div class="page-state">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </div>
+} @else if (pageState === 'notFound') {
+  <div class="page-state">
+    <p>Recipe not found.</p>
+    <a routerLink="/">Back to recipes</a>
+  </div>
+} @else if (pageState === 'error') {
+  <div class="page-state">
+    <p>Something went wrong loading this recipe.</p>
+    <a routerLink="/">Back to recipes</a>
+  </div>
+} @else {
+  <!-- Header -->
+  <header class="form-header">
+    <button type="button" class="header-cancel" (click)="cancel()">Cancel</button>
+    <span class="header-title">{{ formTitle }}</span>
+    <button
+      type="button"
+      class="header-save"
+      (click)="save()"
+      [disabled]="saveState === 'saving'">
+      @if (saveState === 'saving') { Saving… } @else { Save }
+    </button>
+  </header>
+
+  <!-- Banners -->
+  @if (successMessage) {
+    <div class="banner banner--success" role="status">{{ successMessage }}</div>
+  }
+  @if (saveState === 'error') {
+    <div class="banner banner--error" role="alert">Could not save recipe. Please try again.</div>
+  }
+
+  <!-- Form -->
+  <form [formGroup]="form" class="form-body" (ngSubmit)="save()">
+    <div class="form-grid">
+
+      <!-- Left column: Basic Info + Tags -->
+      <div class="col-left">
+
+        <!-- Basic Info card -->
+        <div class="card">
+          <h2 class="card-heading">Basic Info</h2>
+
+          <div class="field">
+            <label class="field-label" for="title">
+              Title <span class="required" aria-hidden="true">*</span>
+            </label>
+            <input
+              id="title"
+              class="field-input"
+              [class.field-input--error]="titleControl?.invalid && titleControl?.touched"
+              formControlName="title"
+              type="text"
+              placeholder="Recipe name"
+              autocomplete="off" />
+            @if (titleControl?.invalid && titleControl?.touched) {
+              <span class="field-error" role="alert">Title is required</span>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="description">Description</label>
+            <textarea
+              id="description"
+              class="field-input field-input--textarea"
+              formControlName="description"
+              rows="3"
+              placeholder="A brief introduction…"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="source">Source</label>
+            <input
+              id="source"
+              class="field-input"
+              formControlName="source"
+              type="text"
+              placeholder="e.g. Mum, BBC Good Food" />
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="prepTime">Prep (min)</label>
+              <input
+                id="prepTime"
+                class="field-input"
+                formControlName="prepTimeMinutes"
+                type="number"
+                min="0"
+                placeholder="–" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="cookTime">Cook (min)</label>
+              <input
+                id="cookTime"
+                class="field-input"
+                formControlName="cookTimeMinutes"
+                type="number"
+                min="0"
+                placeholder="–" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="servings">Servings</label>
+              <input
+                id="servings"
+                class="field-input"
+                formControlName="servings"
+                type="number"
+                min="1"
+                placeholder="–" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags card -->
+        <div class="card">
+          <h2 class="card-heading">Tags</h2>
+          <app-tag-selector
+            [tags]="allTags"
+            [selectedIds]="selectedTagIds"
+            (selectionChange)="onTagSelectionChange($event)">
+          </app-tag-selector>
+        </div>
+
+      </div>
+
+      <!-- Right column: Stages -->
+      <div class="col-right">
+        @for (idx of stageIndices; track idx) {
+          <app-stage-editor
+            [stageGroup]="stageGroup(idx)"
+            [stageIndex]="idx"
+            [canRemove]="stagesArray.length > 1"
+            [units]="units"
+            (removed)="removeStage(idx)">
+          </app-stage-editor>
+        }
+
+        <button type="button" class="btn-add-stage" (click)="addStage()">
+          + Add Stage
+        </button>
+      </div>
+
+    </div>
+  </form>
+}

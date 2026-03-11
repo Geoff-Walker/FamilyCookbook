@@ -1,3 +1,56 @@
+/* ---- Reference data DTOs ---- */
+
+export interface IngredientOptionDto {
+  id: number;
+  name: string;
+}
+
+export interface UnitOptionDto {
+  id: number;
+  name: string;
+  abbreviation: string | null;
+  unitType: string | null;
+}
+
+export interface TagOptionDto {
+  id: number;
+  name: string;
+  slug: string;
+  categoryId: number;
+  categoryName: string;
+}
+
+/* ---- Form payload DTOs ---- */
+
+export interface RecipeIngredientPayload {
+  ingredientName: string;
+  amount: string | null;
+  unitId: number | null;
+  notes: string | null;
+}
+
+export interface RecipeStepPayload {
+  instruction: string;
+}
+
+export interface RecipeStagePayload {
+  name: string;
+  description: string | null;
+  steps: RecipeStepPayload[];
+  ingredients: RecipeIngredientPayload[];
+}
+
+export interface SaveRecipePayload {
+  title: string;
+  description: string | null;
+  source: string | null;
+  prepTimeMinutes: number | null;
+  cookTimeMinutes: number | null;
+  servings: number | null;
+  tagIds: number[];
+  stages: RecipeStagePayload[];
+}
+
 /* ---- List view DTOs ---- */
 
 export interface TagDto {

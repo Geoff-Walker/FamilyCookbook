@@ -1,0 +1,72 @@
+<div class="stage-card" [formGroup]="stageGroup">
+  <!-- Stage header -->
+  <div class="stage-header">
+    <h3 class="stage-title">Stage {{ stageIndex + 1 }}</h3>
+    @if (canRemove) {
+      <button
+        type="button"
+        class="btn-remove-stage"
+        [attr.aria-label]="'Remove stage ' + (stageIndex + 1)"
+        (click)="removed.emit()">
+        Remove stage
+      </button>
+    }
+  </div>
+
+  <!-- Stage name -->
+  <div class="field">
+    <label class="field-label" [for]="'stage-name-' + stageIndex">Stage name</label>
+    <input
+      [id]="'stage-name-' + stageIndex"
+      class="field-input"
+      formControlName="name"
+      type="text"
+      placeholder="e.g. Main, Cake Base, Frosting…" />
+  </div>
+
+  <!-- Ingredients -->
+  <section class="section">
+    <h4 class="section-heading">Ingredients</h4>
+    @for (idx of ingredientIndices; track idx) {
+      <app-ingredient-editor
+        [ingredientGroup]="ingredientGroup(idx)"
+        [units]="units"
+        (removed)="removeIngredient(idx)">
+      </app-ingredient-editor>
+    }
+    @if (ingredientsArray.length === 0) {
+      <p class="section-empty">No ingredients yet.</p>
+    }
+    <button type="button" class="btn-add-row" (click)="addIngredient()">
+      + Add Ingredient
+    </button>
+  </section>
+
+  <!-- Steps -->
+  <section class="section">
+    <h4 class="section-heading">Steps</h4>
+    <div formArrayName="steps">
+      @for (idx of stepIndices; track idx) {
+        <div class="step-row" [formGroupName]="idx">
+          <span class="step-num">{{ idx + 1 }}</span>
+          <textarea
+            class="field-input step-textarea"
+            formControlName="instruction"
+            rows="2"
+            [placeholder]="'Step ' + (idx + 1) + '…'"></textarea>
+          <button
+            type="button"
+            class="btn-remove-step"
+            [attr.aria-label]="'Remove step ' + (idx + 1)"
+            [disabled]="stepsArray.length === 1"
+            (click)="removeStep(idx)">
+            ✕
+          </button>
+        </div>
+      }
+    </div>
+    <button type="button" class="btn-add-row" (click)="addStep()">
+      + Add Step
+    </button>
+  </section>
+</div>

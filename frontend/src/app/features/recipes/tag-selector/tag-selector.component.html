@@ -1,0 +1,20 @@
+@if (tagGroups.length === 0) {
+  <p class="tags-empty">No tags available.</p>
+} @else {
+  @for (group of tagGroups; track group.categoryName) {
+    <div class="tag-group">
+      <p class="tag-category">{{ group.categoryName }}</p>
+      <div class="tag-chips">
+        @for (tag of group.tags; track tag.id) {
+          <button
+            type="button"
+            class="chip"
+            [class.chip--active]="isSelected(tag.id)"
+            (click)="toggle(tag.id)">
+            {{ tag.name }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+}

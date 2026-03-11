@@ -1,0 +1,51 @@
+<div class="ingredient-row" [formGroup]="ingredientGroup">
+  <div class="autocomplete-wrap">
+    <input
+      class="field-input"
+      formControlName="ingredientName"
+      type="text"
+      placeholder="Ingredient"
+      autocomplete="off"
+      (input)="onNameInput($event)"
+      (blur)="closeDropdown()" />
+    @if (showDropdown) {
+      <ul class="suggestions" role="listbox">
+        @for (s of suggestions; track s.id) {
+          <li
+            class="suggestion-item"
+            role="option"
+            (mousedown)="selectSuggestion(s)">
+            {{ s.name }}
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <input
+    class="field-input field-input--amount"
+    formControlName="amount"
+    type="text"
+    placeholder="Amount" />
+
+  <select class="field-input field-input--unit" formControlName="unitId">
+    <option value="">–</option>
+    @for (unit of units; track unit.id) {
+      <option [value]="unit.id">{{ unit.abbreviation || unit.name }}</option>
+    }
+  </select>
+
+  <input
+    class="field-input field-input--notes"
+    formControlName="notes"
+    type="text"
+    placeholder="Notes (e.g. diced)" />
+
+  <button
+    type="button"
+    class="btn-remove-ing"
+    [attr.aria-label]="'Remove ingredient'"
+    (click)="removed.emit()">
+    ✕
+  </button>
+</div>
