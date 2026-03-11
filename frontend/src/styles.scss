@@ -30,9 +30,10 @@
   --color-rating-fill:     #F5A623;
   --color-rating-empty:    #D6E0EC;
 
-  --color-surface-inverse: #1A2B4A;
-  --color-on-secondary:    #FFFFFF;
-  --color-error:           #C62828;
+  --color-surface-inverse:   #1A2B4A;
+  --color-on-secondary:      #FFFFFF;
+  --color-error:             #C62828;
+  --color-text-on-dark-dim:  #9BAFD0;
 
   --shadow-1:              0 1px 3px rgba(26, 37, 53, 0.08);
   --shadow-2:              0 4px 16px rgba(26, 37, 53, 0.14);
@@ -66,9 +67,10 @@
   --color-rating-fill:     #F5A623;
   --color-rating-empty:    #E8D9CF;
 
-  --color-surface-inverse: #D4623A;
-  --color-on-secondary:    #FFFFFF;
-  --color-error:           #B3261E;
+  --color-surface-inverse:   #D4623A;
+  --color-on-secondary:      #FFFFFF;
+  --color-error:             #B3261E;
+  --color-text-on-dark-dim:  #F5D9CE;
 
   --shadow-1:              0 1px 3px rgba(45, 31, 21, 0.08);
   --shadow-2:              0 4px 16px rgba(45, 31, 21, 0.14);
@@ -81,6 +83,9 @@
   /* Shared colours */
   --color-on-primary:   #FFFFFF;
   --color-text-on-dark: #FFFFFF;
+
+  /* Z-index scale */
+  --z-header: 200;
 
   /* Spacing — 4px grid */
   --space-1:  4px;

@@ -9,7 +9,8 @@ import {
   IngredientOptionDto,
   UnitOptionDto,
   TagOptionDto,
-  SaveRecipePayload
+  SaveRecipePayload,
+  UserDto
 } from '../models/recipe.models';
 
 @Injectable({
@@ -51,5 +52,9 @@ export class RecipeApiService {
 
   getTags(): Observable<TagOptionDto[]> {
     return this.http.get<TagOptionDto[]>(`${this.baseUrl}/tags`);
+  }
+
+  getUsers(): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.baseUrl}/users`);
   }
 }
