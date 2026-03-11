@@ -7,25 +7,42 @@
     </button>
   </header>
 
-  <!-- Loading -->
+  <!-- Semantic search box — always visible on this route (AC1) -->
+  <app-semantic-search (searchStateChange)="onSearchStateChange($event)" />
+
+  <!-- AC6: Search error banner — shown above the preserved list -->
+  @if (searchError) {
+    <div class="search-error-banner" role="alert">
+      Search failed. Please try again.
+    </div>
+  }
+
+  <!-- Loading (initial load or search in-flight) -->
   @if (viewState === 'loading') {
     <app-loading-skeleton />
   }
 
-  <!-- Populated -->
+  <!-- Populated (full list or search results) -->
   @if (viewState === 'populated') {
     <app-recipe-grid [recipes]="recipes" />
   }
 
-  <!-- Empty -->
-  @if (viewState === 'empty') {
+  <!-- Empty — no recipes at all (initial load, not a search) -->
+  @if (viewState === 'empty' && !isSearchActive) {
     <div class="state-panel state-panel--empty">
       <p class="state-message">No recipes yet.</p>
       <a routerLink="/recipes/new" class="state-link">Add your first recipe</a>
     </div>
   }
 
-  <!-- Error -->
+  <!-- Empty — no search results (AC5) -->
+  @if (viewState === 'empty' && isSearchActive) {
+    <div class="state-panel state-panel--empty">
+      <p class="state-message">No recipes found for &ldquo;{{ searchQuery }}&rdquo;</p>
+    </div>
+  }
+
+  <!-- Error — initial list load failed (not a search error) -->
   @if (viewState === 'error') {
     <div class="state-panel state-panel--error">
       <p class="state-message">Could not load recipes. Please try again.</p>

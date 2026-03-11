@@ -1,0 +1,67 @@
+<div class="search-row">
+  <div class="search-input-wrap" [class.search-input-wrap--focused]="isFocused">
+    <!-- Loading spinner replaces search icon while in-flight (AC-D7) -->
+    @if (isLoading) {
+      <span class="search-icon search-icon--spinner" aria-hidden="true">
+        <span class="spinner"></span>
+      </span>
+    } @else {
+      <!-- Search icon (AC-D6) -->
+      <span class="search-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+    }
+
+    <!-- Search input (AC1, AC2, AC-D1, AC-D2, AC-D5, AC-D9)
+         Placeholder is set on the element; breakpoint-specific text managed via
+         a hidden sibling span technique in CSS (the input itself only supports
+         one placeholder value, so we use CSS to show a different placeholder
+         via the .search-placeholder spans below). -->
+    <input
+      class="search-input"
+      type="search"
+      autocomplete="off"
+      [value]="query"
+      (input)="onQueryChange($any($event.target).value)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      aria-label="Search recipes">
+
+    <!-- AC-D5: Responsive placeholder text overlay
+         Hidden when input has a value or is focused. -->
+    @if (!query && !isFocused) {
+      <span class="search-placeholder search-placeholder--mobile" aria-hidden="true">
+        Search recipes&hellip;
+      </span>
+      <span class="search-placeholder search-placeholder--desktop" aria-hidden="true">
+        Search by name, ingredient, or describe what you feel like&hellip;
+      </span>
+    }
+
+    <!-- Keyboard shortcut hint — desktop only, empty + unfocused (AC-D10) -->
+    @if (!query && !isFocused) {
+      <span class="search-kbd" aria-hidden="true">
+        <kbd>Ctrl+K</kbd>
+      </span>
+    }
+
+    <!-- Clear button — shown when input has a value (AC-D8, AC7) -->
+    @if (query) {
+      <button
+        class="search-clear"
+        type="button"
+        aria-label="Clear search"
+        (click)="onClear()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    }
+  </div>
+</div>
