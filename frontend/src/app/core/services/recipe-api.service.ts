@@ -57,4 +57,11 @@ export class RecipeApiService {
   getUsers(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.baseUrl}/users`);
   }
+
+  search(query: string, userId: number): Observable<RecipeSummaryDto[]> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('userId', userId.toString());
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
 }

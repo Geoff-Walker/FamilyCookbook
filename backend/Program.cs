@@ -40,6 +40,7 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 // ---------------------------------------------------------------------------
 builder.Services.AddScoped<RecipeEmbeddingService>();
 builder.Services.AddScoped<RecipeService>();
+builder.Services.AddScoped<SearchService>();
 
 // ---------------------------------------------------------------------------
 // CORS
@@ -69,19 +70,18 @@ builder.Services.AddCors(options =>
 });
 
 // ---------------------------------------------------------------------------
-// OpenAI — key read from config; validated at startup, never logged
+// OpenAI — key is optional at startup; absent key causes search endpoint to
+// return HTTP 503 rather than preventing the app from starting.
+// Set environment variable OpenAI__ApiKey or add to appsettings.json.
 // ---------------------------------------------------------------------------
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
-if (string.IsNullOrWhiteSpace(openAiApiKey))
+if (!string.IsNullOrWhiteSpace(openAiApiKey))
 {
-    throw new InvalidOperationException(
-        "OpenAI:ApiKey is not configured. " +
-        "Set the environment variable OpenAI__ApiKey or add it to appsettings.json.");
+    // Key present — register a real client; the raw value is never logged.
+    builder.Services.AddSingleton(new OpenAI.OpenAIClient(openAiApiKey));
 }
-
-// Register as a named configuration entry so services can inject it via IConfiguration.
-// The raw key value is intentionally not logged anywhere.
-builder.Services.AddSingleton(_ => new OpenAI.OpenAIClient(openAiApiKey));
+// Key absent — no client registered; SearchService receives null via DI and
+// returns HTTP 503 from the search endpoint rather than crashing the app.
 
 // ---------------------------------------------------------------------------
 // Swagger / OpenAPI — Development only
@@ -134,5 +134,6 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
 app.MapRecipeEndpoints();
 app.MapReferenceDataEndpoints();
 app.MapReviewEndpoints();
+app.MapSearchEndpoints();
 
 app.Run();
