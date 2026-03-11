@@ -64,4 +64,19 @@ export class RecipeApiService {
       .set('userId', userId.toString());
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
   }
+
+  /** AC5/AC8: Filter recipes by ingredient IDs — returns recipes containing ALL specified ingredients. */
+  filterRecipes(ingredientIds: number[]): Observable<RecipeSummaryDto[]> {
+    const params = new HttpParams().set('ingredientIds', ingredientIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/recipes/filter`, { params });
+  }
+
+  /** AC10: Combined semantic search + ingredient filter. */
+  searchWithIngredients(query: string, userId: number, ingredientIds: number[]): Observable<RecipeSummaryDto[]> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('userId', userId.toString())
+      .set('ingredientIds', ingredientIds.join(','));
+    return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
 }

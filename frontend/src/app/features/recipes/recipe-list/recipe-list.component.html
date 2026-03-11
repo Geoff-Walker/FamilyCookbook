@@ -7,42 +7,61 @@
     </button>
   </header>
 
-  <!-- Semantic search box — always visible on this route (AC1) -->
+  <!-- Semantic search box — always visible on this route (WAL-11 AC1) -->
   <app-semantic-search (searchStateChange)="onSearchStateChange($event)" />
 
-  <!-- AC6: Search error banner — shown above the preserved list -->
+  <!-- Ingredient filter panel — AC1: visible on list route -->
+  <div class="filter-panel-row">
+    <app-ingredient-filter-panel (filterStateChange)="onFilterStateChange($event)" />
+  </div>
+
+  <!-- AC6 (WAL-11): Search error banner — shown above the preserved list -->
   @if (searchError) {
     <div class="search-error-banner" role="alert">
       Search failed. Please try again.
     </div>
   }
 
-  <!-- Loading (initial load or search in-flight) -->
+  <!-- AC7: Ingredient filter error banner — list preserved -->
+  @if (filterError) {
+    <div class="search-error-banner" role="alert">
+      Filter failed. Please try again.
+    </div>
+  }
+
+  <!-- Loading (initial load or search/filter in-flight) -->
   @if (viewState === 'loading') {
     <app-loading-skeleton />
   }
 
-  <!-- Populated (full list or search results) -->
+  <!-- Populated (full list, search results, or filter results) -->
   @if (viewState === 'populated') {
     <app-recipe-grid [recipes]="recipes" />
   }
 
-  <!-- Empty — no recipes at all (initial load, not a search) -->
-  @if (viewState === 'empty' && !isSearchActive) {
+  <!-- AC6: No recipes for filter combination -->
+  @if (viewState === 'empty' && filterEmptyMessage) {
+    <div class="state-panel state-panel--empty">
+      <p class="state-message">No recipes found with those ingredients.</p>
+    </div>
+  }
+
+  <!-- Empty — no search results (WAL-11 AC5) -->
+  @if (viewState === 'empty' && isSearchActive && !filterEmptyMessage) {
+    <div class="state-panel state-panel--empty">
+      <p class="state-message">No recipes found for &ldquo;{{ searchQuery }}&rdquo;</p>
+    </div>
+  }
+
+  <!-- Empty — no recipes at all (initial load, no active filters or search) -->
+  @if (viewState === 'empty' && !isSearchActive && !filterEmptyMessage) {
     <div class="state-panel state-panel--empty">
       <p class="state-message">No recipes yet.</p>
       <a routerLink="/recipes/new" class="state-link">Add your first recipe</a>
     </div>
   }
 
-  <!-- Empty — no search results (AC5) -->
-  @if (viewState === 'empty' && isSearchActive) {
-    <div class="state-panel state-panel--empty">
-      <p class="state-message">No recipes found for &ldquo;{{ searchQuery }}&rdquo;</p>
-    </div>
-  }
-
-  <!-- Error — initial list load failed (not a search error) -->
+  <!-- Error — initial list load failed (not a search/filter error) -->
   @if (viewState === 'error') {
     <div class="state-panel state-panel--error">
       <p class="state-message">Could not load recipes. Please try again.</p>
