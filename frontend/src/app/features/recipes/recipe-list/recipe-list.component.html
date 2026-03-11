@@ -7,17 +7,18 @@
     </button>
   </header>
 
-  <!-- Semantic search box — always visible on this route (WAL-11 AC1) -->
-  <app-semantic-search (searchStateChange)="onSearchStateChange($event)" />
+  <!-- AC3: Sticky filter bar — search + filter triggers in one unit -->
+  <div class="filter-bar">
+    <!-- Semantic search box — always visible on this route (WAL-11 AC1) -->
+    <div class="filter-bar__search">
+      <app-semantic-search (searchStateChange)="onSearchStateChange($event)" />
+    </div>
 
-  <!-- Ingredient filter panel — WAL-12 AC1: visible on list route -->
-  <div class="filter-panel-row">
-    <app-ingredient-filter-panel (filterStateChange)="onFilterStateChange($event)" />
-  </div>
-
-  <!-- Tag filter panel — WAL-13 AC1: visible on list route -->
-  <div class="filter-panel-row">
-    <app-tag-filter (tagFilterStateChange)="onTagFilterStateChange($event)" />
+    <!-- Filter triggers row — ingredient + tag triggers -->
+    <div class="filter-bar__triggers">
+      <app-ingredient-filter-panel (filterStateChange)="onFilterStateChange($event)" />
+      <app-tag-filter (tagFilterStateChange)="onTagFilterStateChange($event)" />
+    </div>
   </div>
 
   <!-- AC6 (WAL-11): Search error banner — shown above the preserved list -->

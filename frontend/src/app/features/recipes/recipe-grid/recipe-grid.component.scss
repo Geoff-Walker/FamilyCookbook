@@ -1,14 +1,15 @@
 .recipe-grid {
   display: grid;
-  gap: var(--space-4);
-  grid-template-columns: 1fr;
+  gap: var(--space-4);        /* AC2: 16px mobile */
+  grid-template-columns: 1fr; /* AC2: 1 column mobile */
+  align-items: stretch;       /* AC2: equal height within each row */
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr); /* AC2: 2 columns tablet */
+    gap: var(--space-5);                   /* AC2: 20px tablet+ */
   }
 
   @media (min-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* AC2: 3 columns desktop */
   }
 }

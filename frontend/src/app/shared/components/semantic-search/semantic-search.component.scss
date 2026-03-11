@@ -2,16 +2,11 @@
    SemanticSearchComponent — AC-D1 through AC-D10
    ============================================================ */
 
-/* AC-D4: Sticky row background */
+/* AC-D4: Search row — layout only; background and stickiness handled by parent filter bar */
 .search-row {
-  background: var(--color-surface-2);
-  padding: var(--space-3) 0;
   display: flex;
   align-items: center;
-
-  &--stuck {
-    box-shadow: var(--shadow-2);
-  }
+  width: 100%;
 }
 
 /* ---- Input wrapper (pill shape) ---- */

@@ -147,6 +147,7 @@ html {
 
 body {
   min-height: 100vh;
+  overflow-x: hidden; /* AC10: prevent horizontal scroll */
 }
 
 a {
