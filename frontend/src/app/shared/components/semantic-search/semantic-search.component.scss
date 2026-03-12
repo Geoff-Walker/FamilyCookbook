@@ -2,6 +2,12 @@
    SemanticSearchComponent — AC-D1 through AC-D10
    ============================================================ */
 
+/* Ensure the component host fills its flex parent in the filter bar */
+:host {
+  display: block;
+  width: 100%;
+}
+
 /* AC-D4: Search row — layout only; background and stickiness handled by parent filter bar */
 .search-row {
   display: flex;
