@@ -60,6 +60,19 @@
   font-size: 1.5rem;
 }
 
+.thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+
+  @media (min-width: 768px) {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
 /* Body */
 .card-body {
   padding: var(--space-3) var(--space-4);

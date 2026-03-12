@@ -10,6 +10,7 @@ public class RecipeSummaryDto
     public string Title { get; init; } = string.Empty;
     public int? PrepTimeMinutes { get; init; }
     public int? CookTimeMinutes { get; init; }
+    public string? ImageUrl { get; init; }
     public List<RecipeSummaryTagDto> Tags { get; init; } = [];
     public List<RecipeSummaryRatingDto> Ratings { get; init; } = [];
 }

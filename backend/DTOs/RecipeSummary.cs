@@ -15,6 +15,7 @@ public class RecipeSummary
     public int? Servings { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
+    public string? ImageUrl { get; init; }
 
     /// <summary>Average rating from all reviews, or null if there are no reviews.</summary>
     public double? AverageRating { get; init; }

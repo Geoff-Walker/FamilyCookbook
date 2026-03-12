@@ -7,9 +7,13 @@
   role="button"
   [attr.aria-label]="recipe.title"
 >
-  <!-- Thumbnail placeholder -->
+  <!-- Thumbnail -->
   <div class="card-thumb" aria-hidden="true">
-    <span class="thumb-icon">🍽️</span>
+    @if (recipe.imageUrl) {
+      <img class="thumb-img" [src]="recipe.imageUrl" [alt]="recipe.title" loading="lazy" />
+    } @else {
+      <span class="thumb-icon">🍽️</span>
+    }
   </div>
 
   <div class="card-body">
