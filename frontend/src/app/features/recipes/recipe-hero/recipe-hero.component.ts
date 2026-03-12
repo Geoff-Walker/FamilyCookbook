@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 })
 export class RecipeHeroComponent {
   @Input({ required: true }) title!: string;
+  @Input() imageUrl: string | null = null;
   @Output() back = new EventEmitter<void>();
   @Output() edit = new EventEmitter<void>();
 }
