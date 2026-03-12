@@ -56,6 +56,10 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
     return this.form.get('title');
   }
 
+  get imageUrlControl() {
+    return this.form.get('imageUrl');
+  }
+
   get formTitle(): string {
     if (this.mode === 'add') return 'New Recipe';
     return this.editTitle ? `Edit ${this.editTitle}` : 'Edit Recipe';
@@ -86,6 +90,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: ['', Validators.required],
       description: [''],
       source: [''],
+      imageUrl: ['', [Validators.pattern(/^https?:.*/)]],
       prepTimeMinutes: [null as number | null],
       cookTimeMinutes: [null as number | null],
       servings: [null as number | null],
@@ -123,6 +128,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: recipe.title,
       description: recipe.description ?? '',
       source: recipe.source ?? '',
+      imageUrl: recipe.imageUrl ?? '',
       prepTimeMinutes: recipe.prepTimeMinutes,
       cookTimeMinutes: recipe.cookTimeMinutes,
       servings: recipe.servings
@@ -238,7 +244,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: (raw.title ?? '').trim(),
       description: raw.description?.trim() || null,
       source: raw.source?.trim() || null,
-      imageUrl: null,
+      imageUrl: raw.imageUrl?.trim() || null,
       prepTimeMinutes: raw.prepTimeMinutes ? +raw.prepTimeMinutes : null,
       cookTimeMinutes: raw.cookTimeMinutes ? +raw.cookTimeMinutes : null,
       servings: raw.servings ? +raw.servings : null,

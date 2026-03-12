@@ -83,6 +83,20 @@
               placeholder="e.g. Mum, BBC Good Food" />
           </div>
 
+          <div class="field">
+            <label class="field-label" for="imageUrl">Image URL</label>
+            <input
+              id="imageUrl"
+              class="field-input"
+              [class.field-input--error]="imageUrlControl?.invalid && imageUrlControl?.touched"
+              formControlName="imageUrl"
+              type="text"
+              placeholder="https://..." />
+            @if (imageUrlControl?.invalid && imageUrlControl?.touched) {
+              <span class="field-error" role="alert">URL must start with http</span>
+            }
+          </div>
+
           <div class="field-row">
             <div class="field">
               <label class="field-label" for="prepTime">Prep (min)</label>
