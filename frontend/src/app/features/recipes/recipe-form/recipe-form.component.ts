@@ -238,6 +238,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: (raw.title ?? '').trim(),
       description: raw.description?.trim() || null,
       source: raw.source?.trim() || null,
+      imageUrl: null,
       prepTimeMinutes: raw.prepTimeMinutes ? +raw.prepTimeMinutes : null,
       cookTimeMinutes: raw.cookTimeMinutes ? +raw.cookTimeMinutes : null,
       servings: raw.servings ? +raw.servings : null,
