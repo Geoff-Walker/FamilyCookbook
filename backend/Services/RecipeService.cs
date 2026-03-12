@@ -93,11 +93,12 @@ public class RecipeService
         await AttachStagesFromCreateAsync(recipe, request.Stages);
 
         var created = await _repository.CreateAsync(recipe);
-        var embeddingFailed = await TryApplyEmbeddingAsync(created);
 
-        // Re-load with full includes so the returned DTO has all data
+        // Re-load with full includes before embedding so navigation properties are populated
         var full = await _repository.GetByIdAsync(created.Id)
                    ?? throw new InvalidOperationException($"Recipe {created.Id} not found after create.");
+
+        var embeddingFailed = await TryApplyEmbeddingAsync(full);
 
         return (MapToDetailDto(full), embeddingFailed);
     }
@@ -137,11 +138,13 @@ public class RecipeService
 
         await AttachStagesFromUpdateAsync(recipe, request.Stages);
 
-        var updated = await _repository.UpdateAsync(recipe);
-        var embeddingFailed = await TryApplyEmbeddingAsync(updated);
+        await _repository.UpdateAsync(recipe);
 
-        var full = await _repository.GetByIdAsync(updated.Id)
-                   ?? throw new InvalidOperationException($"Recipe {updated.Id} not found after update.");
+        // Re-load with full includes before embedding so navigation properties are populated
+        var full = await _repository.GetByIdAsync(recipe.Id)
+                   ?? throw new InvalidOperationException($"Recipe {recipe.Id} not found after update.");
+
+        var embeddingFailed = await TryApplyEmbeddingAsync(full);
 
         return (MapToDetailDto(full), embeddingFailed);
     }
