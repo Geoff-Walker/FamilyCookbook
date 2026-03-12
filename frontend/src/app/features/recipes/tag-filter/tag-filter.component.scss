@@ -99,6 +99,16 @@
   position: relative;
   z-index: var(--z-drawer);
 
+  /* Tablet+: float the panel so it doesn't contribute to flex row width */
+  @media (min-width: 768px) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 280px;
+    width: max-content;
+    max-width: 480px;
+  }
+
   &--open {
     /* AC-D2: Mobile 320px / tablet 240px */
     max-height: 320px;
