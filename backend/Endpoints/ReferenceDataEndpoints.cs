@@ -134,7 +134,7 @@ public static class ReferenceDataEndpoints
     {
         var users = await db.Users
             .OrderBy(u => u.Id)
-            .Select(u => new UserDto { Id = u.Id, Name = u.Name })
+            .Select(u => new UserDto { Id = u.Id, Name = u.Name, ThemeName = u.Name.ToLower() })
             .ToListAsync();
 
         return Results.Ok(users);
