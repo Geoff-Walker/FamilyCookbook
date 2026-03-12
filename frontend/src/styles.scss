@@ -1,4 +1,9 @@
 /* ============================================================
+   Angular CDK overlay — required for MatSnackBar positioning
+   ============================================================ */
+@import '@angular/cdk/overlay-prebuilt.css';
+
+/* ============================================================
    Global design system — Family Cookbook
    All colour, spacing, typography tokens are CSS custom properties.
    Two themes: [data-theme="geoff"] and [data-theme="helen"]
@@ -142,6 +147,7 @@ html {
 
 body {
   min-height: 100vh;
+  overflow-x: hidden; /* AC10: prevent horizontal scroll */
 }
 
 a {
@@ -184,3 +190,11 @@ h3 { font: var(--type-h3); color: var(--color-text-primary); }
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
 }
+
+/* ---------- Breakpoint mixins (WAL-15) ----------
+   Usage: @include mobile { ... }  etc.
+   ------------------------------------------------- */
+@mixin mobile    { @media (max-width: 767px)                       { @content; } }
+@mixin tablet    { @media (min-width: 768px) and (max-width: 1199px) { @content; } }
+@mixin tablet-up { @media (min-width: 768px)                       { @content; } }
+@mixin desktop   { @media (min-width: 1200px)                      { @content; } }

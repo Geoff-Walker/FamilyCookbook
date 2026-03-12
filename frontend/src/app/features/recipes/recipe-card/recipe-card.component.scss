@@ -75,11 +75,15 @@
 }
 
 .card-title {
-  font: var(--type-h3);
+  font: var(--type-h3); /* AC9: 20px mobile */
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; /* AC10: truncate long titles on cards */
+
+  @media (min-width: 768px) {
+    font: var(--type-h2); /* AC9: 24px tablet+ */
+  }
 }
 
 .card-time {

@@ -24,11 +24,6 @@
         [class.rr-card--active]="isActiveUser(card)"
       >
 
-        <!-- Toast (success message) — AC-D8 -->
-        @if (card.showToast) {
-          <div class="rr-toast" role="status" aria-live="polite">Rating saved</div>
-        }
-
         <!-- User name label — AC-D3 -->
         <span class="rr-user-label">{{ card.user.name }}</span>
 

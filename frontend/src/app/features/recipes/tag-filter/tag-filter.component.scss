@@ -169,12 +169,12 @@
   gap: var(--space-2);
 }
 
-/* AC-D5: Tag chip — inactive state */
+/* AC-D5 / AC8: Tag chip — inactive state, ≥44px touch target */
 .tag-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 44px; /* AC8: ≥44px touch target on mobile and tablet */
   padding: 0 var(--space-3);
   border-radius: var(--radius-full);
   font: var(--type-label);
@@ -190,10 +190,6 @@
   background: var(--color-surface-1);
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
-
-  @media (min-width: 768px) {
-    height: 36px;
-  }
 
   &:hover {
     border-color: var(--color-secondary);

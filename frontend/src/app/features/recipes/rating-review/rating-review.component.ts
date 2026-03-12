@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
 import { UserStateService } from '../../../core/services/user-state.service';
 import { ReviewDto } from '../../../core/models/recipe.models';
@@ -21,8 +22,6 @@ interface UserCardState {
   hoverRating: number;
   saveState: SaveState;
   errorMessage: string | null;
-  /** Toast visible flag */
-  showToast: boolean;
 }
 
 @Component({
@@ -46,7 +45,8 @@ export class RatingReviewComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly recipeApi: RecipeApiService,
-    private readonly userState: UserStateService
+    private readonly userState: UserStateService,
+    private readonly snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -128,8 +128,7 @@ export class RatingReviewComponent implements OnInit, OnDestroy {
       pendingNotes: '',
       hoverRating: 0,
       saveState: 'idle',
-      errorMessage: null,
-      showToast: false
+      errorMessage: null
     };
   }
 
@@ -193,22 +192,14 @@ export class RatingReviewComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (review) => {
         card.latestReview = review;
-        card.saveState = 'success';
-        this.showToast(card);
+        card.saveState = 'idle';
+        this.snackBar.open('Rating saved', undefined, { duration: 2000 });
       },
       error: () => {
         card.saveState = 'error';
         card.errorMessage = 'Could not save rating. Please try again.';
       }
     });
-  }
-
-  private showToast(card: UserCardState): void {
-    card.showToast = true;
-    setTimeout(() => {
-      card.showToast = false;
-      card.saveState = 'idle';
-    }, 2000);
   }
 
   // ---------------------------------------------------------------------------

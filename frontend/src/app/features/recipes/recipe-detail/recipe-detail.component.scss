@@ -188,12 +188,12 @@
   }
 }
 
-/* ---- Ingredients column ---- */
+/* ---- Ingredients column — AC5: sticky on tablet+, offset by header height ---- */
 .ingredients-col {
   @media (min-width: 768px) {
     position: sticky;
-    top: calc(var(--space-6));
-    max-height: calc(100vh - var(--space-12));
+    top: calc(64px + var(--space-6)); /* AC5: header + spacing */
+    max-height: calc(100vh - 64px - var(--space-12));
     overflow-y: auto;
   }
 }
