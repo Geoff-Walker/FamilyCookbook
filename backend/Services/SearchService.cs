@@ -206,6 +206,7 @@ public class SearchService
                 Title = r.Title,
                 PrepTimeMinutes = r.PrepTimeMinutes,
                 CookTimeMinutes = r.CookTimeMinutes,
+                ImageUrl = r.ImageUrl,
                 Tags = r.RecipeTags
                     .OrderBy(rt => rt.Tag.Category.Name)
                     .ThenBy(rt => rt.Tag.Name)
