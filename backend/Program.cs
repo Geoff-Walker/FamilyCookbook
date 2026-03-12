@@ -107,6 +107,12 @@ if (builder.Environment.IsDevelopment())
 var app = builder.Build();
 
 // ---------------------------------------------------------------------------
+// Auto-migrate on startup (production safety net)
+// ---------------------------------------------------------------------------
+using (var scope = app.Services.CreateScope())
+    scope.ServiceProvider.GetRequiredService<WalkerDbContext>().Database.Migrate();
+
+// ---------------------------------------------------------------------------
 // Middleware pipeline
 // ---------------------------------------------------------------------------
 app.UseCors();
