@@ -1,4 +1,4 @@
-<div class="hero">
+<div class="hero" [style.background-image]="imageUrl ? 'url(' + imageUrl + ')' : null">
   <!-- Nav bar overlaid on hero -->
   <div class="hero-nav">
     <button class="hero-btn" (click)="back.emit()" type="button" aria-label="Back to recipes">
