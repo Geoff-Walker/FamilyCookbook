@@ -10,6 +10,7 @@ public class RecipeDetailDto
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
     public string? Source { get; init; }
+    public string? ImageUrl { get; init; }
     public int? PrepTimeMinutes { get; init; }
     public int? CookTimeMinutes { get; init; }
     public int? Servings { get; init; }

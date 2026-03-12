@@ -32,6 +32,7 @@ public class RecipeRepository : IRecipeRepository
                 Servings = r.Servings,
                 CreatedAt = r.CreatedAt,
                 UpdatedAt = r.UpdatedAt,
+                ImageUrl = r.ImageUrl,
                 AverageRating = r.Reviews.Count == 0
                     ? (double?)null
                     : r.Reviews.Average(rv => (double)rv.Rating),

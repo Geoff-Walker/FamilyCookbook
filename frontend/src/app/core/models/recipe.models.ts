@@ -72,6 +72,8 @@ export interface SaveRecipePayload {
   title: string;
   description: string | null;
   source: string | null;
+  // TODO (next sprint): replace with file upload — imageUrl will be the URL returned after upload
+  imageUrl: string | null;
   prepTimeMinutes: number | null;
   cookTimeMinutes: number | null;
   servings: number | null;
@@ -98,6 +100,7 @@ export interface RecipeSummaryDto {
   title: string;
   prepTimeMinutes: number | null;
   cookTimeMinutes: number | null;
+  imageUrl: string | null;
   tags: TagDto[];
   ratings: RatingDto[];
 }
@@ -152,6 +155,7 @@ export interface RecipeDetailDto {
   title: string;
   description: string | null;
   source: string | null;
+  imageUrl: string | null;
   prepTimeMinutes: number | null;
   cookTimeMinutes: number | null;
   servings: number | null;

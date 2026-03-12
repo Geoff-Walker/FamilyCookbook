@@ -10,6 +10,12 @@ public class UpdateRecipeDto
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
     public string? Source { get; init; }
+    /// <summary>
+    /// External image URL for the recipe hero image.
+    /// TODO (next sprint): replace with multipart file upload endpoint — this field
+    /// will accept the resolved URL returned after the upload is stored.
+    /// </summary>
+    public string? ImageUrl { get; init; }
     public int? PrepTimeMinutes { get; init; }
     public int? CookTimeMinutes { get; init; }
     public int? Servings { get; init; }

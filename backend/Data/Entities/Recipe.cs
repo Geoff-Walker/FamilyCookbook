@@ -18,6 +18,13 @@ public class Recipe
     public int? CookTimeMinutes { get; set; }
     public int? Servings { get; set; }
     public string? Source { get; set; }
+    /// <summary>
+    /// URL of the hero image for this recipe.
+    /// Currently accepts external URLs only.
+    /// TODO (next sprint): replace with file upload — store locally or in object storage,
+    /// keep this column as the resolved URL after upload.
+    /// </summary>
+    public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public DateTime? DeletedAt { get; set; }

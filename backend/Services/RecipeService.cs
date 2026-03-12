@@ -44,6 +44,7 @@ public class RecipeService
             Title = r.Title,
             PrepTimeMinutes = r.PrepTimeMinutes,
             CookTimeMinutes = r.CookTimeMinutes,
+            ImageUrl = r.ImageUrl,
             Tags = r.Tags.Select(t => new RecipeSummaryTagDto
             {
                 Id = t.TagId,
@@ -82,6 +83,7 @@ public class RecipeService
             Title = request.Title.Trim(),
             Description = request.Description?.Trim(),
             Source = request.Source?.Trim(),
+            ImageUrl = request.ImageUrl?.Trim(),
             PrepTimeMinutes = request.PrepTimeMinutes,
             CookTimeMinutes = request.CookTimeMinutes,
             Servings = request.Servings,
@@ -120,6 +122,7 @@ public class RecipeService
         recipe.Title = request.Title.Trim();
         recipe.Description = request.Description?.Trim();
         recipe.Source = request.Source?.Trim();
+        recipe.ImageUrl = request.ImageUrl?.Trim();
         recipe.PrepTimeMinutes = request.PrepTimeMinutes;
         recipe.CookTimeMinutes = request.CookTimeMinutes;
         recipe.Servings = request.Servings;
@@ -325,6 +328,7 @@ public class RecipeService
             Title = recipe.Title,
             Description = recipe.Description,
             Source = recipe.Source,
+            ImageUrl = recipe.ImageUrl,
             PrepTimeMinutes = recipe.PrepTimeMinutes,
             CookTimeMinutes = recipe.CookTimeMinutes,
             Servings = recipe.Servings,
