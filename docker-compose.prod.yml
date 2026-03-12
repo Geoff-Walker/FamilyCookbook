@@ -37,7 +37,7 @@ services:
   frontend:
     image: ghcr.io/geoff-walker/familycookbook-frontend:latest
     ports:
-      - "80:80"
+      - "8088:80"
     depends_on:
       - api
     restart: unless-stopped
