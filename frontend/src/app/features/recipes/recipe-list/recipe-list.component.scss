@@ -8,7 +8,9 @@
   }
 
   @media (min-width: 1200px) {
-    padding: var(--space-8);
+    /* WAL-42: use --space-6 to match app-header desktop padding and prevent
+       misalignment between header content and page content at 1200px+ */
+    padding: var(--space-6);
   }
 }
 
@@ -76,9 +78,11 @@
   }
 
   @media (min-width: 1200px) {
-    margin: 0 calc(-1 * var(--space-8));
-    padding-left: var(--space-8);
-    padding-right: var(--space-8);
+    /* WAL-42: match --space-6 used by app-header at desktop — page padding also
+       reduced to --space-6 so filter bar bleed and header content edge align */
+    margin: 0 calc(-1 * var(--space-6));
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
   }
 }
 
