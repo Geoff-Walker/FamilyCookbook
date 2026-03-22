@@ -7,9 +7,26 @@
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr); /* AC2: 2 columns tablet */
     gap: var(--space-5);                   /* AC2: 20px tablet+ */
+
+    /* WAL-40: lone last card in a 2-col grid spans both columns to prevent
+       a narrow orphaned card sitting half-width on the final row */
+    > :last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
   }
 
   @media (min-width: 1200px) {
     grid-template-columns: repeat(3, 1fr); /* AC2: 3 columns desktop */
+
+    /* WAL-40: reset the 2-col orphan rule before applying 3-col logic */
+    > :last-child:nth-child(odd) {
+      grid-column: unset;
+    }
+
+    /* WAL-40: a card that starts a new row alone (position 1 mod 3) spans all 3
+       columns so the grid always has clean, full rows */
+    > :last-child:nth-child(3n + 1) {
+      grid-column: 1 / -1;
+    }
   }
 }
