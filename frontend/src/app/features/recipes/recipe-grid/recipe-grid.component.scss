@@ -5,7 +5,7 @@
   align-items: stretch;       /* AC2: equal height within each row */
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr); /* AC2: 2 columns tablet */
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* AC2: 2 columns tablet */
     gap: var(--space-5);                   /* AC2: 20px tablet+ */
 
     /* WAL-40: lone last card in a 2-col grid spans both columns to prevent
@@ -16,7 +16,7 @@
   }
 
   @media (min-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr); /* AC2: 3 columns desktop */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* AC2: 3 columns desktop */
 
     /* WAL-40: reset the 2-col orphan rule before applying 3-col logic */
     > :last-child:nth-child(odd) {
