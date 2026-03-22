@@ -145,6 +145,11 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  overflow-x: hidden; /* WAL-41: prevent layout width exceeding viewport on iOS Safari */
+  max-width: 100%;    /* WAL-41: clamp layout to viewport — prevents pinch-to-zoom on 390px */
+}
+
 body {
   min-height: 100vh;
   overflow-x: hidden; /* AC10: prevent horizontal scroll */
