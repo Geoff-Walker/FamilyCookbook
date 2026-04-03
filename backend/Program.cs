@@ -41,6 +41,7 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<RecipeEmbeddingService>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<SearchService>();
+builder.Services.AddScoped<ImageUploadService>();
 
 // ---------------------------------------------------------------------------
 // CORS

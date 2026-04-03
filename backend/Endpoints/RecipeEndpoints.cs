@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WalkerFcb.Api.Data;
 using WalkerFcb.Api.DTOs;
 using WalkerFcb.Api.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace WalkerFcb.Api.Endpoints;
 
@@ -51,6 +52,14 @@ public static class RecipeEndpoints
             .WithSummary("Soft-delete a recipe")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
+
+        // POST /api/recipes/{id}/image
+        group.MapPost("/{id:int}/image", UploadImage)
+            .WithSummary("Upload a recipe hero image (JPEG or PNG, max 5 MB)")
+            .Produces<ImageUploadResponseDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .DisableAntiforgery();
 
         return app;
     }
@@ -277,5 +286,21 @@ public static class RecipeEndpoints
         return found
             ? Results.NoContent()
             : Results.NotFound();
+    }
+
+    private static async Task<IResult> UploadImage(
+        int id,
+        IFormFile file,
+        ImageUploadService imageUploadService)
+    {
+        var result = await imageUploadService.UploadAsync(id, file);
+
+        if (result.RecipeNotFound)
+            return Results.NotFound();
+
+        if (!result.Succeeded)
+            return Results.BadRequest(new { error = result.ErrorMessage });
+
+        return Results.Ok(new ImageUploadResponseDto { ImageUrl = result.PublicUrl! });
     }
 }
