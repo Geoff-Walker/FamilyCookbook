@@ -31,6 +31,7 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
+      - familycookbook_recipe_images:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -44,8 +45,10 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - familycookbook_recipe_images:/usr/share/nginx/html/uploads
     depends_on:
       - api
 
 volumes:
   postgres_data:
+  familycookbook_recipe_images:
