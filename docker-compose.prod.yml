@@ -30,7 +30,7 @@ services:
         Host=db;Port=5432;Database=walkerfcb;Username=walker;Password=${POSTGRES_PASSWORD}
       OpenAI__ApiKey: ${OPENAI_API_KEY}
     volumes:
-      - familycookbook_recipe_images:/app/uploads
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -41,11 +41,10 @@ services:
     ports:
       - "80:80"
     volumes:
-      - familycookbook_recipe_images:/usr/share/nginx/html/uploads
+      - ./uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       - api
     restart: unless-stopped
 
 volumes:
   postgres_data:
-  familycookbook_recipe_images:
