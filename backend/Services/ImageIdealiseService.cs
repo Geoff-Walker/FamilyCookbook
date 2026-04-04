@@ -84,14 +84,14 @@ public class ImageIdealiseService
         _logger.LogDebug("Idealising image for recipe {Id} with prompt: {Prompt}", recipeId, prompt);
 
         // --- Call OpenAI images.edit ---
-        string resultImageUrl;
+        // gpt-image-1 always returns base64-encoded bytes — ResponseFormat is not supported.
+        byte[] resultBytes;
         try
         {
             var imageClient = _openAi.GetImageClient(ImageModel);
             var options = new ImageEditOptions
             {
                 Size = GeneratedImageSize.W1024xH1024,
-                ResponseFormat = GeneratedImageFormat.Uri,
             };
 
             using var imageStream = new MemoryStream(sourceBytes);
@@ -102,25 +102,13 @@ public class ImageIdealiseService
                 options,
                 CancellationToken.None);
 
-            resultImageUrl = response.Value.ImageUri?.ToString()
-                ?? throw new InvalidOperationException("OpenAI returned no image URI.");
+            resultBytes = response.Value.ImageBytes?.ToArray()
+                ?? throw new InvalidOperationException("OpenAI returned no image data.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "OpenAI image edit failed for recipe {Id}.", recipeId);
             return ImageIdealiseResult.OpenAiFailure($"Image idealise failed: {ex.Message}");
-        }
-
-        // --- Download result bytes ---
-        byte[] resultBytes;
-        try
-        {
-            resultBytes = await _httpClient.GetByteArrayAsync(resultImageUrl);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to download idealised image for recipe {Id} from {Url}.", recipeId, resultImageUrl);
-            return ImageIdealiseResult.OpenAiFailure("Idealised image could not be downloaded.");
         }
 
         // --- Store to volume (same convention as WAL-32 / WAL-34) ---

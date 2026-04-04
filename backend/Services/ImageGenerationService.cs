@@ -75,36 +75,24 @@ public class ImageGenerationService
         _logger.LogDebug("Generating image for recipe {Id} with prompt: {Prompt}", recipeId, prompt);
 
         // --- Call OpenAI ---
-        string imageUrl;
+        // gpt-image-1 always returns base64-encoded bytes — ResponseFormat is not supported.
+        byte[] imageBytes;
         try
         {
             var imageClient = _openAi.GetImageClient(ImageModel);
             var options = new ImageGenerationOptions
             {
                 Size = GeneratedImageSize.W1024xH1024,
-                ResponseFormat = GeneratedImageFormat.Uri,
             };
 
             var response = await imageClient.GenerateImageAsync(prompt, options);
-            imageUrl = response.Value.ImageUri?.ToString()
-                ?? throw new InvalidOperationException("OpenAI returned no image URI.");
+            imageBytes = response.Value.ImageBytes?.ToArray()
+                ?? throw new InvalidOperationException("OpenAI returned no image data.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "OpenAI image generation failed for recipe {Id}.", recipeId);
             return ImageGenerationResult.OpenAiFailure($"Image generation failed: {ex.Message}");
-        }
-
-        // --- Download image bytes ---
-        byte[] imageBytes;
-        try
-        {
-            imageBytes = await _httpClient.GetByteArrayAsync(imageUrl);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to download generated image for recipe {Id} from {Url}.", recipeId, imageUrl);
-            return ImageGenerationResult.OpenAiFailure("Generated image could not be downloaded.");
         }
 
         // --- Store to volume ---
