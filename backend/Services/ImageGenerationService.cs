@@ -15,18 +15,8 @@ public class ImageGenerationService
     private const string ImageSize = "1024x1024";
     private const string BaseQuality = "Professional food photography, appetising, high resolution, natural light, shallow depth of field, realistic";
 
-    private static readonly IReadOnlyDictionary<string, string> StyleMap =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["rustic"]        = "warm natural light, wooden surfaces, linen, homestyle presentation",
-            ["minimalist"]    = "clean white background, precise plating, contemporary food photography",
-            ["mediterranean"] = "bright warm light, terracotta, olive wood, sunshine colours",
-            ["cosy"]          = "golden hour light, rich warm tones, seasonal garnish, soft shadows",
-            ["classic"]       = "neutral background, traditional food styling, garnished, cookbook standard",
-            ["moody"]         = "dramatic low-key lighting, dark slate surface, restaurant plating",
-        };
-
-    public static readonly IReadOnlyCollection<string> ValidStyles = StyleMap.Keys.ToList();
+    // Style map and valid-style list live in RecipeImageStyles — shared with ImageIdealiseService.
+    public static IReadOnlyCollection<string> ValidStyles => RecipeImageStyles.ValidStyles;
 
     private readonly WalkerDbContext _db;
     private readonly OpenAIClient? _openAi;
@@ -69,7 +59,8 @@ public class ImageGenerationService
         if (ingredientList.Count == 0)
             return ImageGenerationResult.Failure("ingredients must contain at least one entry.");
 
-        if (!StyleMap.TryGetValue(style, out var styleClause))
+        var styleClause = RecipeImageStyles.GetClause(style);
+        if (styleClause is null)
             return ImageGenerationResult.InvalidStyle($"style must be one of: {string.Join(", ", ValidStyles)}.");
 
         // --- OpenAI client guard ---
