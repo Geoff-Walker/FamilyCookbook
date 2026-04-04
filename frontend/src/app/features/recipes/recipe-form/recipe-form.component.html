@@ -146,8 +146,8 @@
               <select
                 id="imageStyle"
                 class="field-input"
-                [(ngModel)]="selectedStyle"
-                [ngModelOptions]="{ standalone: true }">
+                [value]="selectedStyle"
+                (change)="selectedStyle = $any($event.target).value">
                 <option value="">— choose style —</option>
                 @for (opt of imageStyles; track opt.value) {
                   <option [value]="opt.value">{{ opt.label }}</option>
@@ -161,8 +161,8 @@
                 id="imageFreeText"
                 class="field-input"
                 type="text"
-                [(ngModel)]="freeText"
-                [ngModelOptions]="{ standalone: true }"
+                [value]="freeText"
+                (input)="freeText = $any($event.target).value"
                 placeholder="e.g. warm orange tones, steam rising" />
             </div>
 
