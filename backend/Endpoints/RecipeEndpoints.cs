@@ -69,6 +69,14 @@ public static class RecipeEndpoints
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status502BadGateway);
 
+        // POST /api/recipes/{id}/image/idealise
+        group.MapPost("/{id:int}/image/idealise", IdealiseImage)
+            .WithSummary("Idealise an existing recipe image via OpenAI gpt-image-1 img2img")
+            .Produces<IdealiseImageResponseDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status502BadGateway);
+
         return app;
     }
 
@@ -345,5 +353,33 @@ public static class RecipeEndpoints
             return Results.BadRequest(new { error = result.ErrorMessage });
 
         return Results.Ok(new GenerateImageResponseDto { ImageUrl = result.PublicUrl! });
+    }
+
+    private static async Task<IResult> IdealiseImage(
+        int id,
+        IdealiseImageRequestDto request,
+        ImageIdealiseService imageIdealiseService)
+    {
+        if (string.IsNullOrWhiteSpace(request.Style))
+            return Results.BadRequest(new { error = $"style is required. Must be one of: {string.Join(", ", RecipeImageStyles.ValidStyles)}." });
+
+        var result = await imageIdealiseService.IdealiseAsync(id, request.Style, request.FreeText);
+
+        if (result.RecipeNotFound)
+            return Results.NotFound();
+
+        if (result.IsNoImageError)
+            return Results.BadRequest(new { error = result.ErrorMessage });
+
+        if (result.IsStyleError)
+            return Results.BadRequest(new { error = result.ErrorMessage });
+
+        if (result.IsOpenAiError)
+            return Results.Json(new { error = result.ErrorMessage }, statusCode: StatusCodes.Status502BadGateway);
+
+        if (!result.Succeeded)
+            return Results.BadRequest(new { error = result.ErrorMessage });
+
+        return Results.Ok(new IdealiseImageResponseDto { ImageUrl = result.PublicUrl! });
     }
 }

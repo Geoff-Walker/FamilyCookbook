@@ -44,6 +44,8 @@ builder.Services.AddScoped<SearchService>();
 builder.Services.AddScoped<ImageUploadService>();
 builder.Services.AddHttpClient<ImageGenerationService>();
 builder.Services.AddScoped<ImageGenerationService>();
+builder.Services.AddHttpClient<ImageIdealiseService>();
+builder.Services.AddScoped<ImageIdealiseService>();
 
 // ---------------------------------------------------------------------------
 // CORS
