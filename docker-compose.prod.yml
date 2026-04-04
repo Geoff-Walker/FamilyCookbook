@@ -39,7 +39,7 @@ services:
   frontend:
     image: ghcr.io/geoff-walker/familycookbook-frontend:latest
     ports:
-      - "80:80"
+      - "8088:80"
     volumes:
       - ./uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
