@@ -42,6 +42,8 @@ builder.Services.AddScoped<RecipeEmbeddingService>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<SearchService>();
 builder.Services.AddScoped<ImageUploadService>();
+builder.Services.AddHttpClient<ImageGenerationService>();
+builder.Services.AddScoped<ImageGenerationService>();
 
 // ---------------------------------------------------------------------------
 // CORS

@@ -61,6 +61,14 @@ public static class RecipeEndpoints
             .Produces(StatusCodes.Status404NotFound)
             .DisableAntiforgery();
 
+        // POST /api/recipes/{id}/image/generate
+        group.MapPost("/{id:int}/image/generate", GenerateImage)
+            .WithSummary("Generate a recipe hero image via OpenAI gpt-image-1")
+            .Produces<GenerateImageResponseDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status502BadGateway);
+
         return app;
     }
 
@@ -302,5 +310,40 @@ public static class RecipeEndpoints
             return Results.BadRequest(new { error = result.ErrorMessage });
 
         return Results.Ok(new ImageUploadResponseDto { ImageUrl = result.PublicUrl! });
+    }
+
+    private static async Task<IResult> GenerateImage(
+        int id,
+        GenerateImageRequestDto request,
+        ImageGenerationService imageGenerationService)
+    {
+        // Validate required fields before calling the service so we can return
+        // informative 400s without touching the DB.
+        if (string.IsNullOrWhiteSpace(request.Description))
+            return Results.BadRequest(new { error = "description is required." });
+
+        if (request.Ingredients is not { Count: > 0 })
+            return Results.BadRequest(new { error = "ingredients must contain at least one entry." });
+
+        if (string.IsNullOrWhiteSpace(request.Style))
+            return Results.BadRequest(new { error = $"style is required. Must be one of: {string.Join(", ", ImageGenerationService.ValidStyles)}." });
+
+        var result = await imageGenerationService.GenerateAsync(
+            id,
+            request.Description,
+            request.Ingredients,
+            request.Style,
+            request.FreeText);
+
+        if (result.RecipeNotFound)
+            return Results.NotFound();
+
+        if (result.IsOpenAiError)
+            return Results.Json(new { error = result.ErrorMessage }, statusCode: StatusCodes.Status502BadGateway);
+
+        if (!result.Succeeded)
+            return Results.BadRequest(new { error = result.ErrorMessage });
+
+        return Results.Ok(new GenerateImageResponseDto { ImageUrl = result.PublicUrl! });
     }
 }
