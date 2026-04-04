@@ -3,20 +3,28 @@ import { ReactiveFormsModule, FormArray, FormBuilder, FormGroup, Validators } fr
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
-import { RecipeDetailDto, SaveRecipePayload, TagOptionDto, UnitOptionDto } from '../../../core/models/recipe.models';
+import { RecipeDetailDto, SaveRecipePayload, TagOptionDto, UnitOptionDto, ImageStyle } from '../../../core/models/recipe.models';
 import { StageEditorComponent } from '../stage-editor/stage-editor.component';
 import { TagSelectorComponent } from '../tag-selector/tag-selector.component';
 
 type FormMode = 'add' | 'edit';
 type PageState = 'loading' | 'ready' | 'notFound' | 'error';
 type SaveState = 'idle' | 'saving' | 'error';
+type ImageAction = 'upload' | 'generate' | 'idealise';
+
+export interface ImageStyleOption {
+  label: string;
+  value: ImageStyle;
+}
 
 @Component({
   selector: 'app-recipe-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, StageEditorComponent, TagSelectorComponent],
+  imports: [ReactiveFormsModule, RouterLink, StageEditorComponent, TagSelectorComponent, MatSnackBarModule],
   templateUrl: './recipe-form.component.html',
   styleUrl: './recipe-form.component.scss'
 })
@@ -25,6 +33,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(RecipeApiService);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly destroy$ = new Subject<void>();
 
   mode: FormMode = 'add';
@@ -37,6 +46,27 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
   units: UnitOptionDto[] = [];
   selectedTagIds = new Set<number>();
   successMessage = '';
+
+  /** Current image URL — updated optimistically on each image action success. */
+  currentImageUrl: string | null = null;
+
+  /** Which image action (if any) is currently in progress. */
+  imageActionInProgress: ImageAction | null = null;
+
+  /** Selected style for Generate / Idealise. */
+  selectedStyle: ImageStyle | '' = '';
+
+  /** Free text detail for Generate / Idealise. */
+  freeText = '';
+
+  readonly imageStyles: ImageStyleOption[] = [
+    { label: 'Rustic',         value: 'rustic'         },
+    { label: 'Minimalist',     value: 'minimalist'     },
+    { label: 'Mediterranean',  value: 'mediterranean'  },
+    { label: 'Cosy',           value: 'cosy'           },
+    { label: 'Classic',        value: 'classic'        },
+    { label: 'Moody',          value: 'moody'          },
+  ];
 
   form!: FormGroup;
 
@@ -56,13 +86,26 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
     return this.form.get('title');
   }
 
-  get imageUrlControl() {
-    return this.form.get('imageUrl');
-  }
-
   get formTitle(): string {
     if (this.mode === 'add') return 'New Recipe';
     return this.editTitle ? `Edit ${this.editTitle}` : 'Edit Recipe';
+  }
+
+  get imageActionsDisabled(): boolean {
+    return this.imageActionInProgress !== null;
+  }
+
+  get generateDisabled(): boolean {
+    return this.imageActionsDisabled || !this.selectedStyle;
+  }
+
+  get idealiseDisabled(): boolean {
+    return this.imageActionsDisabled || !this.selectedStyle || !this.currentImageUrl;
+  }
+
+  get idealiseTooltip(): string {
+    if (!this.currentImageUrl) return 'Upload an image first';
+    return '';
   }
 
   ngOnInit(): void {
@@ -90,7 +133,6 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: ['', Validators.required],
       description: [''],
       source: [''],
-      imageUrl: ['', [Validators.pattern(/^https?:.*/)]],
       prepTimeMinutes: [null as number | null],
       cookTimeMinutes: [null as number | null],
       servings: [null as number | null],
@@ -124,11 +166,11 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
 
   private populateForm(recipe: RecipeDetailDto): void {
     this.editTitle = recipe.title;
+    this.currentImageUrl = recipe.imageUrl ?? null;
     this.form.patchValue({
       title: recipe.title,
       description: recipe.description ?? '',
       source: recipe.source ?? '',
-      imageUrl: recipe.imageUrl ?? '',
       prepTimeMinutes: recipe.prepTimeMinutes,
       cookTimeMinutes: recipe.cookTimeMinutes,
       servings: recipe.servings
@@ -244,7 +286,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       title: (raw.title ?? '').trim(),
       description: raw.description?.trim() || null,
       source: raw.source?.trim() || null,
-      imageUrl: raw.imageUrl?.trim() || null,
+      imageUrl: this.currentImageUrl,
       prepTimeMinutes: raw.prepTimeMinutes ? +raw.prepTimeMinutes : null,
       cookTimeMinutes: raw.cookTimeMinutes ? +raw.cookTimeMinutes : null,
       servings: raw.servings ? +raw.servings : null,
@@ -265,5 +307,99 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
           }))
       }))
     };
+  }
+
+  // ─── Image actions ────────────────────────────────────────────────────────
+
+  triggerFileInput(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    fileInput.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.recipeId) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.snackBar.open('Image must be 5 MB or smaller.', undefined, { duration: 4000 });
+      return;
+    }
+
+    this.imageActionInProgress = 'upload';
+    this.api.uploadRecipeImage(this.recipeId, file)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (recipe) => {
+          this.currentImageUrl = recipe.imageUrl ?? null;
+          this.imageActionInProgress = null;
+        },
+        error: () => {
+          this.imageActionInProgress = null;
+          this.snackBar.open('Image upload failed. Please try again.', undefined, { duration: 4000 });
+        }
+      });
+  }
+
+  generateImage(): void {
+    if (!this.recipeId || !this.selectedStyle) return;
+
+    const description = (this.form.get('description')?.value ?? '').trim();
+    const ingredients = this.getAllIngredientNames();
+    const freeText = this.freeText.trim() || undefined;
+
+    this.imageActionInProgress = 'generate';
+    this.api.generateRecipeImage(this.recipeId, {
+      description,
+      ingredients,
+      style: this.selectedStyle,
+      freeText
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (recipe) => {
+          this.currentImageUrl = recipe.imageUrl ?? null;
+          this.imageActionInProgress = null;
+        },
+        error: () => {
+          this.imageActionInProgress = null;
+          this.snackBar.open('Image generation failed. Please try again.', undefined, { duration: 4000 });
+        }
+      });
+  }
+
+  idealiseImage(): void {
+    if (!this.recipeId || !this.selectedStyle || !this.currentImageUrl) return;
+
+    const freeText = this.freeText.trim() || undefined;
+
+    this.imageActionInProgress = 'idealise';
+    this.api.idealiseRecipeImage(this.recipeId, {
+      style: this.selectedStyle,
+      freeText
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (recipe) => {
+          this.currentImageUrl = recipe.imageUrl ?? null;
+          this.imageActionInProgress = null;
+        },
+        error: () => {
+          this.imageActionInProgress = null;
+          this.snackBar.open('Image idealise failed. Please try again.', undefined, { duration: 4000 });
+        }
+      });
+  }
+
+  private getAllIngredientNames(): string[] {
+    const names: string[] = [];
+    const stages = this.stagesArray.value as any[];
+    for (const stage of stages) {
+      for (const ing of (stage.ingredients ?? [])) {
+        const name = ing.ingredientName?.trim();
+        if (name) names.push(name);
+      }
+    }
+    return names;
   }
 }

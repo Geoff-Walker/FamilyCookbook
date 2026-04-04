@@ -12,7 +12,9 @@ import {
   SaveRecipePayload,
   UserDto,
   ReviewDto,
-  CreateReviewPayload
+  CreateReviewPayload,
+  GenerateImagePayload,
+  IdealiseImagePayload
 } from '../models/recipe.models';
 
 @Injectable({
@@ -128,5 +130,22 @@ export class RecipeApiService {
     if (ingredientIds.length > 0) params = params.set('ingredientIds', ingredientIds.join(','));
     if (tagIds.length > 0) params = params.set('tagIds', tagIds.join(','));
     return this.http.get<RecipeSummaryDto[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  /** Upload an image for a recipe (multipart). Returns the updated recipe with new imageUrl. */
+  uploadRecipeImage(recipeId: number, file: File): Observable<RecipeDetailDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<RecipeDetailDto>(`${this.baseUrl}/recipes/${recipeId}/image`, formData);
+  }
+
+  /** Generate an AI image for a recipe. Returns the updated recipe with new imageUrl. */
+  generateRecipeImage(recipeId: number, payload: GenerateImagePayload): Observable<RecipeDetailDto> {
+    return this.http.post<RecipeDetailDto>(`${this.baseUrl}/recipes/${recipeId}/image/generate`, payload);
+  }
+
+  /** Idealise an existing recipe image. Returns the updated recipe with new imageUrl. */
+  idealiseRecipeImage(recipeId: number, payload: IdealiseImagePayload): Observable<RecipeDetailDto> {
+    return this.http.post<RecipeDetailDto>(`${this.baseUrl}/recipes/${recipeId}/image/idealise`, payload);
   }
 }
