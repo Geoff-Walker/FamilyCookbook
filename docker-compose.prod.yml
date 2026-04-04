@@ -29,6 +29,8 @@ services:
       ConnectionStrings__DefaultConnection: >-
         Host=db;Port=5432;Database=walkerfcb;Username=walker;Password=${POSTGRES_PASSWORD}
       OpenAI__ApiKey: ${OPENAI_API_KEY}
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -38,6 +40,8 @@ services:
     image: ghcr.io/geoff-walker/familycookbook-frontend:latest
     ports:
       - "80:80"
+    volumes:
+      - ./uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       - api
     restart: unless-stopped
