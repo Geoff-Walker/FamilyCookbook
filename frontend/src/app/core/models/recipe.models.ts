@@ -72,13 +72,26 @@ export interface SaveRecipePayload {
   title: string;
   description: string | null;
   source: string | null;
-  // TODO (next sprint): replace with file upload — imageUrl will be the URL returned after upload
   imageUrl: string | null;
   prepTimeMinutes: number | null;
   cookTimeMinutes: number | null;
   servings: number | null;
   tagIds: number[];
   stages: RecipeStagePayload[];
+}
+
+export type ImageStyle = 'rustic' | 'minimalist' | 'mediterranean' | 'cosy' | 'classic' | 'moody';
+
+export interface GenerateImagePayload {
+  description: string;
+  ingredients: string[];
+  style: ImageStyle;
+  freeText?: string;
+}
+
+export interface IdealiseImagePayload {
+  style: ImageStyle;
+  freeText?: string;
 }
 
 /* ---- List view DTOs ---- */

@@ -83,20 +83,6 @@
               placeholder="e.g. Mum, BBC Good Food" />
           </div>
 
-          <div class="field">
-            <label class="field-label" for="imageUrl">Image URL</label>
-            <input
-              id="imageUrl"
-              class="field-input"
-              [class.field-input--error]="imageUrlControl?.invalid && imageUrlControl?.touched"
-              formControlName="imageUrl"
-              type="text"
-              placeholder="https://..." />
-            @if (imageUrlControl?.invalid && imageUrlControl?.touched) {
-              <span class="field-error" role="alert">URL must start with http</span>
-            }
-          </div>
-
           <div class="field-row">
             <div class="field">
               <label class="field-label" for="prepTime">Prep (min)</label>
@@ -129,6 +115,124 @@
                 placeholder="–" />
             </div>
           </div>
+        </div>
+
+        <!-- Image card -->
+        <div class="card">
+          <h2 class="card-heading">Image</h2>
+
+          <!-- Preview -->
+          <div class="image-preview">
+            @if (imageActionInProgress) {
+              <div class="image-preview__spinner" aria-label="Loading image…">
+                <div class="spinner"></div>
+              </div>
+            } @else if (currentImageUrl) {
+              <img
+                class="image-preview__img"
+                [src]="currentImageUrl"
+                alt="Recipe image preview" />
+            } @else {
+              <div class="image-preview__placeholder">
+                <span class="image-preview__placeholder-text">No image</span>
+              </div>
+            }
+          </div>
+
+          @if (mode === 'edit') {
+            <!-- Style + free text -->
+            <div class="field">
+              <label class="field-label" for="imageStyle">Style</label>
+              <select
+                id="imageStyle"
+                class="field-input"
+                [(ngModel)]="selectedStyle"
+                [ngModelOptions]="{ standalone: true }">
+                <option value="">— choose style —</option>
+                @for (opt of imageStyles; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="imageFreeText">Details</label>
+              <input
+                id="imageFreeText"
+                class="field-input"
+                type="text"
+                [(ngModel)]="freeText"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="e.g. warm orange tones, steam rising" />
+            </div>
+
+            <!-- Action buttons -->
+            <div class="image-actions">
+              <!-- Hidden file input -->
+              <input
+                #fileInput
+                type="file"
+                accept="image/jpeg,image/png"
+                style="display:none"
+                (change)="onFileSelected($event)" />
+
+              <button
+                type="button"
+                class="btn-image btn-image--upload"
+                [disabled]="imageActionsDisabled"
+                (click)="triggerFileInput(fileInput)">
+                @if (imageActionInProgress === 'upload') {
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                }
+                Upload
+              </button>
+
+              <button
+                type="button"
+                class="btn-image btn-image--generate"
+                [disabled]="generateDisabled"
+                (click)="generateImage()">
+                @if (imageActionInProgress === 'generate') {
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                }
+                Generate
+              </button>
+
+              <button
+                type="button"
+                class="btn-image btn-image--idealise"
+                [disabled]="idealiseDisabled"
+                [title]="idealiseTooltip"
+                (click)="idealiseImage()">
+                @if (imageActionInProgress === 'idealise') {
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                }
+                Idealise
+              </button>
+            </div>
+
+          } @else {
+            <!-- Add mode: upload only -->
+            <p class="image-add-note">Save the recipe first to enable Generate and Idealise.</p>
+
+            <div class="image-actions">
+              <!-- Hidden file input (disabled in add mode — no recipeId yet) -->
+              <input
+                #fileInputAdd
+                type="file"
+                accept="image/jpeg,image/png"
+                style="display:none"
+                (change)="onFileSelected($event)" />
+
+              <button
+                type="button"
+                class="btn-image btn-image--upload"
+                [disabled]="imageActionsDisabled"
+                (click)="triggerFileInput(fileInputAdd)">
+                Upload
+              </button>
+            </div>
+          }
         </div>
 
         <!-- Tags card -->
