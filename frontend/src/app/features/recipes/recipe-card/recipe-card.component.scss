@@ -7,8 +7,8 @@
   display: flex;
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 
-  /* Mobile: horizontal layout */
-  flex-direction: row;
+  /* Mobile: vertical layout — WAL-46 */
+  flex-direction: column;
   /* WAL-45: cap card width to viewport to prevent overflow on Android Chrome */
   max-width: calc(100vw - var(--space-4));
 
@@ -34,14 +34,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 
-  /* Mobile: fixed width, flexible height — WAL-45 */
-  width: 80px;
-  height: auto;
-  min-height: 80px;
-  align-self: stretch;
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  /* Mobile: full-width 16:9 hero — WAL-46 */
+  width: 100%;
+  height: 0;
+  padding-top: 56.25%;
+  position: relative;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+
+  .thumb-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 
   @media (min-width: 768px) {
     /* Tablet+: 16:9 full width */
@@ -65,9 +71,14 @@
 }
 
 .thumb-img {
+  /* Mobile: absolutely positioned within 16:9 container — WAL-46 */
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
 
   @media (min-width: 768px) {
@@ -79,7 +90,8 @@
 
 /* Body */
 .card-body {
-  padding: var(--space-3) var(--space-4);
+  /* Mobile: var(--space-3) all sides — WAL-46 */
+  padding: var(--space-3);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -94,7 +106,7 @@
 .card-title {
   font: var(--type-h3); /* AC9: 20px mobile */
   color: var(--color-text-primary);
-  /* WAL-45: mobile allows wrapping — ellipsis applied at tablet+ only */
+  /* WAL-46: no white-space constraint on mobile — wraps freely */
 
   @media (min-width: 768px) {
     font: var(--type-h2); /* AC9: 24px tablet+ */
@@ -132,9 +144,10 @@
 
 /* Ratings */
 .card-ratings {
+  /* Mobile: side by side — WAL-46 */
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  gap: var(--space-4);
   margin-top: auto;
   padding-top: var(--space-2);
 }
