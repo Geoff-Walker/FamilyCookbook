@@ -55,6 +55,7 @@ export interface RecipeIngredientPayload {
   amount: string | null;
   unitId: number | null;
   notes: string | null;
+  weightGrams: number | null;
 }
 
 export interface RecipeStepPayload {
@@ -129,6 +130,7 @@ export interface RecipeDetailIngredientDto {
   unitName: string | null;
   unitAbbreviation: string | null;
   notes: string | null;
+  weightGrams: number | null;
   sortOrder: number;
 }
 

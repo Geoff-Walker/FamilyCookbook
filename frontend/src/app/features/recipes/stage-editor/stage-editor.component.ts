@@ -58,7 +58,8 @@ export class StageEditorComponent {
       ingredientName: [''],
       amount: [''],
       unitId: [''],
-      notes: ['']
+      notes: [''],
+      weightGrams: [null]
     }));
   }
 
