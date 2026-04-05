@@ -7,6 +7,7 @@
 
 .filter-panel-host {
   position: relative;
+  width: 100%; /* fill the flex item assigned by the parent trigger row */
 }
 
 /* =====================================================================
