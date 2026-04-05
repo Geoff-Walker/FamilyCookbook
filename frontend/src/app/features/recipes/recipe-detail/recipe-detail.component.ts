@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
-import { RecipeDetailDto, RecipeDetailReviewDto, RecipeDetailTagDto, RecipeDetailStageDto } from '../../../core/models/recipe.models';
+import { RecipeDetailDto, RecipeDetailIngredientDto, RecipeDetailReviewDto, RecipeDetailTagDto, RecipeDetailStageDto } from '../../../core/models/recipe.models';
 import { RecipeHeroComponent } from '../recipe-hero/recipe-hero.component';
 import { IngredientListComponent } from '../ingredient-list/ingredient-list.component';
 import { MethodStepsComponent } from '../method-steps/method-steps.component';
 import { RatingReviewComponent } from '../rating-review/rating-review.component';
+import { PortionScalerComponent } from '../portion-scaler/portion-scaler.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
 
 type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
@@ -15,7 +16,7 @@ type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent, RatingReviewComponent],
+  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent, RatingReviewComponent, PortionScalerComponent],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
@@ -61,6 +62,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
   goEdit(): void {
     this.router.navigate(['/recipes', this.recipeId, 'edit']);
+  }
+
+  /** All ingredients across all stages, flattened — used by PortionScalerComponent. */
+  get allIngredients(): RecipeDetailIngredientDto[] {
+    if (!this.recipe) return [];
+    return this.recipe.stages.flatMap(s => s.ingredients);
   }
 
   get isMultiStage(): boolean {

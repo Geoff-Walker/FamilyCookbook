@@ -132,6 +132,14 @@
       }
     </div>
 
+    <!-- Portion scaler — WAL-52 -->
+    <div class="portion-scaler-section">
+      <app-portion-scaler
+        [baseServings]="recipe.servings"
+        [ingredients]="allIngredients"
+      />
+    </div>
+
     <!-- Ratings & Reviews — WAL-14 -->
     <section class="reviews-section">
       <h2 class="section-heading">Ratings &amp; Reviews</h2>

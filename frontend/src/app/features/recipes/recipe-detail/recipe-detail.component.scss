@@ -222,6 +222,16 @@
   margin-bottom: var(--space-4);
 }
 
+/* ---- Portion scaler — WAL-52 ---- */
+.portion-scaler-section {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+
+  @media (min-width: 768px) {
+    padding: var(--space-6);
+  }
+}
+
 /* ---- Reviews ---- */
 .reviews-section {
   padding: var(--space-4);

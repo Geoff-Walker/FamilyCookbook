@@ -1,0 +1,118 @@
+.portion-scaler {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+
+  @media (min-width: 768px) {
+    padding: var(--space-4) var(--space-4);
+  }
+}
+
+/* ---- Header row ---- */
+.scaler-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.scaler-heading {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.scaler-base {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---- Control row ---- */
+.scaler-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.scaler-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.scaler-input {
+  /* AC10: 44px min tap target */
+  min-height: 44px;
+  width: 80px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+
+  &:focus {
+    outline: 2px solid var(--color-border);
+    outline-offset: 2px;
+  }
+
+  /* Remove browser spinner arrows — keeps the input clean on tablet */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+/* ---- Ingredient list ---- */
+.scaler-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.scaler-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.scaler-ingredient-name {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  flex: 1 1 0;
+}
+
+.scaler-ingredient-amount {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.scaler-weight {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-left: var(--space-3);
+}
+
+.scaler-notes {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}

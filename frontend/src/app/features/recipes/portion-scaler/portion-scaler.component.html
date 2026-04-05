@@ -1,0 +1,46 @@
+@if (isVisible) {
+  <section class="portion-scaler" aria-label="Scale portions">
+
+    <div class="scaler-header">
+      <h2 class="scaler-heading">Scale portions</h2>
+      <span class="scaler-base">Base: {{ baseServings }} {{ baseServings === 1 ? 'serving' : 'servings' }}</span>
+    </div>
+
+    <div class="scaler-control">
+      <label class="scaler-label" for="desired-portions">Portions</label>
+      <input
+        id="desired-portions"
+        class="scaler-input"
+        type="number"
+        min="1"
+        step="1"
+        [(ngModel)]="desiredServings"
+        (ngModelChange)="onDesiredChange()"
+        aria-label="Desired portion count"
+      />
+    </div>
+
+    <ul class="scaler-list" role="list">
+      @for (ing of scaledIngredients; track ing.id) {
+        <li class="scaler-row">
+          <span class="scaler-ingredient-name">{{ ing.ingredientName }}</span>
+          <span class="scaler-ingredient-amount">
+            @if (ing.scaledAmount) {
+              {{ ing.scaledAmount }}
+              @if (ing.unitAbbreviation) {
+                &#160;{{ ing.unitAbbreviation }}
+              }
+            }
+            @if (ing.scaledWeightGrams !== null) {
+              <span class="scaler-weight">({{ formatWeight(ing.scaledWeightGrams) }})</span>
+            }
+            @if (ing.notes) {
+              <span class="scaler-notes">, {{ ing.notes }}</span>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+
+  </section>
+}
