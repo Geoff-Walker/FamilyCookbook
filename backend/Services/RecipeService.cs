@@ -44,6 +44,7 @@ public class RecipeService
             Title = r.Title,
             PrepTimeMinutes = r.PrepTimeMinutes,
             CookTimeMinutes = r.CookTimeMinutes,
+            Servings = r.Servings,
             ImageUrl = r.ImageUrl,
             Tags = r.Tags.Select(t => new RecipeSummaryTagDto
             {
@@ -224,6 +225,7 @@ public class RecipeService
                     Amount = ingDto.Amount?.Trim(),
                     UnitId = ingDto.UnitId,
                     Notes = ingDto.Notes?.Trim(),
+                    WeightGrams = ingDto.WeightGrams,
                     SortOrder = ingIndex
                 });
             }
@@ -267,6 +269,7 @@ public class RecipeService
                     Amount = ingDto.Amount?.Trim(),
                     UnitId = ingDto.UnitId,
                     Notes = ingDto.Notes?.Trim(),
+                    WeightGrams = ingDto.WeightGrams,
                     SortOrder = ingIndex
                 });
             }
@@ -362,6 +365,7 @@ public class RecipeService
                             UnitName = i.Unit?.Name,
                             UnitAbbreviation = i.Unit?.Abbreviation,
                             Notes = i.Notes,
+                            WeightGrams = i.WeightGrams,
                             SortOrder = i.SortOrder
                         }).ToList()
                 }).ToList(),

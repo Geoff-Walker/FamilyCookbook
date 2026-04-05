@@ -230,6 +230,7 @@ public static class RecipeEndpoints
             Title = r.Title,
             PrepTimeMinutes = r.PrepTimeMinutes,
             CookTimeMinutes = r.CookTimeMinutes,
+            Servings = r.Servings,
             Tags = r.RecipeTags
                 .OrderBy(rt => rt.Tag.Category.Name)
                 .ThenBy(rt => rt.Tag.Name)

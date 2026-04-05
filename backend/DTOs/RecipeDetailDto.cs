@@ -58,6 +58,7 @@ public class RecipeDetailIngredientDto
     public string? UnitName { get; init; }
     public string? UnitAbbreviation { get; init; }
     public string? Notes { get; init; }
+    public decimal? WeightGrams { get; init; }
     public int SortOrder { get; init; }
 }
 
