@@ -196,7 +196,8 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
           ing.ingredientName,
           ing.amount ?? '',
           ing.unitId,
-          ing.notes ?? ''
+          ing.notes ?? '',
+          ing.weightGrams ?? null
         ));
       }
       stagesArray.push(sg);
@@ -223,13 +224,15 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
     ingredientName = '',
     amount = '',
     unitId: number | null = null,
-    notes = ''
+    notes = '',
+    weightGrams: number | null = null
   ): FormGroup {
     return this.fb.group({
       ingredientName: [ingredientName],
       amount: [amount],
       unitId: [unitId ?? ''],
-      notes: [notes]
+      notes: [notes],
+      weightGrams: [weightGrams]
     });
   }
 
@@ -303,7 +306,8 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
             ingredientName: ing.ingredientName.trim(),
             amount: ing.amount?.trim() || null,
             unitId: (ing.unitId !== null && ing.unitId !== '') ? +ing.unitId : null,
-            notes: ing.notes?.trim() || null
+            notes: ing.notes?.trim() || null,
+            weightGrams: (ing.weightGrams !== null && ing.weightGrams !== '') ? +ing.weightGrams : null
           }))
       }))
     };
