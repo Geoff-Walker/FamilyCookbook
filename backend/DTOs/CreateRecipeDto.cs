@@ -51,4 +51,5 @@ public class CreateRecipeIngredientDto
     public string? Amount { get; init; }
     public int? UnitId { get; init; }
     public string? Notes { get; init; }
+    public decimal? WeightGrams { get; init; }
 }

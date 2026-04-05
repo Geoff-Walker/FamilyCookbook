@@ -16,6 +16,7 @@ public class RecipeIngredient
     public int? UnitId { get; set; }
     public string? Notes { get; set; }
     public int SortOrder { get; set; }
+    public decimal? WeightGrams { get; set; }
 
     public Recipe Recipe { get; set; } = null!;
     public RecipeStage? Stage { get; set; }

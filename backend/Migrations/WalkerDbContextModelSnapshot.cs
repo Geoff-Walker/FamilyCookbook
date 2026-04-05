@@ -148,6 +148,10 @@ namespace WalkerFcb.Api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("unit_id");
 
+                    b.Property<decimal?>("WeightGrams")
+                        .HasColumnType("numeric")
+                        .HasColumnName("weight_grams");
+
                     b.HasKey("Id")
                         .HasName("pk_recipe_ingredients");
 
