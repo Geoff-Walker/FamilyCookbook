@@ -269,6 +269,18 @@ public static class RecipeEndpoints
         if (string.IsNullOrWhiteSpace(request.Title))
             return Results.BadRequest(new { error = "title is required" });
 
+        if (request.Servings.HasValue && request.Servings.Value < 1)
+            return Results.BadRequest(new { error = "servings must be a positive integer (≥ 1)" });
+
+        foreach (var stage in request.Stages)
+        {
+            foreach (var ingredient in stage.Ingredients)
+            {
+                if (ingredient.WeightGrams.HasValue && ingredient.WeightGrams.Value <= 0)
+                    return Results.BadRequest(new { error = "weightGrams must be a positive value (> 0)" });
+            }
+        }
+
         var (dto, embeddingFailed) = await service.CreateAsync(request);
 
         if (embeddingFailed)
@@ -285,6 +297,18 @@ public static class RecipeEndpoints
     {
         if (string.IsNullOrWhiteSpace(request.Title))
             return Results.BadRequest(new { error = "title is required" });
+
+        if (request.Servings.HasValue && request.Servings.Value < 1)
+            return Results.BadRequest(new { error = "servings must be a positive integer (≥ 1)" });
+
+        foreach (var stage in request.Stages)
+        {
+            foreach (var ingredient in stage.Ingredients)
+            {
+                if (ingredient.WeightGrams.HasValue && ingredient.WeightGrams.Value <= 0)
+                    return Results.BadRequest(new { error = "weightGrams must be a positive value (> 0)" });
+            }
+        }
 
         var (dto, embeddingFailed) = await service.UpdateAsync(id, request);
 
