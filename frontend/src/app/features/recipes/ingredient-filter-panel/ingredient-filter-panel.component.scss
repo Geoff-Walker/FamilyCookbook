@@ -36,10 +36,11 @@
   color: var(--color-text-secondary);
   font: var(--type-label);
   cursor: pointer;
+  overflow: hidden;
   transition: background 0.15s ease, border-color 0.15s ease;
 
-  /* AC-D1: Mobile = full-width */
-  width: 100%;
+  /* AC-D1: Mobile = natural content width (WAL-45) */
+  width: auto;
 
   @media (min-width: 768px) {
     /* AC-D1: Tablet = right portion of filter bar, min-width 160px */
@@ -67,6 +68,19 @@
   flex: 1;
   text-align: left;
   white-space: nowrap;
+
+  &__mobile {
+    display: inline;
+  }
+
+  &__full {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    &__mobile { display: none; }
+    &__full   { display: inline; }
+  }
 }
 
 /* AC-D2: Count badge */
