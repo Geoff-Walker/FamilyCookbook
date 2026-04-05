@@ -36,6 +36,7 @@
   color: var(--color-text-secondary);
   font: var(--type-label);
   cursor: pointer;
+  overflow: hidden;
   transition: background 0.15s ease, border-color 0.15s ease;
 
   /* Mobile = full-width */
@@ -67,6 +68,19 @@
   flex: 1;
   text-align: left;
   white-space: nowrap;
+
+  &__mobile {
+    display: inline;
+  }
+
+  &__full {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    &__mobile { display: none; }
+    &__full   { display: inline; }
+  }
 }
 
 /* AC7 / AC-D1: Count badge — same style as WAL-12 AC-D2 */
