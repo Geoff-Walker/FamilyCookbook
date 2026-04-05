@@ -115,9 +115,14 @@
   gap: var(--space-2);
   align-items: flex-start;
 
-  app-ingredient-filter-panel,
+  app-ingredient-filter-panel {
+    flex: 3 1 0; /* WAL-45: ~60% — wider for longer label */
+    min-width: 0;
+  }
+
   app-tag-filter {
-    flex: 0 0 auto; /* WAL-45: natural content width on mobile */
+    flex: 2 1 0; /* WAL-45: ~40% — narrower for shorter label */
+    min-width: 0;
   }
 
   @media (min-width: 768px) {
