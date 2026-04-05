@@ -9,6 +9,8 @@
 
   /* Mobile: horizontal layout */
   flex-direction: row;
+  /* WAL-45: cap card width to viewport to prevent overflow on Android Chrome */
+  max-width: calc(100vw - var(--space-4));
 
   &:hover {
     box-shadow: var(--shadow-2);
@@ -34,9 +36,11 @@
   justify-content: center;
   flex-shrink: 0;
 
-  /* Mobile: 80×80 fixed */
+  /* Mobile: fixed width, flexible height — WAL-45 */
   width: 80px;
-  height: 80px;
+  height: auto;
+  min-height: 80px;
+  align-self: stretch;
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 
   @media (min-width: 768px) {
@@ -90,12 +94,13 @@
 .card-title {
   font: var(--type-h3); /* AC9: 20px mobile */
   color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; /* AC10: truncate long titles on cards */
+  /* WAL-45: mobile allows wrapping — ellipsis applied at tablet+ only */
 
   @media (min-width: 768px) {
     font: var(--type-h2); /* AC9: 24px tablet+ */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* AC10: truncate long titles on cards at tablet+ */
   }
 }
 
