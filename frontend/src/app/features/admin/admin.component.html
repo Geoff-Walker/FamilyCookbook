@@ -1,0 +1,159 @@
+<div class="admin-page">
+  <h1 class="admin-page__heading">Admin</h1>
+
+  <mat-accordion class="admin-page__accordion">
+
+    <!-- ===================================================================
+         Ingredients section
+         =================================================================== -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title class="admin-panel__title">Ingredients</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Loading -->
+      @if (ingredientsState === 'loading') {
+        <div class="admin-panel__loading" aria-label="Loading ingredients">
+          <mat-spinner diameter="32" />
+        </div>
+      }
+
+      <!-- Error -->
+      @if (ingredientsState === 'error') {
+        <p class="admin-panel__error" role="alert">
+          Failed to load ingredients. Please refresh the page.
+        </p>
+      }
+
+      <!-- List -->
+      @if (ingredientsState === 'ready') {
+        @if (ingredientRows.length === 0) {
+          <p class="admin-panel__empty">No ingredients yet.</p>
+        } @else {
+          <ul class="admin-ingredient-list" role="list">
+            @for (row of ingredientRows; track row.ingredient.id) {
+              <li class="admin-ingredient-list__item">
+                <span class="admin-ingredient-list__name">
+                  {{ row.ingredient.name | ingredientCase }}
+                </span>
+
+                <button
+                  type="button"
+                  class="admin-ingredient-list__delete-btn"
+                  [disabled]="row.deleting"
+                  [attr.aria-label]="'Delete ' + (row.ingredient.name | ingredientCase)"
+                  (click)="deleteIngredient(row)"
+                >
+                  @if (row.deleting) {
+                    <mat-spinner diameter="18" />
+                  } @else {
+                    Delete
+                  }
+                </button>
+
+                @if (row.error) {
+                  <span class="admin-ingredient-list__row-error" role="alert">
+                    {{ row.error }}
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      }
+    </mat-expansion-panel>
+
+    <!-- ===================================================================
+         Units section
+         =================================================================== -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title class="admin-panel__title">Units</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Display list -->
+      @if (units.length === 0) {
+        <p class="admin-panel__empty">No units loaded.</p>
+      } @else {
+        <ul class="admin-unit-list" role="list">
+          @for (unit of units; track unit.id) {
+            <li class="admin-unit-list__item">
+              <span class="admin-unit-list__name">{{ unit.name }}</span>
+              @if (unit.abbreviation) {
+                <span class="admin-unit-list__abbr">({{ unit.abbreviation }})</span>
+              }
+              @if (unit.unitType) {
+                <span class="admin-unit-list__type">{{ unit.unitType }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      <!-- Add unit form -->
+      <form
+        class="admin-unit-form"
+        [formGroup]="unitForm"
+        (ngSubmit)="submitUnitForm()"
+        novalidate
+      >
+        <h3 class="admin-unit-form__heading">Add unit</h3>
+
+        <div class="admin-unit-form__fields">
+          <mat-form-field appearance="outline" class="admin-unit-form__field">
+            <mat-label>Name</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              placeholder="e.g. fluid ounce"
+              autocomplete="off"
+            />
+            @if (unitForm.get('name')?.invalid && unitForm.get('name')?.touched) {
+              <mat-error>Name is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="admin-unit-form__field">
+            <mat-label>Abbreviation (optional)</mat-label>
+            <input
+              matInput
+              formControlName="abbreviation"
+              placeholder="e.g. fl oz"
+              autocomplete="off"
+            />
+          </mat-form-field>
+        </div>
+
+        @if (unitFormError) {
+          <p class="admin-unit-form__error" role="alert">{{ unitFormError }}</p>
+        }
+
+        <button
+          type="submit"
+          class="admin-unit-form__submit"
+          [disabled]="unitForm.invalid || unitFormSaving"
+        >
+          @if (unitFormSaving) {
+            Saving…
+          } @else {
+            Add unit
+          }
+        </button>
+      </form>
+    </mat-expansion-panel>
+
+    <!-- ===================================================================
+         Reviews section (Phase 3 placeholder)
+         =================================================================== -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title class="admin-panel__title">Reviews</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <p class="admin-panel__coming-soon">
+        Review management is coming in Phase 3.
+      </p>
+    </mat-expansion-panel>
+
+  </mat-accordion>
+</div>

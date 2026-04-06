@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { UserToggleComponent } from './user-toggle/user-toggle.component';
 import { HeaderStateService } from '../services/header-state.service';
@@ -10,7 +10,7 @@ type HeaderMode = 'list' | 'detail' | 'form';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, UserToggleComponent],
+  imports: [CommonModule, RouterLink, UserToggleComponent],
   templateUrl: './app-header.component.html',
   styleUrl: './app-header.component.scss'
 })

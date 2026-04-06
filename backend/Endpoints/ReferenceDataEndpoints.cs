@@ -29,6 +29,13 @@ public static class ReferenceDataEndpoints
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status409Conflict);
 
+        app.MapDelete("/api/ingredients/{id}", DeleteIngredient)
+            .WithTags("Reference Data")
+            .WithSummary("Delete a canonical ingredient (409 if used in any recipe)")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status409Conflict);
+
         // -----------------------------------------------------------------------
         // Units
         // -----------------------------------------------------------------------
@@ -179,6 +186,32 @@ public static class ReferenceDataEndpoints
         return Results.Created(
             $"/api/ingredients/{ingredient.Id}",
             new IngredientDto { Id = ingredient.Id, Name = ingredient.Name });
+    }
+
+    private static async Task<IResult> DeleteIngredient(
+        int id,
+        WalkerDbContext db)
+    {
+        var ingredient = await db.Ingredients.FindAsync(id);
+        if (ingredient is null)
+            return Results.NotFound();
+
+        var recipeCount = await db.RecipeIngredients
+            .Where(ri => ri.IngredientId == id)
+            .Select(ri => ri.RecipeId)
+            .Distinct()
+            .CountAsync();
+
+        if (recipeCount > 0)
+            return Results.Conflict(new
+            {
+                message = $"Used in {recipeCount} recipe(s) — remove from those recipes first",
+                recipeCount
+            });
+
+        db.Ingredients.Remove(ingredient);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
     }
 
     private static async Task<IResult> CreateUnit(
