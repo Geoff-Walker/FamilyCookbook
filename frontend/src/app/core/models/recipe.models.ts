@@ -52,10 +52,9 @@ export interface TagOptionDto {
 
 export interface RecipeIngredientPayload {
   ingredientName: string;
-  amount: string | null;
+  amount: number | null;
   unitId: number | null;
   notes: string | null;
-  weightGrams: number | null;
 }
 
 export interface RecipeStepPayload {

@@ -194,10 +194,9 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       for (const ing of stage.ingredients) {
         ingredientsArray.push(this.createIngredientGroup(
           ing.ingredientName,
-          ing.amount ?? '',
+          ing.amount !== null && ing.amount !== undefined ? +ing.amount : null,
           ing.unitId,
-          ing.notes ?? '',
-          ing.weightGrams ?? null
+          ing.notes ?? ''
         ));
       }
       stagesArray.push(sg);
@@ -222,17 +221,15 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
 
   createIngredientGroup(
     ingredientName = '',
-    amount = '',
+    amount: number | null = null,
     unitId: number | null = null,
-    notes = '',
-    weightGrams: number | null = null
+    notes = ''
   ): FormGroup {
     return this.fb.group({
       ingredientName: [ingredientName],
       amount: [amount],
       unitId: [unitId ?? ''],
-      notes: [notes],
-      weightGrams: [weightGrams]
+      notes: [notes]
     });
   }
 
@@ -304,10 +301,9 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
           .filter((ing: any) => ing.ingredientName?.trim())
           .map((ing: any) => ({
             ingredientName: ing.ingredientName.trim(),
-            amount: ing.amount?.trim() || null,
+            amount: (ing.amount !== null && ing.amount !== '' && ing.amount !== undefined) ? +ing.amount : null,
             unitId: (ing.unitId !== null && ing.unitId !== '') ? +ing.unitId : null,
-            notes: ing.notes?.trim() || null,
-            weightGrams: (ing.weightGrams !== null && ing.weightGrams !== '') ? +ing.weightGrams : null
+            notes: ing.notes?.trim() || null
           }))
       }))
     };
