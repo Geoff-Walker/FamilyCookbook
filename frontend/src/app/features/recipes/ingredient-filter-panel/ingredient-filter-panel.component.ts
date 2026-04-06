@@ -18,6 +18,7 @@ import {
 import { catchError } from 'rxjs/operators';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
 import { IngredientOptionDto } from '../../../core/models/recipe.models';
+import { IngredientCasePipe } from '../../../shared/pipes/ingredient-case.pipe';
 
 export interface IngredientFilterState {
   /** True when at least one ingredient chip is selected */
@@ -36,7 +37,7 @@ export interface SelectedIngredient {
 @Component({
   selector: 'app-ingredient-filter-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IngredientCasePipe],
   templateUrl: './ingredient-filter-panel.component.html',
   styleUrl: './ingredient-filter-panel.component.scss'
 })
