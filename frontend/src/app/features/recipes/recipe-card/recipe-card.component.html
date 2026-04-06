@@ -19,7 +19,7 @@
     <button
       class="card-delete-btn"
       type="button"
-      aria-label="Delete {{ recipe.title }}"
+      [attr.aria-label]="'Delete ' + recipe.title"
       (click)="promptDelete($event)"
     >
       ✕
