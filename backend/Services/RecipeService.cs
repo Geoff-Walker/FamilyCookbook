@@ -222,10 +222,9 @@ public class RecipeService
                     Recipe = recipe,
                     Stage = stage,
                     Ingredient = ingredient,
-                    Amount = ingDto.Amount?.Trim(),
+                    Amount = ingDto.Amount.HasValue ? ingDto.Amount.Value.ToString("G") : null,
                     UnitId = ingDto.UnitId,
                     Notes = ingDto.Notes?.Trim(),
-                    WeightGrams = ingDto.WeightGrams,
                     SortOrder = ingIndex
                 });
             }
@@ -266,10 +265,9 @@ public class RecipeService
                     Recipe = recipe,
                     Stage = stage,
                     Ingredient = ingredient,
-                    Amount = ingDto.Amount?.Trim(),
+                    Amount = ingDto.Amount.HasValue ? ingDto.Amount.Value.ToString("G") : null,
                     UnitId = ingDto.UnitId,
                     Notes = ingDto.Notes?.Trim(),
-                    WeightGrams = ingDto.WeightGrams,
                     SortOrder = ingIndex
                 });
             }

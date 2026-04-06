@@ -48,8 +48,7 @@ public class CreateRecipeStepDto
 public class CreateRecipeIngredientDto
 {
     public string IngredientName { get; init; } = string.Empty;
-    public string? Amount { get; init; }
+    public decimal? Amount { get; init; }
     public int? UnitId { get; init; }
     public string? Notes { get; init; }
-    public decimal? WeightGrams { get; init; }
 }
