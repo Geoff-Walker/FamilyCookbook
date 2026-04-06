@@ -281,9 +281,12 @@ public class RecipeService
     /// </summary>
     private async Task<Ingredient> UpsertIngredientAsync(string name)
     {
-        var normalised = name.Trim();
+        // Normalise to lowercase before persisting so all ingredient names are
+        // stored consistently. Display casing is handled by the Angular
+        // ingredientCase pipe at render time.
+        var normalised = name.Trim().ToLowerInvariant();
         var existing = await _db.Ingredients
-            .FirstOrDefaultAsync(i => i.Name.ToLower() == normalised.ToLower());
+            .FirstOrDefaultAsync(i => i.Name == normalised);
 
         if (existing != null)
             return existing;

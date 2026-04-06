@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeDetailIngredientDto } from '../../../core/models/recipe.models';
+import { IngredientCasePipe } from '../../../shared/pipes/ingredient-case.pipe';
 
 @Component({
   selector: 'app-ingredient-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IngredientCasePipe],
   templateUrl: './ingredient-list.component.html',
   styleUrl: './ingredient-list.component.scss'
 })

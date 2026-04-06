@@ -90,7 +90,7 @@
               role="option"
               [attr.aria-selected]="false"
               (mousedown)="selectIngredient(suggestion)">
-              {{ suggestion.name }}
+              {{ suggestion.name | ingredientCase }}
             </li>
           }
         </ul>
@@ -104,7 +104,7 @@
           <span
             class="ingredient-chip"
             [class.ingredient-chip--out]="chip.animState === 'out'">
-            <span class="chip-label">{{ chip.name }}</span>
+            <span class="chip-label">{{ chip.name | ingredientCase }}</span>
             <button
               class="chip-remove"
               type="button"

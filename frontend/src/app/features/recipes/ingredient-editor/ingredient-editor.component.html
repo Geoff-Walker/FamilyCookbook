@@ -15,7 +15,7 @@
             class="suggestion-item"
             role="option"
             (mousedown)="selectSuggestion(s)">
-            {{ s.name }}
+            {{ s.name | ingredientCase }}
           </li>
         }
       </ul>

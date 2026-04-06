@@ -17,7 +17,7 @@
       <div class="ingredient-check" aria-hidden="true">
         @if (isChecked(ing.id)) { ✓ }
       </div>
-      <span class="ingredient-name">{{ ing.ingredientName }}</span>
+      <span class="ingredient-name">{{ ing.ingredientName | ingredientCase }}</span>
       <span class="ingredient-amount">
         {{ formatAmount(ing) }}
         @if (ing.notes) {

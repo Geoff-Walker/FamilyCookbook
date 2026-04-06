@@ -11,11 +11,12 @@ import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil } from 'rxjs';
 import { IngredientOptionDto, UnitOptionDto } from '../../../core/models/recipe.models';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
+import { IngredientCasePipe } from '../../../shared/pipes/ingredient-case.pipe';
 
 @Component({
   selector: 'app-ingredient-editor',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, IngredientCasePipe],
   templateUrl: './ingredient-editor.component.html',
   styleUrl: './ingredient-editor.component.scss'
 })
