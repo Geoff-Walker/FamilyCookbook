@@ -58,6 +58,10 @@ export class RecipeApiService {
     return this.http.get<UnitOptionDto[]>(`${this.baseUrl}/units`);
   }
 
+  createUnit(name: string, abbreviation?: string): Observable<UnitOptionDto> {
+    return this.http.post<UnitOptionDto>(`${this.baseUrl}/units`, { name, abbreviation });
+  }
+
   getTags(): Observable<TagOptionDto[]> {
     return this.http.get<TagOptionDto[]>(`${this.baseUrl}/tags`);
   }

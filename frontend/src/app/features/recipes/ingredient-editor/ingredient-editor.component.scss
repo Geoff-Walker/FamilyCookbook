@@ -57,6 +57,97 @@
   }
 }
 
+// ─── Unit column wrapper ───────────────────────────────────────────────────
+
+.unit-wrap {
+  position: relative;
+}
+
+// "Add unit…" sentinel option — visually distinct
+.unit-option--add {
+  font-style: italic;
+  color: var(--color-primary);
+  border-top: 1px solid var(--color-border);
+}
+
+// ─── Inline add-unit form ─────────────────────────────────────────────────
+
+.add-unit-form {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 10;
+  min-width: 220px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__input {
+    font: var(--type-body);
+    min-height: 44px; // 44px minimum tap target
+
+    &--abbr {
+      font: var(--type-body);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+}
+
+.btn-confirm-unit {
+  flex: 1;
+  min-height: 44px; // 44px minimum tap target
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font: var(--type-label);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel-unit {
+  flex: 1;
+  min-height: 44px; // 44px minimum tap target
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: var(--type-label);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-surface-3);
+    color: var(--color-text-secondary);
+  }
+}
+
+.add-unit-error {
+  font: var(--type-caption);
+  color: var(--color-error);
+  margin: 0;
+}
+
+// ─── Remove button ────────────────────────────────────────────────────────
+
 .btn-remove-ing {
   width: 32px;
   height: 44px; // 44px minimum tap target

@@ -30,7 +30,6 @@
     @for (idx of ingredientIndices; track idx) {
       <app-ingredient-editor
         [ingredientGroup]="ingredientGroup(idx)"
-        [units]="units"
         (removed)="removeIngredient(idx)">
       </app-ingredient-editor>
     }

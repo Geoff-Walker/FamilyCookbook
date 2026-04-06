@@ -130,6 +130,7 @@ public class WalkerDbContext : DbContext
             e.Property(u => u.Id).UseIdentityByDefaultColumn();
             e.Property(u => u.Name).IsRequired();
             e.Property(u => u.UnitType).IsRequired();
+            e.HasIndex(u => u.Name).IsUnique();
 
             e.HasData(
                 // mass

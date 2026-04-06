@@ -41,12 +41,60 @@
     min="0"
     placeholder="Amount" />
 
-  <select class="field-input field-input--unit" formControlName="unitId">
-    <option value="">–</option>
-    @for (unit of units; track unit.id) {
-      <option [value]="unit.id">{{ unit.abbreviation || unit.name }}</option>
+  <div class="unit-wrap">
+    <select
+      class="field-input field-input--unit"
+      formControlName="unitId"
+      (change)="onUnitSelectChange($event)">
+      <option value="">–</option>
+      @for (unit of unitsService.units$ | async; track unit.id) {
+        <option [value]="unit.id">{{ unit.abbreviation || unit.name }}</option>
+      }
+      <option value="__ADD_UNIT__" class="unit-option--add">+ Add unit…</option>
+    </select>
+
+    @if (showAddUnitForm) {
+      <div class="add-unit-form" role="group" aria-label="Add new unit">
+        <input
+          class="field-input add-unit-form__input"
+          type="text"
+          placeholder="Name (e.g. sprig)"
+          autocomplete="off"
+          [formControl]="unitNameControl"
+          (keydown.enter)="confirmAddUnit()"
+          (keydown.escape)="cancelAddUnit()" />
+
+        <input
+          class="field-input add-unit-form__input add-unit-form__input--abbr"
+          type="text"
+          placeholder="Abbr. (optional)"
+          autocomplete="off"
+          [formControl]="unitAbbreviationControl"
+          (keydown.enter)="confirmAddUnit()"
+          (keydown.escape)="cancelAddUnit()" />
+
+        <div class="add-unit-form__actions">
+          <button
+            type="button"
+            class="btn-confirm-unit"
+            [disabled]="unitNameControl.invalid || isCreatingUnit"
+            (click)="confirmAddUnit()">
+            {{ isCreatingUnit ? 'Adding…' : 'Add' }}
+          </button>
+          <button
+            type="button"
+            class="btn-cancel-unit"
+            (click)="cancelAddUnit()">
+            Cancel
+          </button>
+        </div>
+
+        @if (unitNameError) {
+          <p class="add-unit-error" role="alert">{{ unitNameError }}</p>
+        }
+      </div>
     }
-  </select>
+  </div>
 
   <input
     class="field-input field-input--notes"

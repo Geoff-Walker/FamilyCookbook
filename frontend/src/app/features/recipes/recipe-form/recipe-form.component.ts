@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
+import { UnitsService } from '../../../core/services/units.service';
 import { RecipeDetailDto, SaveRecipePayload, TagOptionDto, UnitOptionDto, ImageStyle } from '../../../core/models/recipe.models';
 import { StageEditorComponent } from '../stage-editor/stage-editor.component';
 import { TagSelectorComponent } from '../tag-selector/tag-selector.component';
@@ -33,6 +34,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(RecipeApiService);
+  private readonly unitsService = inject(UnitsService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroy$ = new Subject<void>();
 
@@ -141,22 +143,20 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
   }
 
   private async loadReferenceData(): Promise<void> {
-    const [tags, units] = await Promise.all([
+    const [tags] = await Promise.all([
       firstValueFrom(this.api.getTags()),
-      firstValueFrom(this.api.getUnits())
     ]);
     this.allTags = tags;
-    this.units = units;
+    this.unitsService.refresh();
   }
 
   private loadForEdit(id: number): void {
     Promise.all([
       firstValueFrom(this.api.getRecipe(id)),
       firstValueFrom(this.api.getTags()),
-      firstValueFrom(this.api.getUnits())
-    ]).then(([recipe, tags, units]) => {
+    ]).then(([recipe, tags]) => {
       this.allTags = tags;
-      this.units = units;
+      this.unitsService.refresh();
       this.populateForm(recipe);
       this.pageState = 'ready';
     }).catch((err: HttpErrorResponse) => {
