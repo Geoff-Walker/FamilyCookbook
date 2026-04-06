@@ -13,4 +13,5 @@ export class RecipeHeroComponent {
   @Input() imageUrl: string | null = null;
   @Output() back = new EventEmitter<void>();
   @Output() edit = new EventEmitter<void>();
+  @Output() delete = new EventEmitter<void>();
 }

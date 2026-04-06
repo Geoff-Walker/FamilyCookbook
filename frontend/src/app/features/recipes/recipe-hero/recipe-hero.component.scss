@@ -19,7 +19,7 @@
   }
 }
 
-/* Nav: back + edit buttons, top of hero */
+/* Nav: back + edit/delete buttons, top of hero */
 .hero-nav {
   position: absolute;
   top: var(--space-4);
@@ -27,7 +27,14 @@
   right: var(--space-4);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   z-index: 2;
+}
+
+/* Group edit + delete on the right */
+.hero-actions {
+  display: flex;
+  gap: var(--space-2);
 }
 
 .hero-btn {
@@ -48,6 +55,14 @@
   &:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
+  }
+}
+
+.hero-btn--delete {
+  background: rgba(180, 40, 40, 0.5);
+
+  &:hover {
+    background: rgba(180, 40, 40, 0.8);
   }
 }
 

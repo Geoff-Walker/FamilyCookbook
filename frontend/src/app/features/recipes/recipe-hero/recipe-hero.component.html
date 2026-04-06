@@ -4,9 +4,14 @@
     <button class="hero-btn" (click)="back.emit()" type="button" aria-label="Back to recipes">
       ← Back
     </button>
-    <button class="hero-btn" (click)="edit.emit()" type="button" aria-label="Edit recipe">
-      Edit
-    </button>
+    <div class="hero-actions">
+      <button class="hero-btn" (click)="edit.emit()" type="button" aria-label="Edit recipe">
+        Edit
+      </button>
+      <button class="hero-btn hero-btn--delete" (click)="delete.emit()" type="button" aria-label="Delete recipe">
+        Delete
+      </button>
+    </div>
   </div>
 
   <!-- Gradient scrim + title -->

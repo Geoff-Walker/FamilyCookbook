@@ -71,6 +71,83 @@
   }
 }
 
+/* ---- Delete confirmation overlay ---- */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+}
+
+.confirm-panel {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--space-6);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.confirm-message {
+  font: var(--type-body);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.btn-cancel {
+  background: none;
+  border: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-5);
+  font: var(--type-label);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-confirm-delete {
+  background: #c0392b;
+  border: none;
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-5);
+  font: var(--type-label);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #a93226;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 /* ---- Metadata bar ---- */
 .metadata-bar {
   padding: var(--space-4);
