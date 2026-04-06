@@ -573,6 +573,10 @@ namespace WalkerFcb.Api.Migrations
                     b.HasKey("Id")
                         .HasName("pk_units");
 
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_units_name");
+
                     b.ToTable("units", (string)null);
 
                     b.HasData(

@@ -10,3 +10,12 @@ public class UnitDto
     public string? Abbreviation { get; init; }
     public string UnitType { get; init; } = string.Empty;
 }
+
+/// <summary>
+/// Request body for POST /api/units.
+/// </summary>
+public class CreateUnitDto
+{
+    public string Name { get; init; } = string.Empty;
+    public string? Abbreviation { get; init; }
+}

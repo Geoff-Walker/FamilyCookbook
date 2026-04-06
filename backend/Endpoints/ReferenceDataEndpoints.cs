@@ -37,6 +37,13 @@ public static class ReferenceDataEndpoints
             .WithSummary("List all units of measurement")
             .Produces<List<UnitDto>>(StatusCodes.Status200OK);
 
+        app.MapPost("/api/units", CreateUnit)
+            .WithTags("Reference Data")
+            .WithSummary("Create a new unit of measurement (409 on duplicate name)")
+            .Produces<UnitDto>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict);
+
         // -----------------------------------------------------------------------
         // Tags
         // -----------------------------------------------------------------------
@@ -172,5 +179,44 @@ public static class ReferenceDataEndpoints
         return Results.Created(
             $"/api/ingredients/{ingredient.Id}",
             new IngredientDto { Id = ingredient.Id, Name = ingredient.Name });
+    }
+
+    private static async Task<IResult> CreateUnit(
+        CreateUnitDto request,
+        WalkerDbContext db)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return Results.BadRequest(new { error = "name is required" });
+
+        var trimmedName = request.Name.Trim();
+        var trimmedAbbreviation = request.Abbreviation?.Trim();
+
+        var unit = new Unit
+        {
+            Name         = trimmedName,
+            Abbreviation = trimmedAbbreviation,
+            UnitType     = "custom",
+        };
+        db.Units.Add(unit);
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+        {
+            // Unique constraint violation — unit name already exists
+            return Results.Conflict(new { error = $"a unit named '{trimmedName}' already exists" });
+        }
+
+        return Results.Created(
+            $"/api/units/{unit.Id}",
+            new UnitDto
+            {
+                Id           = unit.Id,
+                Name         = unit.Name,
+                Abbreviation = unit.Abbreviation,
+                UnitType     = unit.UnitType,
+            });
     }
 }
