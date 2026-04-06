@@ -25,7 +25,9 @@
   <input
     class="field-input field-input--amount"
     formControlName="amount"
-    type="text"
+    type="number"
+    step="any"
+    min="0"
     placeholder="Amount" />
 
   <select class="field-input field-input--unit" formControlName="unitId">
@@ -34,12 +36,6 @@
       <option [value]="unit.id">{{ unit.abbreviation || unit.name }}</option>
     }
   </select>
-
-  <input
-    class="field-input field-input--weight"
-    formControlName="weightGrams"
-    type="number"
-    placeholder="Weight (g)" />
 
   <input
     class="field-input field-input--notes"
