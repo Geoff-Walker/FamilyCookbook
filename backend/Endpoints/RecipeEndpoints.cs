@@ -272,6 +272,12 @@ public static class RecipeEndpoints
         if (request.Servings.HasValue && request.Servings.Value < 1)
             return Results.BadRequest(new { error = "servings must be a positive integer (≥ 1)" });
 
+        var missingIngredientId = request.Stages
+            .SelectMany(s => s.Ingredients)
+            .Any(i => i.IngredientId == null);
+        if (missingIngredientId)
+            return Results.BadRequest(new { error = "all ingredients must include ingredient_id" });
+
         var (dto, embeddingFailed) = await service.CreateAsync(request);
 
         if (embeddingFailed)
@@ -291,6 +297,12 @@ public static class RecipeEndpoints
 
         if (request.Servings.HasValue && request.Servings.Value < 1)
             return Results.BadRequest(new { error = "servings must be a positive integer (≥ 1)" });
+
+        var missingIngredientId = request.Stages
+            .SelectMany(s => s.Ingredients)
+            .Any(i => i.IngredientId == null);
+        if (missingIngredientId)
+            return Results.BadRequest(new { error = "all ingredients must include ingredient_id" });
 
         var (dto, embeddingFailed) = await service.UpdateAsync(id, request);
 

@@ -55,7 +55,8 @@ export class StageEditorComponent {
 
   addIngredient(): void {
     this.ingredientsArray.push(this.fb.group({
-      ingredientName: [''],
+      ingredientId: [null],
+      ingredientDisplayName: [''],
       amount: [null],
       unitId: [''],
       notes: ['']

@@ -2,24 +2,35 @@
   <div class="autocomplete-wrap">
     <input
       class="field-input"
-      formControlName="ingredientName"
       type="text"
       placeholder="Ingredient"
       autocomplete="off"
-      (input)="onNameInput($event)"
-      (blur)="closeDropdown()" />
-    @if (showDropdown) {
-      <ul class="suggestions" role="listbox">
-        @for (s of suggestions; track s.id) {
-          <li
-            class="suggestion-item"
-            role="option"
-            (mousedown)="selectSuggestion(s)">
+      [formControl]="displayControl"
+      [matAutocomplete]="ingredientAuto" />
+
+    <mat-autocomplete
+      #ingredientAuto="matAutocomplete"
+      [displayWith]="displayFn"
+      (optionSelected)="onOptionSelected($event)">
+
+      @for (s of suggestions; track s.id) {
+        @if (!s.isAddNew) {
+          <mat-option class="ingredient-option" [value]="s">
             {{ s.name | ingredientCase }}
-          </li>
+          </mat-option>
+        } @else {
+          <mat-option class="ingredient-option ingredient-option--add-new" [value]="s">
+            <span class="add-new-label">+ Add "{{ s.name | ingredientCase }}" as a new ingredient</span>
+          </mat-option>
         }
-      </ul>
-    }
+      }
+
+      @if (isCreating) {
+        <mat-option disabled class="ingredient-option">
+          <span class="creating-label">Creating…</span>
+        </mat-option>
+      }
+    </mat-autocomplete>
   </div>
 
   <input

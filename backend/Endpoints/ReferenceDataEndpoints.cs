@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using WalkerFcb.Api.Data;
+using WalkerFcb.Api.Data.Entities;
 using WalkerFcb.Api.DTOs;
 
 namespace WalkerFcb.Api.Endpoints;
 
 /// <summary>
-/// Minimal API endpoints for read-only reference data used by autocomplete,
+/// Minimal API endpoints for reference data used by autocomplete,
 /// dropdowns, and filter panels in the frontend.
-/// All routes are read-only — no write endpoints are provided here.
 /// </summary>
 public static class ReferenceDataEndpoints
 {
@@ -21,6 +21,13 @@ public static class ReferenceDataEndpoints
             .WithSummary("List all ingredients, optionally filtered by name")
             .Produces<List<IngredientDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest);
+
+        app.MapPost("/api/ingredients", CreateIngredient)
+            .WithTags("Reference Data")
+            .WithSummary("Create a new canonical ingredient (409 on duplicate)")
+            .Produces<IngredientDto>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status409Conflict);
 
         // -----------------------------------------------------------------------
         // Units
@@ -138,5 +145,32 @@ public static class ReferenceDataEndpoints
             .ToListAsync();
 
         return Results.Ok(users);
+    }
+
+    private static async Task<IResult> CreateIngredient(
+        CreateIngredientDto request,
+        WalkerDbContext db)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return Results.BadRequest(new { error = "name is required" });
+
+        var normalised = request.Name.Trim().ToLowerInvariant();
+
+        var ingredient = new Ingredient { Name = normalised };
+        db.Ingredients.Add(ingredient);
+
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+        {
+            // Unique constraint violation — ingredient already exists
+            return Results.Conflict(new { error = $"ingredient '{normalised}' already exists" });
+        }
+
+        return Results.Created(
+            $"/api/ingredients/{ingredient.Id}",
+            new IngredientDto { Id = ingredient.Id, Name = ingredient.Name });
     }
 }
