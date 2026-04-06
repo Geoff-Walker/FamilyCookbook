@@ -193,6 +193,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
       const ingredientsArray = sg.get('ingredients') as FormArray;
       for (const ing of stage.ingredients) {
         ingredientsArray.push(this.createIngredientGroup(
+          ing.ingredientId,
           ing.ingredientName,
           ing.amount !== null && ing.amount !== undefined ? +ing.amount : null,
           ing.unitId,
@@ -220,13 +221,15 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
   }
 
   createIngredientGroup(
-    ingredientName = '',
+    ingredientId: number | null = null,
+    ingredientDisplayName = '',
     amount: number | null = null,
     unitId: number | null = null,
     notes = ''
   ): FormGroup {
     return this.fb.group({
-      ingredientName: [ingredientName],
+      ingredientId: [ingredientId],
+      ingredientDisplayName: [ingredientDisplayName],
       amount: [amount],
       unitId: [unitId ?? ''],
       notes: [notes]
@@ -298,9 +301,9 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
           .filter((st: any) => st.instruction?.trim())
           .map((st: any) => ({ instruction: st.instruction.trim() })),
         ingredients: (s.ingredients ?? [])
-          .filter((ing: any) => ing.ingredientName?.trim())
+          .filter((ing: any) => ing.ingredientId != null)
           .map((ing: any) => ({
-            ingredientName: ing.ingredientName.trim(),
+            ingredientId: +ing.ingredientId,
             amount: (ing.amount !== null && ing.amount !== '' && ing.amount !== undefined) ? +ing.amount : null,
             unitId: (ing.unitId !== null && ing.unitId !== '') ? +ing.unitId : null,
             notes: ing.notes?.trim() || null
@@ -396,7 +399,7 @@ export class RecipeFormComponent implements OnInit, OnDestroy {
     const stages = this.stagesArray.value as any[];
     for (const stage of stages) {
       for (const ing of (stage.ingredients ?? [])) {
-        const name = ing.ingredientName?.trim();
+        const name = ing.ingredientDisplayName?.trim();
         if (name) names.push(name);
       }
     }

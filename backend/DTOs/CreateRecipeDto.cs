@@ -43,11 +43,12 @@ public class CreateRecipeStepDto
 
 /// <summary>
 /// An ingredient line within a <see cref="CreateRecipeStageDto"/>.
-/// Ingredient is identified by name (upserted if not found).
+/// Ingredient is identified by <see cref="IngredientId"/> (canonical FK from the ingredients table).
 /// </summary>
 public class CreateRecipeIngredientDto
 {
-    public string IngredientName { get; init; } = string.Empty;
+    /// <summary>Required. Must reference an existing row in the ingredients table.</summary>
+    public int? IngredientId { get; init; }
     public decimal? Amount { get; init; }
     public int? UnitId { get; init; }
     public string? Notes { get; init; }

@@ -51,7 +51,8 @@ export interface TagOptionDto {
 /* ---- Form payload DTOs ---- */
 
 export interface RecipeIngredientPayload {
-  ingredientName: string;
+  /** Resolved canonical ingredient ID — required by the backend. */
+  ingredientId: number;
   amount: number | null;
   unitId: number | null;
   notes: string | null;

@@ -9,7 +9,7 @@ namespace WalkerFcb.Api.Services;
 
 /// <summary>
 /// Business logic layer for recipe CRUD operations.
-/// Orchestrates the repository, ingredient upsert, and embedding pipeline.
+/// Orchestrates the repository, ingredient lookup, and embedding pipeline.
 /// </summary>
 public class RecipeService
 {
@@ -216,7 +216,7 @@ public class RecipeService
             for (var ingIndex = 0; ingIndex < stageDto.Ingredients.Count; ingIndex++)
             {
                 var ingDto = stageDto.Ingredients[ingIndex];
-                var ingredient = await UpsertIngredientAsync(ingDto.IngredientName);
+                var ingredient = await LoadIngredientByIdAsync(ingDto.IngredientId!.Value);
                 stage.Ingredients.Add(new RecipeIngredient
                 {
                     Recipe = recipe,
@@ -259,7 +259,7 @@ public class RecipeService
             for (var ingIndex = 0; ingIndex < stageDto.Ingredients.Count; ingIndex++)
             {
                 var ingDto = stageDto.Ingredients[ingIndex];
-                var ingredient = await UpsertIngredientAsync(ingDto.IngredientName);
+                var ingredient = await LoadIngredientByIdAsync(ingDto.IngredientId!.Value);
                 stage.Ingredients.Add(new RecipeIngredient
                 {
                     Recipe = recipe,
@@ -277,24 +277,14 @@ public class RecipeService
     }
 
     /// <summary>
-    /// Finds an ingredient by name (case-insensitive) or creates it if not found.
+    /// Loads a canonical ingredient by its primary key.
+    /// Throws <see cref="KeyNotFoundException"/> if the ingredient does not exist.
     /// </summary>
-    private async Task<Ingredient> UpsertIngredientAsync(string name)
+    private async Task<Ingredient> LoadIngredientByIdAsync(int ingredientId)
     {
-        // Normalise to lowercase before persisting so all ingredient names are
-        // stored consistently. Display casing is handled by the Angular
-        // ingredientCase pipe at render time.
-        var normalised = name.Trim().ToLowerInvariant();
-        var existing = await _db.Ingredients
-            .FirstOrDefaultAsync(i => i.Name == normalised);
-
-        if (existing != null)
-            return existing;
-
-        var created = new Ingredient { Name = normalised };
-        _db.Ingredients.Add(created);
-        await _db.SaveChangesAsync();
-        return created;
+        var ingredient = await _db.Ingredients.FindAsync(ingredientId)
+            ?? throw new KeyNotFoundException($"Ingredient with ID {ingredientId} not found.");
+        return ingredient;
     }
 
     /// <summary>

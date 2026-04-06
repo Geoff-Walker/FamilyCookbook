@@ -50,6 +50,10 @@ export class RecipeApiService {
     return this.http.get<IngredientOptionDto[]>(`${this.baseUrl}/ingredients`, { params });
   }
 
+  createIngredient(name: string): Observable<IngredientOptionDto> {
+    return this.http.post<IngredientOptionDto>(`${this.baseUrl}/ingredients`, { name });
+  }
+
   getUnits(): Observable<UnitOptionDto[]> {
     return this.http.get<UnitOptionDto[]>(`${this.baseUrl}/units`);
   }
