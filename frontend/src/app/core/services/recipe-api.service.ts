@@ -54,6 +54,14 @@ export class RecipeApiService {
     return this.http.post<IngredientOptionDto>(`${this.baseUrl}/ingredients`, { name });
   }
 
+  deleteIngredient(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/ingredients/${id}`);
+  }
+
+  getAllIngredients(): Observable<IngredientOptionDto[]> {
+    return this.http.get<IngredientOptionDto[]>(`${this.baseUrl}/ingredients`);
+  }
+
   getUnits(): Observable<UnitOptionDto[]> {
     return this.http.get<UnitOptionDto[]>(`${this.baseUrl}/units`);
   }

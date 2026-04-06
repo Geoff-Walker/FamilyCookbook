@@ -1,6 +1,6 @@
 <header class="app-header">
 
-  <!-- List mode: app title (h1) + toggle -->
+  <!-- List mode: app title (h1) + nav + toggle -->
   @if (isListMode) {
     <div class="app-header__slot app-header__slot--left">
       <h1 class="app-header__title">
@@ -9,11 +9,12 @@
       </h1>
     </div>
     <div class="app-header__slot app-header__slot--right">
+      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
       <app-user-toggle />
     </div>
   }
 
-  <!-- Detail mode: back button + recipe title + toggle -->
+  <!-- Detail mode: back button + recipe title + nav + toggle -->
   @if (isDetailMode) {
     <div class="app-header__slot app-header__slot--left">
       <button
@@ -31,11 +32,12 @@
       }
     </div>
     <div class="app-header__slot app-header__slot--right">
+      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
       <app-user-toggle />
     </div>
   }
 
-  <!-- Form mode: app title (span) + toggle -->
+  <!-- Form mode: app title (span) + nav + toggle -->
   @if (!isListMode && !isDetailMode) {
     <div class="app-header__slot app-header__slot--left">
       <span class="app-header__title">
@@ -44,6 +46,7 @@
       </span>
     </div>
     <div class="app-header__slot app-header__slot--right">
+      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
       <app-user-toggle />
     </div>
   }
