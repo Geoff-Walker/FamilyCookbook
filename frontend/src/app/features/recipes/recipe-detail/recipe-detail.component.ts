@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
 import { RecipeDetailDto, RecipeDetailReviewDto, RecipeDetailTagDto, RecipeDetailStageDto } from '../../../core/models/recipe.models';
 import { RecipeHeroComponent } from '../recipe-hero/recipe-hero.component';
@@ -24,11 +25,15 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   recipe: RecipeDetailDto | null = null;
   recipeId!: number;
 
+  showDeleteConfirm = false;
+  isDeleting = false;
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeApi: RecipeApiService,
-    private readonly headerState: HeaderStateService
+    private readonly headerState: HeaderStateService,
+    private readonly snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +66,29 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
   goEdit(): void {
     this.router.navigate(['/recipes', this.recipeId, 'edit']);
+  }
+
+  promptDelete(): void {
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
+  }
+
+  confirmDelete(): void {
+    if (this.isDeleting) return;
+    this.isDeleting = true;
+    this.recipeApi.deleteRecipe(this.recipeId).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        this.isDeleting = false;
+        this.showDeleteConfirm = false;
+        this.snackBar.open('Could not delete recipe. Please try again.', 'Dismiss', { duration: 5000 });
+      }
+    });
   }
 
   get isMultiStage(): boolean {

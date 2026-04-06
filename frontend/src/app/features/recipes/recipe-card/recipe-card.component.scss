@@ -5,6 +5,7 @@
   overflow: hidden;
   cursor: pointer;
   display: flex;
+  position: relative;
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 
   /* Mobile: vertical layout — WAL-46 */
