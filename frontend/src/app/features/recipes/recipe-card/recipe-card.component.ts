@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RecipeSummaryDto } from '../../../core/models/recipe.models';
@@ -12,6 +12,9 @@ import { RecipeSummaryDto } from '../../../core/models/recipe.models';
 })
 export class RecipeCardComponent {
   @Input({ required: true }) recipe!: RecipeSummaryDto;
+  @Output() deleted = new EventEmitter<number>();
+
+  showDeleteConfirm = false;
 
   constructor(private readonly router: Router) {}
 
@@ -53,5 +56,21 @@ export class RecipeCardComponent {
 
   navigate(): void {
     this.router.navigate(['/recipes', this.recipe.id]);
+  }
+
+  promptDelete(event: Event): void {
+    event.stopPropagation();
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete(event: Event): void {
+    event.stopPropagation();
+    this.showDeleteConfirm = false;
+  }
+
+  confirmDelete(event: Event): void {
+    event.stopPropagation();
+    this.deleted.emit(this.recipe.id);
+    this.showDeleteConfirm = false;
   }
 }

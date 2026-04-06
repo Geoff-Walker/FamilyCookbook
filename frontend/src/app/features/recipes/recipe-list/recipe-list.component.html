@@ -42,7 +42,7 @@
 
   <!-- Populated (full list, search results, or filter results) -->
   @if (viewState === 'populated') {
-    <app-recipe-grid [recipes]="recipes" />
+    <app-recipe-grid [recipes]="recipes" (recipeDeleted)="onRecipeDeleted($event)" />
   }
 
   <!-- AC4 (WAL-13): No recipes for tag filter -->

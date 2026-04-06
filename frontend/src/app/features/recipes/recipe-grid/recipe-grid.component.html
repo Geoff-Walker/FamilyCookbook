@@ -1,5 +1,5 @@
 <div class="recipe-grid">
   @for (recipe of recipes; track recipe.id) {
-    <app-recipe-card [recipe]="recipe" />
+    <app-recipe-card [recipe]="recipe" (deleted)="recipeDeleted.emit($event)" />
   }
 </div>

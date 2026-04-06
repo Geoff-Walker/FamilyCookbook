@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RecipeApiService } from '../../../core/services/recipe-api.service';
 import { RecipeSummaryDto } from '../../../core/models/recipe.models';
 import { RecipeGridComponent } from '../recipe-grid/recipe-grid.component';
@@ -59,7 +60,8 @@ export class RecipeListComponent implements OnInit {
   constructor(
     private readonly recipeApi: RecipeApiService,
     private readonly userState: UserStateService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +84,21 @@ export class RecipeListComponent implements OnInit {
 
   navigateToAdd(): void {
     this.router.navigate(['/recipes/new']);
+  }
+
+  onRecipeDeleted(id: number): void {
+    this.recipeApi.deleteRecipe(id).subscribe({
+      next: () => {
+        this.baseRecipes = this.baseRecipes.filter(r => r.id !== id);
+        this.recipes = this.recipes.filter(r => r.id !== id);
+        if (this.viewState === 'populated' && this.recipes.length === 0) {
+          this.viewState = 'empty';
+        }
+      },
+      error: () => {
+        this.snackBar.open('Could not delete recipe. Please try again.', 'Dismiss', { duration: 5000 });
+      }
+    });
   }
 
   // -------------------------------------------------------------------------
