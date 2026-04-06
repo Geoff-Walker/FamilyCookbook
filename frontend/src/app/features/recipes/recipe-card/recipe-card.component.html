@@ -15,15 +15,6 @@
       <span class="thumb-icon">🍽️</span>
     }
 
-    <!-- Delete trigger — top-right of thumbnail -->
-    <button
-      class="card-delete-btn"
-      type="button"
-      [attr.aria-label]="'Delete ' + recipe.title"
-      (click)="promptDelete($event)"
-    >
-      ✕
-    </button>
   </div>
 
   <div class="card-body">
@@ -61,18 +52,5 @@
       </div>
     </div>
   </div>
-
-  <!-- Card delete confirmation overlay — inside article so position:absolute covers the card -->
-  @if (showDeleteConfirm) {
-    <div class="card-confirm-overlay" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <div class="card-confirm-panel">
-        <p class="card-confirm-message">Delete "{{ recipe.title }}"?</p>
-        <div class="card-confirm-actions">
-          <button class="card-btn-cancel" type="button" (click)="cancelDelete($event)">Cancel</button>
-          <button class="card-btn-delete" type="button" (click)="confirmDelete($event)">Delete</button>
-        </div>
-      </div>
-    </div>
-  }
 
 </article>
