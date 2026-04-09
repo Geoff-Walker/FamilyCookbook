@@ -861,6 +861,116 @@ namespace WalkerFcb.Api.Migrations
                     b.ToTable("recipe_versions", (string)null);
                 });
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.MealPlanSlot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BatchMultiplier")
+                        .HasColumnType("integer")
+                        .HasColumnName("batch_multiplier")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("recipe_id");
+
+                    b.Property<DateOnly>("SlotDate")
+                        .HasColumnType("date")
+                        .HasColumnName("slot_date");
+
+                    b.Property<string>("SlotType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slot_type");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id")
+                        .HasName("pk_meal_plan_slots");
+
+                    b.HasIndex("RecipeId")
+                        .HasDatabaseName("ix_meal_plan_slots_recipe_id");
+
+                    b.ToTable("meal_plan_slots", (string)null);
+                });
+
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeSuggestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("recipe_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status")
+                        .HasDefaultValue("pending");
+
+                    b.Property<int>("SuggestedBy")
+                        .HasColumnType("integer")
+                        .HasColumnName("suggested_by");
+
+                    b.Property<string>("SuggestionText")
+                        .HasColumnType("text")
+                        .HasColumnName("suggestion_text");
+
+                    b.Property<string>("SuggestionUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("suggestion_url");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id")
+                        .HasName("pk_recipe_suggestions");
+
+                    b.HasIndex("RecipeId")
+                        .HasDatabaseName("ix_recipe_suggestions_recipe_id");
+
+                    b.HasIndex("SuggestedBy")
+                        .HasDatabaseName("ix_recipe_suggestions_suggested_by");
+
+                    b.ToTable("recipe_suggestions", (string)null);
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
                 {
                     b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
@@ -1060,6 +1170,37 @@ namespace WalkerFcb.Api.Migrations
                     b.Navigation("PromotedFromCookInstance");
 
                     b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.MealPlanSlot", b =>
+                {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_meal_plan_slots_recipes_recipe_id");
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeSuggestion", b =>
+                {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.User", "SuggestedByUser")
+                        .WithMany()
+                        .HasForeignKey("SuggestedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_recipe_suggestions_users_suggested_by");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_recipe_suggestions_recipes_recipe_id");
+
+                    b.Navigation("SuggestedByUser");
+
+                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
