@@ -1,54 +1,32 @@
 <header class="app-header">
 
-  <!-- List mode: app title (h1) + nav + toggle -->
-  @if (isListMode) {
-    <div class="app-header__slot app-header__slot--left">
-      <h1 class="app-header__title">
-        <span class="app-header__title-main">Walker</span>
-        <span class="app-header__title-sub">Family Cookbook</span>
-      </h1>
-    </div>
-    <div class="app-header__slot app-header__slot--right">
-      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
-      <app-user-toggle />
-    </div>
-  }
+  <!-- Left zone: user toggle -->
+  <div class="app-header__zone app-header__zone--left">
+    <app-user-toggle />
+  </div>
 
-  <!-- Detail mode: back button + recipe title + nav + toggle -->
-  @if (isDetailMode) {
-    <div class="app-header__slot app-header__slot--left">
-      <button
-        type="button"
-        class="app-header__back-btn"
-        aria-label="Back to recipe list"
-        (click)="goBack()"
-      >
-        <span class="app-header__back-icon" aria-hidden="true">&#8592;</span>
-      </button>
-    </div>
-    <div class="app-header__slot app-header__slot--centre">
-      @if (pageTitle) {
-        <span class="app-header__page-title">{{ pageTitle }}</span>
-      }
-    </div>
-    <div class="app-header__slot app-header__slot--right">
-      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
-      <app-user-toggle />
-    </div>
-  }
+  <!-- Centre zone: app title -->
+  <div class="app-header__zone app-header__zone--centre">
+    <span class="app-header__title">Walker Family Cookbook</span>
+  </div>
 
-  <!-- Form mode: app title (span) + nav + toggle -->
-  @if (!isListMode && !isDetailMode) {
-    <div class="app-header__slot app-header__slot--left">
-      <span class="app-header__title">
-        <span class="app-header__title-main">Walker</span>
-        <span class="app-header__title-sub">Family Cookbook</span>
-      </span>
-    </div>
-    <div class="app-header__slot app-header__slot--right">
-      <a routerLink="/admin" class="app-header__nav-link" aria-label="Admin">Admin</a>
-      <app-user-toggle />
-    </div>
-  }
+  <!-- Right zone: burger icon -->
+  <div class="app-header__zone app-header__zone--right">
+    <button
+      type="button"
+      class="app-header__burger"
+      aria-label="Open navigation menu"
+      (click)="openPanel()"
+    >
+      <span class="app-header__burger-line" aria-hidden="true"></span>
+      <span class="app-header__burger-line" aria-hidden="true"></span>
+      <span class="app-header__burger-line" aria-hidden="true"></span>
+    </button>
+  </div>
 
 </header>
+
+<app-side-panel
+  [isOpen]="isPanelOpen"
+  (closed)="closePanel()"
+/>

@@ -1,0 +1,84 @@
+<!-- Overlay — tap to dismiss -->
+<div
+  class="side-panel-overlay"
+  [class.side-panel-overlay--open]="isOpen"
+  aria-hidden="true"
+  (click)="close()"
+></div>
+
+<!-- Side panel -->
+<aside
+  class="side-panel"
+  [class.side-panel--open]="isOpen"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Navigation"
+>
+
+  <!-- Panel header -->
+  <div class="side-panel__head">
+    <span class="side-panel__head-title">Walker Family Cookbook</span>
+    <button
+      type="button"
+      class="side-panel__close"
+      aria-label="Close navigation menu"
+      (click)="close()"
+    >&#x2715;</button>
+  </div>
+
+  <!-- Nav list -->
+  <nav class="side-panel__nav" aria-label="Main navigation">
+
+    <a
+      routerLink="/"
+      routerLinkActive="side-panel__nav-item--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="side-panel__nav-item"
+      (click)="close()"
+    >
+      <span class="side-panel__nav-icon" aria-hidden="true">&#127968;</span>
+      <span class="side-panel__nav-label">Recipes</span>
+    </a>
+
+    <a
+      routerLink="/meal-planner"
+      routerLinkActive="side-panel__nav-item--active"
+      class="side-panel__nav-item"
+      (click)="close()"
+    >
+      <span class="side-panel__nav-icon" aria-hidden="true">&#128197;</span>
+      <span class="side-panel__nav-label">Meal Planner</span>
+    </a>
+
+    <a
+      routerLink="/admin"
+      routerLinkActive="side-panel__nav-item--active"
+      class="side-panel__nav-item"
+      (click)="close()"
+    >
+      <span class="side-panel__nav-icon" aria-hidden="true">&#9881;</span>
+      <span class="side-panel__nav-label">Admin</span>
+    </a>
+
+    <a
+      routerLink="/geoff-filter"
+      routerLinkActive="side-panel__nav-item--active"
+      class="side-panel__nav-item"
+      (click)="close()"
+    >
+      <span class="side-panel__nav-icon" aria-hidden="true">&#9878;</span>
+      <span class="side-panel__nav-label">The Geoff Filter</span>
+    </a>
+
+  </nav>
+
+  <!-- Panel footer -->
+  <div class="side-panel__footer">
+    <button
+      type="button"
+      class="side-panel__suggest-btn"
+      (click)="onSuggestClick()"
+    >+ Submit Suggestion</button>
+  </div>
+
+</aside>

@@ -37,6 +37,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'meal-planner',
+    loadComponent: () =>
+      import('./features/meal-planner/meal-planner.component').then(
+        m => m.MealPlannerComponent
+      )
+  },
+  {
+    path: 'geoff-filter',
+    loadComponent: () =>
+      import('./features/geoff-filter/geoff-filter.component').then(
+        m => m.GeoffFilterComponent
+      )
+  },
+  {
     path: '**',
     redirectTo: ''
   }
