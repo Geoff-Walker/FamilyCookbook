@@ -291,7 +291,9 @@ public class WalkerDbContext : DbContext
             e.Property(rr => rr.CreatedAt).HasDefaultValueSql("now()");
 
             // rating CHECK 1-5 is enforced via raw SQL in the migration
-            e.Property(rr => rr.Rating).IsRequired();
+            // Column type must be explicit — AlterRatingToNumeric migration changed it to numeric(3,1)
+            // and EF Core's default mapping for decimal (numeric/numeric(18,6)) would mismatch the snapshot.
+            e.Property(rr => rr.Rating).IsRequired().HasColumnType("numeric(3,1)");
 
             e.HasOne(rr => rr.Recipe)
              .WithMany(r => r.Reviews)
