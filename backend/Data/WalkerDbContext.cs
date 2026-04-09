@@ -31,6 +31,7 @@ public class WalkerDbContext : DbContext
     public DbSet<RecipeReview> RecipeReviews => Set<RecipeReview>();
     public DbSet<CookInstance> CookInstances => Set<CookInstance>();
     public DbSet<CookInstanceIngredient> CookInstanceIngredients => Set<CookInstanceIngredient>();
+    public DbSet<RecipeVersion> RecipeVersions => Set<RecipeVersion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -357,6 +358,40 @@ public class WalkerDbContext : DbContext
              .WithMany(u => u.CookInstanceIngredients)
              .HasForeignKey(cii => cii.UnitId)
              .OnDelete(DeleteBehavior.SetNull)
+             .IsRequired(false);
+        });
+
+        // -----------------------------------------------------------------------
+        // recipe_versions
+        // -----------------------------------------------------------------------
+        modelBuilder.Entity<RecipeVersion>(e =>
+        {
+            e.ToTable("recipe_versions");
+            e.HasKey(rv => rv.Id);
+            e.Property(rv => rv.Id).UseIdentityByDefaultColumn();
+            e.Property(rv => rv.VersionNumber).IsRequired();
+            e.Property(rv => rv.Snapshot).IsRequired().HasColumnType("jsonb");
+            e.Property(rv => rv.CreatedAt).HasDefaultValueSql("now()");
+
+            // recipe_id -> recipes CASCADE (snapshots are part of the recipe's history)
+            e.HasOne(rv => rv.Recipe)
+             .WithMany(r => r.RecipeVersions)
+             .HasForeignKey(rv => rv.RecipeId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            // promoted_from -> cook_instances — nullable, no cascade
+            // A deleted cook instance must not cascade-delete the version snapshot
+            e.HasOne(rv => rv.PromotedFromCookInstance)
+             .WithMany(ci => ci.RecipeVersions)
+             .HasForeignKey(rv => rv.PromotedFrom)
+             .OnDelete(DeleteBehavior.Restrict)
+             .IsRequired(false);
+
+            // created_by -> users — nullable, no cascade
+            e.HasOne(rv => rv.CreatedByUser)
+             .WithMany(u => u.RecipeVersions)
+             .HasForeignKey(rv => rv.CreatedBy)
+             .OnDelete(DeleteBehavior.Restrict)
              .IsRequired(false);
         });
     }

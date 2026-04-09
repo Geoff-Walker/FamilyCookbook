@@ -810,6 +810,57 @@ namespace WalkerFcb.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("recipe_id");
+
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("version_number");
+
+                    b.Property<string>("Snapshot")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("snapshot");
+
+                    b.Property<int?>("PromotedFrom")
+                        .HasColumnType("integer")
+                        .HasColumnName("promoted_from");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer")
+                        .HasColumnName("created_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_recipe_versions");
+
+                    b.HasIndex("RecipeId")
+                        .HasDatabaseName("ix_recipe_versions_recipe_id");
+
+                    b.HasIndex("PromotedFrom")
+                        .HasDatabaseName("ix_recipe_versions_promoted_from");
+
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("ix_recipe_versions_created_by");
+
+                    b.ToTable("recipe_versions", (string)null);
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
                 {
                     b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
@@ -983,9 +1034,39 @@ namespace WalkerFcb.Api.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeVersion", b =>
+                {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
+                        .WithMany("RecipeVersions")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_recipe_versions_recipes_recipe_id");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.CookInstance", "PromotedFromCookInstance")
+                        .WithMany("RecipeVersions")
+                        .HasForeignKey("PromotedFrom")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_recipe_versions_cook_instances_promoted_from");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.User", "CreatedByUser")
+                        .WithMany("RecipeVersions")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_recipe_versions_users_created_by");
+
+                    b.Navigation("Recipe");
+
+                    b.Navigation("PromotedFromCookInstance");
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
                 {
                     b.Navigation("Ingredients");
+
+                    b.Navigation("RecipeVersions");
                 });
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.Ingredient", b =>
@@ -1002,6 +1083,8 @@ namespace WalkerFcb.Api.Migrations
                     b.Navigation("Ingredients");
 
                     b.Navigation("RecipeTags");
+
+                    b.Navigation("RecipeVersions");
 
                     b.Navigation("Reviews");
 
@@ -1035,6 +1118,8 @@ namespace WalkerFcb.Api.Migrations
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.User", b =>
                 {
                     b.Navigation("CookInstances");
+
+                    b.Navigation("RecipeVersions");
 
                     b.Navigation("Reviews");
                 });
