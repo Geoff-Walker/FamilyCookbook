@@ -23,6 +23,111 @@ namespace WalkerFcb.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("Portions")
+                        .HasColumnType("integer")
+                        .HasColumnName("portions");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("recipe_id");
+
+                    b.Property<DateTime>("StartedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_cook_instances");
+
+                    b.HasIndex("RecipeId")
+                        .HasDatabaseName("ix_cook_instances_recipe_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_cook_instances_user_id");
+
+                    b.ToTable("cook_instances", (string)null);
+                });
+
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstanceIngredient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(10,3)")
+                        .HasColumnName("amount");
+
+                    b.Property<bool>("Checked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("checked")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("CookInstanceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cook_instance_id");
+
+                    b.Property<int>("IngredientId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ingredient_id");
+
+                    b.Property<bool>("IsLimiter")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_limiter")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("unit_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_cook_instance_ingredients");
+
+                    b.HasIndex("CookInstanceId")
+                        .HasDatabaseName("ix_cook_instance_ingredients_cook_instance_id");
+
+                    b.HasIndex("IngredientId")
+                        .HasDatabaseName("ix_cook_instance_ingredients_ingredient_id");
+
+                    b.HasIndex("UnitId")
+                        .HasDatabaseName("ix_cook_instance_ingredients_unit_id");
+
+                    b.ToTable("cook_instance_ingredients", (string)null);
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.Ingredient", b =>
                 {
                     b.Property<int>("Id")
@@ -705,6 +810,56 @@ namespace WalkerFcb.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
+                {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
+                        .WithMany("CookInstances")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cook_instances_recipes_recipe_id");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.User", "User")
+                        .WithMany("CookInstances")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_cook_instances_users_user_id");
+
+                    b.Navigation("Recipe");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstanceIngredient", b =>
+                {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.CookInstance", "CookInstance")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("CookInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cook_instance_ingredients_cook_instances_cook_instance_id");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Ingredient", "Ingredient")
+                        .WithMany("CookInstanceIngredients")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_cook_instance_ingredients_ingredients_ingredient_id");
+
+                    b.HasOne("WalkerFcb.Api.Data.Entities.Unit", "Unit")
+                        .WithMany("CookInstanceIngredients")
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_cook_instance_ingredients_units_unit_id");
+
+                    b.Navigation("CookInstance");
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Unit");
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeIngredient", b =>
                 {
                     b.HasOne("WalkerFcb.Api.Data.Entities.Ingredient", "Ingredient")
@@ -828,13 +983,22 @@ namespace WalkerFcb.Api.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("WalkerFcb.Api.Data.Entities.CookInstance", b =>
+                {
+                    b.Navigation("Ingredients");
+                });
+
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.Ingredient", b =>
                 {
+                    b.Navigation("CookInstanceIngredients");
+
                     b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.Recipe", b =>
                 {
+                    b.Navigation("CookInstances");
+
                     b.Navigation("Ingredients");
 
                     b.Navigation("RecipeTags");
@@ -863,11 +1027,15 @@ namespace WalkerFcb.Api.Migrations
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.Unit", b =>
                 {
+                    b.Navigation("CookInstanceIngredients");
+
                     b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.User", b =>
                 {
+                    b.Navigation("CookInstances");
+
                     b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618

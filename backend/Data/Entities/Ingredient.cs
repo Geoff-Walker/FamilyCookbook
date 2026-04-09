@@ -12,4 +12,5 @@ public class Ingredient
     public string Name { get; set; } = string.Empty;
 
     public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = [];
+    public ICollection<CookInstanceIngredient> CookInstanceIngredients { get; set; } = [];
 }
