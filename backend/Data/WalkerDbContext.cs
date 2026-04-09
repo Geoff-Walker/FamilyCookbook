@@ -32,6 +32,8 @@ public class WalkerDbContext : DbContext
     public DbSet<CookInstance> CookInstances => Set<CookInstance>();
     public DbSet<CookInstanceIngredient> CookInstanceIngredients => Set<CookInstanceIngredient>();
     public DbSet<RecipeVersion> RecipeVersions => Set<RecipeVersion>();
+    public DbSet<MealPlanSlot> MealPlanSlots => Set<MealPlanSlot>();
+    public DbSet<RecipeSuggestion> RecipeSuggestions => Set<RecipeSuggestion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -391,6 +393,57 @@ public class WalkerDbContext : DbContext
             e.HasOne(rv => rv.CreatedByUser)
              .WithMany(u => u.RecipeVersions)
              .HasForeignKey(rv => rv.CreatedBy)
+             .OnDelete(DeleteBehavior.Restrict)
+             .IsRequired(false);
+        });
+
+        // -----------------------------------------------------------------------
+        // meal_plan_slots
+        // -----------------------------------------------------------------------
+        modelBuilder.Entity<MealPlanSlot>(e =>
+        {
+            e.ToTable("meal_plan_slots");
+            e.HasKey(m => m.Id);
+            e.Property(m => m.Id).UseIdentityByDefaultColumn();
+            e.Property(m => m.SlotDate).IsRequired();
+            e.Property(m => m.SlotType).IsRequired();
+            e.Property(m => m.BatchMultiplier).HasDefaultValue(1);
+            e.Property(m => m.SortOrder).HasDefaultValue(0);
+            e.Property(m => m.CreatedAt).HasDefaultValueSql("now()");
+
+            // recipe_id -> recipes RESTRICT, nullable
+            // Deleting a recipe must not cascade-delete the meal plan slot
+            e.HasOne(m => m.Recipe)
+             .WithMany()
+             .HasForeignKey(m => m.RecipeId)
+             .OnDelete(DeleteBehavior.Restrict)
+             .IsRequired(false);
+        });
+
+        // -----------------------------------------------------------------------
+        // recipe_suggestions
+        // -----------------------------------------------------------------------
+        modelBuilder.Entity<RecipeSuggestion>(e =>
+        {
+            e.ToTable("recipe_suggestions");
+            e.HasKey(s => s.Id);
+            e.Property(s => s.Id).UseIdentityByDefaultColumn();
+            e.Property(s => s.Status).IsRequired().HasDefaultValue("pending");
+            e.Property(s => s.CreatedAt).HasDefaultValueSql("now()");
+            e.Property(s => s.UpdatedAt).HasDefaultValueSql("now()");
+
+            // suggested_by -> users RESTRICT, NOT NULL
+            e.HasOne(s => s.SuggestedByUser)
+             .WithMany()
+             .HasForeignKey(s => s.SuggestedBy)
+             .OnDelete(DeleteBehavior.Restrict)
+             .IsRequired();
+
+            // recipe_id -> recipes RESTRICT, nullable
+            // Populated when suggestion is accepted via the Geoff Filter accept flow
+            e.HasOne(s => s.Recipe)
+             .WithMany()
+             .HasForeignKey(s => s.RecipeId)
              .OnDelete(DeleteBehavior.Restrict)
              .IsRequired(false);
         });
