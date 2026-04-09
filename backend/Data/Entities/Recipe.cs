@@ -33,4 +33,5 @@ public class Recipe
     public ICollection<RecipeIngredient> Ingredients { get; set; } = [];
     public ICollection<RecipeTag> RecipeTags { get; set; } = [];
     public ICollection<RecipeReview> Reviews { get; set; } = [];
+    public ICollection<CookInstance> CookInstances { get; set; } = [];
 }

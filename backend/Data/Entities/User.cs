@@ -10,4 +10,5 @@ public class User
     public string Name { get; set; } = string.Empty;
 
     public ICollection<RecipeReview> Reviews { get; set; } = [];
+    public ICollection<CookInstance> CookInstances { get; set; } = [];
 }

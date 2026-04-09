@@ -29,6 +29,8 @@ public class WalkerDbContext : DbContext
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<RecipeTag> RecipeTags => Set<RecipeTag>();
     public DbSet<RecipeReview> RecipeReviews => Set<RecipeReview>();
+    public DbSet<CookInstance> CookInstances => Set<CookInstance>();
+    public DbSet<CookInstanceIngredient> CookInstanceIngredients => Set<CookInstanceIngredient>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -297,6 +299,65 @@ public class WalkerDbContext : DbContext
              .WithMany(u => u.Reviews)
              .HasForeignKey(rr => rr.UserId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // -----------------------------------------------------------------------
+        // cook_instances
+        // -----------------------------------------------------------------------
+        modelBuilder.Entity<CookInstance>(e =>
+        {
+            e.ToTable("cook_instances");
+            e.HasKey(ci => ci.Id);
+            e.Property(ci => ci.Id).UseIdentityByDefaultColumn();
+            e.Property(ci => ci.StartedAt).HasDefaultValueSql("now()");
+
+            // Soft delete — application code filters WHERE deleted_at IS NULL
+            e.Property(ci => ci.DeletedAt).IsRequired(false);
+            e.Property(ci => ci.CompletedAt).IsRequired(false);
+
+            // recipe_id -> recipes CASCADE
+            e.HasOne(ci => ci.Recipe)
+             .WithMany(r => r.CookInstances)
+             .HasForeignKey(ci => ci.RecipeId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            // user_id -> users RESTRICT (do not cascade-delete cook history when user removed)
+            e.HasOne(ci => ci.User)
+             .WithMany(u => u.CookInstances)
+             .HasForeignKey(ci => ci.UserId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // -----------------------------------------------------------------------
+        // cook_instance_ingredients
+        // -----------------------------------------------------------------------
+        modelBuilder.Entity<CookInstanceIngredient>(e =>
+        {
+            e.ToTable("cook_instance_ingredients");
+            e.HasKey(cii => cii.Id);
+            e.Property(cii => cii.Id).UseIdentityByDefaultColumn();
+            e.Property(cii => cii.Amount).HasColumnType("decimal(10,3)");
+            e.Property(cii => cii.Checked).HasDefaultValue(false);
+            e.Property(cii => cii.IsLimiter).HasDefaultValue(false);
+
+            // cook_instance_id -> cook_instances CASCADE
+            e.HasOne(cii => cii.CookInstance)
+             .WithMany(ci => ci.Ingredients)
+             .HasForeignKey(cii => cii.CookInstanceId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            // ingredient_id -> ingredients RESTRICT
+            e.HasOne(cii => cii.Ingredient)
+             .WithMany(i => i.CookInstanceIngredients)
+             .HasForeignKey(cii => cii.IngredientId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            // unit_id -> units SET NULL (nullable)
+            e.HasOne(cii => cii.Unit)
+             .WithMany(u => u.CookInstanceIngredients)
+             .HasForeignKey(cii => cii.UnitId)
+             .OnDelete(DeleteBehavior.SetNull)
+             .IsRequired(false);
         });
     }
 }

@@ -13,4 +13,5 @@ public class Unit
     public string UnitType { get; set; } = string.Empty;
 
     public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = [];
+    public ICollection<CookInstanceIngredient> CookInstanceIngredients { get; set; } = [];
 }
