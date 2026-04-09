@@ -11,7 +11,7 @@ public class ReviewDto
     public int RecipeId { get; init; }
     public int UserId { get; init; }
     public string UserName { get; init; } = string.Empty;
-    public int Rating { get; init; }
+    public decimal Rating { get; init; }
     public string? Notes { get; init; }
     public DateOnly? MadeOn { get; init; }
     public DateTime CreatedAt { get; init; }
@@ -23,7 +23,7 @@ public class ReviewDto
 public class CreateReviewDto
 {
     public int UserId { get; init; }
-    public int Rating { get; init; }
+    public decimal Rating { get; init; }
     public string? Notes { get; init; }
     public string? MadeOn { get; init; }
 }
