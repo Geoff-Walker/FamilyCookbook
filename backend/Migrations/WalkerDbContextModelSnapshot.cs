@@ -298,8 +298,8 @@ namespace WalkerFcb.Api.Migrations
                         .HasColumnType("text")
                         .HasColumnName("notes");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer")
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("numeric(3,1)")
                         .HasColumnName("rating");
 
                     b.Property<int>("RecipeId")

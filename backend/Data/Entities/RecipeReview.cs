@@ -10,7 +10,7 @@ public class RecipeReview
     public int Id { get; set; }
     public int RecipeId { get; set; }
     public int UserId { get; set; }
-    public int Rating { get; set; }
+    public decimal Rating { get; set; }
     public string? Notes { get; set; }
     public DateOnly? MadeOn { get; set; }
     public DateTime CreatedAt { get; set; }
