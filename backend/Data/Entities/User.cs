@@ -11,4 +11,5 @@ public class User
 
     public ICollection<RecipeReview> Reviews { get; set; } = [];
     public ICollection<CookInstance> CookInstances { get; set; } = [];
+    public ICollection<RecipeVersion> RecipeVersions { get; set; } = [];
 }

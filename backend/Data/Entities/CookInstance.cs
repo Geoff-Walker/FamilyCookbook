@@ -19,4 +19,5 @@ public class CookInstance
     public Recipe Recipe { get; set; } = null!;
     public User User { get; set; } = null!;
     public ICollection<CookInstanceIngredient> Ingredients { get; set; } = [];
+    public ICollection<RecipeVersion> RecipeVersions { get; set; } = [];
 }
