@@ -38,12 +38,12 @@ public class CookInstanceService
             .Include(r => r.Stages.OrderBy(s => s.SortOrder))
                 .ThenInclude(s => s.Ingredients.OrderBy(i => i.SortOrder))
                     .ThenInclude(i => i.Ingredient)
-            .Include(r => r.Stages)
-                .ThenInclude(s => s.Ingredients)
+            .Include(r => r.Stages.OrderBy(s => s.SortOrder))
+                .ThenInclude(s => s.Ingredients.OrderBy(i => i.SortOrder))
                     .ThenInclude(i => i.Unit)
             .Include(r => r.Ingredients.Where(i => i.StageId == null).OrderBy(i => i.SortOrder))
                 .ThenInclude(i => i.Ingredient)
-            .Include(r => r.Ingredients.Where(i => i.StageId == null))
+            .Include(r => r.Ingredients.Where(i => i.StageId == null).OrderBy(i => i.SortOrder))
                 .ThenInclude(i => i.Unit)
             .FirstOrDefaultAsync(r => r.Id == request.RecipeId);
 
