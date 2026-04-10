@@ -11,6 +11,8 @@ Thumbs.db
 backend/bin/
 backend/obj/
 backend/*.user
+tests/bin/
+tests/obj/
 
 # Angular build output
 frontend/node_modules/
