@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -5,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WalkerFcb.Api.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(WalkerFcb.Api.Data.WalkerDbContext))]
+    [Migration("20260406130000_NormaliseIngredientNamesToLowercase")]
     public partial class NormaliseIngredientNamesToLowercase : Migration
     {
         /// <inheritdoc />
