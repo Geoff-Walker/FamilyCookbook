@@ -1,0 +1,234 @@
+// ---- Limiter callout --------------------------------------------------------
+
+.limiter-callout {
+  background: var(--color-surface-2);
+  border-left: 4px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.callout-text {
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+// ---- Checklist container ----------------------------------------------------
+
+.checklist {
+  width: 100%;
+}
+
+// ---- Stage header -----------------------------------------------------------
+
+.stage-header {
+  background: var(--color-surface-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.stage-name {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+// ---- Ingredient row (CSS Grid) ----------------------------------------------
+
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 100px 80px 48px;
+  align-items: center;
+  min-height: 56px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-0);
+  transition: background 0.15s ease;
+
+  &--checked {
+    background: color-mix(in srgb, var(--color-success) 6%, transparent);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: 36px 1fr 80px 64px 40px;
+  }
+}
+
+// ---- Cells ------------------------------------------------------------------
+
+.cell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-1);
+
+  &--tick {
+    justify-content: center;
+    padding: 0;
+  }
+
+  &--name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+
+  &--amount {
+    justify-content: flex-end;
+  }
+
+  &--unit {
+    padding-left: var(--space-2);
+  }
+
+  &--limiter {
+    justify-content: center;
+    padding: 0;
+  }
+}
+
+// ---- Tick button ------------------------------------------------------------
+
+.tick-btn {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  // Expand touch target to 40×40 via padding on parent cell
+  margin: 6px; // (40 - 28) / 2
+
+  &--checked {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: #fff;
+  }
+
+  &:hover:not(.tick-btn--checked) {
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.tick-icon {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+}
+
+// ---- Ingredient name --------------------------------------------------------
+
+.ingredient-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+
+  &--checked {
+    text-decoration: line-through;
+    color: var(--color-text-tertiary);
+  }
+}
+
+.ingredient-notes {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+
+  @media (min-width: 768px) {
+    // On tablet notes sit in the same cell, wrapping below the name naturally
+  }
+}
+
+// ---- Amount field -----------------------------------------------------------
+
+.amount-field {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  text-align: right;
+  padding: 0 var(--space-2);
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
+
+  &--override {
+    color: var(--color-primary);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
+  }
+
+  // Remove spinners
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+// ---- Unit label -------------------------------------------------------------
+
+.unit-label {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+// ---- Limiter toggle button --------------------------------------------------
+
+.limiter-toggle {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  transition: color 0.15s ease;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &--active {
+    color: var(--color-warning);
+  }
+
+  &:hover {
+    color: var(--color-warning);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// ---- Limiter sub-row --------------------------------------------------------
+
+.limiter-row {
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-warning) 5%, transparent);
+}

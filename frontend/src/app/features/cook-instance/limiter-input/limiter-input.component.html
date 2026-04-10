@@ -1,0 +1,15 @@
+<div class="limiter-input-row">
+  <label class="limiter-label">Qty I have:</label>
+  <input
+    class="limiter-qty-field"
+    type="number"
+    min="0"
+    step="any"
+    [value]="limiterQty ?? ''"
+    (input)="onInput($any($event.target).value)"
+    [attr.aria-label]="'Quantity of ' + ingredient.ingredientName + ' available'"
+  />
+  @if (ingredient.unitAbbreviation) {
+    <span class="limiter-unit">{{ ingredient.unitAbbreviation }}</span>
+  }
+</div>

@@ -1,0 +1,67 @@
+<!-- Loading -->
+@if (viewState === 'loading') {
+  <div class="state-loading" aria-busy="true" aria-label="Loading cook instance">
+    <div class="skeleton-line shimmer" style="width: 60%; height: 28px;"></div>
+    <div class="skeleton-line shimmer" style="width: 40%; height: 16px; margin-top: 8px;"></div>
+  </div>
+}
+
+<!-- Not found -->
+@if (viewState === 'notFound') {
+  <div class="state-panel">
+    <p class="state-message">Cook session not found.</p>
+    <a routerLink="/" class="state-link">← Back to recipes</a>
+  </div>
+}
+
+<!-- Error -->
+@if (viewState === 'error') {
+  <div class="state-panel">
+    <p class="state-message">Could not load cook session. Please try again.</p>
+    <button class="btn-retry" type="button" (click)="load()">Retry</button>
+  </div>
+}
+
+<!-- Loaded -->
+@if (viewState === 'loaded' && cookInstance) {
+  <div class="cook-page">
+
+    <!-- Page header -->
+    <header class="cook-header">
+      <div class="cook-header__inner">
+        <h1 class="cook-title">{{ cookInstance.recipeTitle }}</h1>
+        <div class="cook-subtitle-row">
+          <span class="cook-subtitle">Started {{ formatStartedAt(cookInstance.startedAt) }}</span>
+          <span class="cook-subtitle-sep" aria-hidden="true">·</span>
+          <span class="cook-subtitle">{{ cookInstance.portions ?? '?' }} portions</span>
+        </div>
+        <span class="status-pill" role="status">In Progress</span>
+      </div>
+    </header>
+
+    <!-- Ingredient checklist -->
+    <main class="cook-main">
+      <div class="checklist-wrapper">
+        <app-ingredient-checklist
+          [stageGroups]="cookInstance.stageGroups"
+          [basePortions]="cookInstance.portions"
+          (ingredientPatched)="onIngredientPatched($event)"
+        />
+      </div>
+    </main>
+
+    <!-- Sticky footer -->
+    <footer class="cook-footer">
+      <div class="cook-footer__inner">
+        <button
+          class="btn-complete"
+          type="button"
+          (click)="onCompleteCook()"
+        >
+          Complete Cook
+        </button>
+      </div>
+    </footer>
+
+  </div>
+}
