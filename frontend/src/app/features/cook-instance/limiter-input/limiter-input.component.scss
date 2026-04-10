@@ -1,0 +1,43 @@
+.limiter-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: 40px; // inset to align with ingredient name column
+  padding: var(--space-2) var(--space-4) var(--space-2) 0;
+}
+
+.limiter-label {
+  font: var(--type-caption);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.limiter-qty-field {
+  width: 80px;
+  height: 36px;
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  font: var(--type-body);
+  text-align: right;
+  padding: 0 var(--space-2);
+  color: var(--color-text-primary);
+
+  &:focus {
+    outline: 2px solid var(--color-warning);
+    outline-offset: 1px;
+  }
+
+  // Remove number input spinners
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  -moz-appearance: textfield;
+}
+
+.limiter-unit {
+  font: var(--type-caption);
+  color: var(--color-text-secondary);
+}

@@ -1,4 +1,5 @@
 using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -7,6 +8,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WalkerFcb.Api.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(WalkerFcb.Api.Data.WalkerDbContext))]
+    [Migration("20260409110000_AddRecipeVersionsTable")]
     public partial class AddRecipeVersionsTable : Migration
     {
         /// <inheritdoc />

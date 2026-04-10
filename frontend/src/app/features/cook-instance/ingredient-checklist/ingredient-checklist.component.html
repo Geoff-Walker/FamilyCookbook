@@ -1,0 +1,126 @@
+<!-- Limiter callout — only shown when one or more limiters are active -->
+@if (activeLimiters.length > 0) {
+  <div class="limiter-callout" role="status" aria-live="polite">
+    @if (activeLimiters.length === 1) {
+      <p class="callout-text">
+        Scaled to {{ scaledPortions }} portions based on
+        <strong>{{ activeLimiters[0].ingredient.ingredientName }}</strong>
+        ({{ activeLimiters[0].limiterQty ?? '?' }}
+        {{ activeLimiters[0].ingredient.unitAbbreviation }} available)
+      </p>
+    } @else {
+      <p class="callout-text">
+        <strong>{{ activeLimiters[0].ingredient.ingredientName }}</strong> gives {{ limiterPortions(activeLimiters[0]) }} portions.
+        <strong>{{ activeLimiters[1].ingredient.ingredientName }}</strong> gives {{ limiterPortions(activeLimiters[1]) }} portions.
+        @if (bindingLimiter) {
+          <strong>{{ bindingLimiter.ingredient.ingredientName }}</strong> is binding.
+        }
+      </p>
+    }
+  </div>
+}
+
+<!-- Ingredient checklist -->
+<div class="checklist">
+  @for (stage of stageGroups; track trackByStage($index, stage)) {
+
+    <!-- Stage header — only shown for multi-stage recipes -->
+    @if (isMultiStage && stage.stageName) {
+      <div class="stage-header" role="rowgroup">
+        <span class="stage-name">{{ stage.stageName }}</span>
+      </div>
+    }
+
+    <!-- Ingredient rows -->
+    @for (ing of stage.ingredients; track trackByIngredientId($index, ing)) {
+      @let state = getRowState(ing.id);
+
+      <!-- Main row -->
+      <div
+        class="ingredient-row"
+        [class.ingredient-row--checked]="ing.checked"
+        role="row"
+      >
+        <!-- Tick box -->
+        <div class="cell cell--tick">
+          <button
+            class="tick-btn"
+            type="button"
+            [class.tick-btn--checked]="ing.checked"
+            (click)="onToggleChecked(ing.id)"
+            [attr.aria-label]="(ing.checked ? 'Uncheck' : 'Check') + ' ' + ing.ingredientName"
+            [attr.aria-pressed]="ing.checked"
+          >
+            @if (ing.checked) {
+              <svg class="tick-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            }
+          </button>
+        </div>
+
+        <!-- Ingredient name + notes -->
+        <div class="cell cell--name">
+          <span
+            class="ingredient-name"
+            [class.ingredient-name--checked]="ing.checked"
+          >{{ ing.ingredientName }}</span>
+          @if (ing.notes) {
+            <span class="ingredient-notes">{{ ing.notes }}</span>
+          }
+        </div>
+
+        <!-- Amount field -->
+        <div class="cell cell--amount">
+          @if (state) {
+            <input
+              class="amount-field"
+              type="number"
+              min="0"
+              step="any"
+              [value]="state.amountFieldValue"
+              [class.amount-field--override]="state.manuallyOverridden"
+              (input)="onAmountInput(ing.id, $any($event.target).value)"
+              (blur)="onAmountBlur(ing.id)"
+              [attr.aria-label]="'Amount of ' + ing.ingredientName"
+            />
+          }
+        </div>
+
+        <!-- Unit -->
+        <div class="cell cell--unit">
+          <span class="unit-label">{{ ing.unitAbbreviation ?? ing.unitName ?? '' }}</span>
+        </div>
+
+        <!-- Limiter toggle -->
+        <div class="cell cell--limiter">
+          <button
+            class="limiter-toggle"
+            type="button"
+            [class.limiter-toggle--active]="ing.isLimiter"
+            (click)="onToggleLimiter(ing.id)"
+            [attr.aria-label]="(ing.isLimiter ? 'Remove limiter from' : 'Set limiter on') + ' ' + ing.ingredientName"
+            [attr.aria-pressed]="ing.isLimiter"
+          >
+            <!-- Flag / limiter icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+              <line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Limiter input sub-row — expands below when ingredient is a limiter -->
+      @if (ing.isLimiter && state) {
+        <div class="limiter-row">
+          <app-limiter-input
+            [ingredient]="ing"
+            [baseAmount]="ing.amount"
+            (limiterQuantityChange)="onLimiterQuantityChange(ing.id, $event)"
+          />
+        </div>
+      }
+    }
+  }
+</div>
