@@ -144,7 +144,7 @@ export class IngredientChecklistComponent implements OnChanges {
   onToggleChecked(ingredientId: number): void {
     const state = this.rowStates.get(ingredientId);
     if (!state) return;
-    state.ingredient = { ...state.ingredient, checked: !state.ingredient.checked };
+    state.ingredient.checked = !state.ingredient.checked;
     this.ingredientPatched.emit({
       ingredientId,
       patch: { checked: state.ingredient.checked }
@@ -199,7 +199,7 @@ export class IngredientChecklistComponent implements OnChanges {
     if (!currentlyLimiter && this.limiterCount >= 2) return;
 
     const newIsLimiter = !currentlyLimiter;
-    state.ingredient = { ...state.ingredient, isLimiter: newIsLimiter };
+    state.ingredient.isLimiter = newIsLimiter;
 
     if (!newIsLimiter) {
       // Turning off — clear qty and rescale
