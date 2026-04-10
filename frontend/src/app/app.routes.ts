@@ -51,6 +51,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'cook/:id',
+    loadComponent: () =>
+      import('./features/cook-instance/cook-instance-page/cook-instance-page.component').then(
+        m => m.CookInstancePageComponent
+      )
+  },
+  {
     path: '**',
     redirectTo: ''
   }

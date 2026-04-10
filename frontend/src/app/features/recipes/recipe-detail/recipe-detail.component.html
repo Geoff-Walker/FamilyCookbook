@@ -58,6 +58,18 @@
       </div>
     }
 
+    <!-- Start Cook action -->
+    <div class="start-cook-bar">
+      <button
+        class="btn-start-cook"
+        type="button"
+        (click)="startCook()"
+        [disabled]="isStartingCook"
+      >
+        {{ isStartingCook ? 'Starting…' : 'Start Cook' }}
+      </button>
+    </div>
+
     <!-- Metadata bar -->
     <div class="metadata-bar">
       <div class="metadata-items">

@@ -148,6 +148,43 @@
   }
 }
 
+/* ---- Start Cook bar ---- */
+.start-cook-bar {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+
+  @media (min-width: 768px) {
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+.btn-start-cook {
+  height: 44px;
+  padding: 0 var(--space-6);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
 /* ---- Metadata bar ---- */
 .metadata-bar {
   padding: var(--space-4);

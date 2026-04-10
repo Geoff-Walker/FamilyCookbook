@@ -10,6 +10,8 @@ import { IngredientListComponent } from '../ingredient-list/ingredient-list.comp
 import { MethodStepsComponent } from '../method-steps/method-steps.component';
 import { RatingReviewComponent } from '../rating-review/rating-review.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
+import { CookInstanceApiService } from '../../../core/services/cook-instance-api.service';
+import { UserStateService } from '../../../core/services/user-state.service';
 
 type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
 
@@ -27,13 +29,16 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
 
   showDeleteConfirm = false;
   isDeleting = false;
+  isStartingCook = false;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeApi: RecipeApiService,
     private readonly headerState: HeaderStateService,
-    private readonly snackBar: MatSnackBar
+    private readonly snackBar: MatSnackBar,
+    private readonly cookApi: CookInstanceApiService,
+    private readonly userState: UserStateService
   ) {}
 
   ngOnInit(): void {
@@ -87,6 +92,24 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         this.isDeleting = false;
         this.showDeleteConfirm = false;
         this.snackBar.open('Could not delete recipe. Please try again.', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
+  startCook(): void {
+    if (!this.recipe || this.isStartingCook) return;
+    this.isStartingCook = true;
+    this.cookApi.startCook({
+      recipeId: this.recipeId,
+      userId: this.userState.activeUserId,
+      portions: this.recipe.servings ?? null
+    }).subscribe({
+      next: (cookInstance) => {
+        this.router.navigate(['/cook', cookInstance.id]);
+      },
+      error: () => {
+        this.isStartingCook = false;
+        this.snackBar.open('Could not start cook session. Please try again.', 'Dismiss', { duration: 5000 });
       }
     });
   }
