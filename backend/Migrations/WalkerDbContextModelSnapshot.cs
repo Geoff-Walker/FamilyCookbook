@@ -284,6 +284,10 @@ namespace WalkerFcb.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CookInstanceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("cook_instance_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -312,6 +316,9 @@ namespace WalkerFcb.Api.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_recipe_reviews");
+
+                    b.HasIndex("CookInstanceId")
+                        .HasDatabaseName("ix_recipe_reviews_cook_instance_id");
 
                     b.HasIndex("RecipeId")
                         .HasDatabaseName("ix_recipe_reviews_recipe_id");
@@ -1060,6 +1067,12 @@ namespace WalkerFcb.Api.Migrations
 
             modelBuilder.Entity("WalkerFcb.Api.Data.Entities.RecipeReview", b =>
                 {
+                    b.HasOne("WalkerFcb.Api.Data.Entities.CookInstance", "CookInstance")
+                        .WithMany()
+                        .HasForeignKey("CookInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_recipe_reviews_cook_instances_cook_instance_id");
+
                     b.HasOne("WalkerFcb.Api.Data.Entities.Recipe", "Recipe")
                         .WithMany("Reviews")
                         .HasForeignKey("RecipeId")
@@ -1073,6 +1086,8 @@ namespace WalkerFcb.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_recipe_reviews_users_user_id");
+
+                    b.Navigation("CookInstance");
 
                     b.Navigation("Recipe");
 

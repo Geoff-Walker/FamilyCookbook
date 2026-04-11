@@ -304,6 +304,14 @@ public class WalkerDbContext : DbContext
              .WithMany(u => u.Reviews)
              .HasForeignKey(rr => rr.UserId)
              .OnDelete(DeleteBehavior.Cascade);
+
+            // cook_instance_id — nullable FK; SetNull so deleting a cook instance
+            // does not cascade-delete its associated reviews.
+            e.HasOne(rr => rr.CookInstance)
+             .WithMany()
+             .HasForeignKey(rr => rr.CookInstanceId)
+             .OnDelete(DeleteBehavior.SetNull)
+             .IsRequired(false);
         });
 
         // -----------------------------------------------------------------------

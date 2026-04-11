@@ -178,6 +178,7 @@ public class CookInstanceService
             cookInstance.Notes = request.Notes;
 
         // Persist any submitted reviews
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
         foreach (var reviewDto in request.Reviews)
         {
             _db.RecipeReviews.Add(new RecipeReview
@@ -185,7 +186,9 @@ public class CookInstanceService
                 RecipeId = cookInstance.RecipeId,
                 UserId = reviewDto.UserId,
                 Rating = reviewDto.Rating,
-                Notes = reviewDto.Notes,
+                Notes = request.Notes,     // shared notes field per spec
+                MadeOn = today,
+                CookInstanceId = cookInstance.Id,
                 CreatedAt = DateTime.UtcNow
             });
         }
