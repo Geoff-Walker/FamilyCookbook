@@ -46,3 +46,18 @@ export interface PatchCookIngredientPayload {
   amount?: number;
   isLimiter?: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// POST /api/cook-instances/{id}/complete — request
+// ---------------------------------------------------------------------------
+
+export interface CookReviewPayload {
+  userId: number;
+  rating: number;
+}
+
+export interface CompleteCookPayload {
+  portions: number | null;
+  notes: string | null;
+  reviews: CookReviewPayload[];
+}
