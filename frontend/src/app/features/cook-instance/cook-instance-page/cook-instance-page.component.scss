@@ -103,12 +103,29 @@
   align-items: center;
   height: 24px;
   padding: 0 var(--space-3);
-  background: var(--color-warning);
   color: #fff;
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
   font-weight: 600;
   align-self: flex-start;
+
+  // Default (in-progress)
+  background: var(--color-warning);
+
+  // Awaiting Review — warning tone matches spec
+  &.status-pill--awaiting {
+    background: var(--color-warning);
+  }
+
+  // Completed — success colour per AC8
+  &.status-pill--completed {
+    background: var(--color-success);
+  }
+
+  // In-progress — already the default, explicit for clarity
+  &.status-pill--in-progress {
+    background: var(--color-warning);
+  }
 }
 
 // ---- Main content -----------------------------------------------------------

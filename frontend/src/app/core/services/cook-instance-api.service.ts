@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  CompleteCookPayload,
   CookInstanceDetailDto,
   PatchCookIngredientPayload,
   StartCookPayload
@@ -35,7 +36,10 @@ export class CookInstanceApiService {
     );
   }
 
-  completeCook(cookInstanceId: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/cook-instances/${cookInstanceId}/complete`, {});
+  completeCook(cookInstanceId: number, payload: CompleteCookPayload): Observable<CookInstanceDetailDto> {
+    return this.http.post<CookInstanceDetailDto>(
+      `${this.baseUrl}/cook-instances/${cookInstanceId}/complete`,
+      payload
+    );
   }
 }

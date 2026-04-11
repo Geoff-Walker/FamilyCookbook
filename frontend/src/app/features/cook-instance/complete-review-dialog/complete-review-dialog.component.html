@@ -1,0 +1,131 @@
+<!-- Overlay backdrop -->
+<div class="crd-backdrop" role="presentation" (click)="onBackdropClick()"></div>
+
+<!-- Dialog panel -->
+<div
+  class="crd-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="crd-title"
+>
+  <h2 class="crd-title" id="crd-title">How did it go?</h2>
+
+  <!-- Rating rows — one per user -->
+  @for (ur of userRatings; track ur.userId) {
+    <div class="crd-rating-row">
+      <span class="crd-rating-label">{{ ur.userName }}</span>
+      <div
+        class="crd-stars"
+        [attr.aria-label]="ur.userName + ' rating: ' + ratingLabel(ur)"
+        (mouseleave)="onStarLeave(ur)"
+      >
+        @for (star of starValues; track star) {
+          <button
+            type="button"
+            class="crd-star-btn"
+            [attr.aria-label]="starAriaLabel(star)"
+            (click)="onStarClick(ur, star, $event)"
+            (mousemove)="onStarHover(ur, star, $event)"
+          >
+            <!-- SVG with clip-path to allow partial fill for half-star -->
+            <svg class="crd-star-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <defs>
+                <clipPath [id]="'left-' + ur.userId + '-' + star">
+                  <rect x="0" y="0" width="12" height="24" />
+                </clipPath>
+                <clipPath [id]="'right-' + ur.userId + '-' + star">
+                  <rect x="12" y="0" width="12" height="24" />
+                </clipPath>
+              </defs>
+              <!-- Empty star base -->
+              <path
+                class="crd-star-empty"
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <!-- Left half fill -->
+              @if (leftHalfFilled(ur, star)) {
+                <path
+                  class="crd-star-filled"
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                  [attr.clip-path]="'url(#left-' + ur.userId + '-' + star + ')'"
+                />
+              }
+              <!-- Right half fill -->
+              @if (rightHalfFilled(ur, star)) {
+                <path
+                  class="crd-star-filled"
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                  [attr.clip-path]="'url(#right-' + ur.userId + '-' + star + ')'"
+                />
+              }
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Rating validation error (AC9) -->
+  @if (ratingError) {
+    <p class="crd-error" role="alert">{{ ratingError }}</p>
+  }
+
+  <!-- Notes textarea (AC4) -->
+  <div class="crd-field">
+    <label class="crd-label" for="crd-notes">Notes</label>
+    <textarea
+      id="crd-notes"
+      class="crd-textarea"
+      rows="3"
+      placeholder="Any notes about this cook?"
+      [(ngModel)]="notes"
+    ></textarea>
+  </div>
+
+  <!-- Portions field (AC5) -->
+  <div class="crd-field crd-field--inline">
+    <label class="crd-label" for="crd-portions">Portions made:</label>
+    <input
+      id="crd-portions"
+      class="crd-portions-input"
+      type="number"
+      min="1"
+      [(ngModel)]="portions"
+    />
+  </div>
+
+  <!-- Save error -->
+  @if (saveError) {
+    <p class="crd-error" role="alert">{{ saveError }}</p>
+  }
+
+  <!-- Actions -->
+  <div class="crd-actions">
+    <button
+      type="button"
+      class="crd-btn-save"
+      [disabled]="isSaving"
+      (click)="onSaveReview()"
+    >
+      @if (isSaving) {
+        <span class="crd-spinner" aria-hidden="true"></span>
+        <span class="crd-sr-only">Saving…</span>
+      } @else {
+        Save Review
+      }
+    </button>
+
+    <!-- Skip link (AC7) -->
+    <button
+      type="button"
+      class="crd-btn-skip"
+      [disabled]="isSaving"
+      (click)="onSkip()"
+    >
+      Do this later
+    </button>
+  </div>
+</div>

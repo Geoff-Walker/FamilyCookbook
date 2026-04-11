@@ -1,0 +1,274 @@
+// ---------------------------------------------------------------------------
+// Backdrop — full-screen overlay behind the dialog
+// ---------------------------------------------------------------------------
+
+.crd-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: var(--z-modal-backdrop, 900);
+}
+
+// ---------------------------------------------------------------------------
+// Dialog panel
+// ---------------------------------------------------------------------------
+
+.crd-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-modal, 901);
+
+  background: var(--color-surface-0);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  max-width: 480px;
+  width: 90vw;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  // Prevent backdrop click propagation from reaching the panel
+  pointer-events: all;
+}
+
+// ---------------------------------------------------------------------------
+// Title
+// ---------------------------------------------------------------------------
+
+.crd-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Rating rows
+// ---------------------------------------------------------------------------
+
+.crd-rating-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.crd-rating-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  min-width: 48px;
+}
+
+.crd-stars {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.crd-star-btn {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.crd-star-svg {
+  width: 36px;
+  height: 36px;
+  color: var(--color-border);
+}
+
+.crd-star-empty {
+  color: var(--color-border);
+}
+
+.crd-star-filled {
+  fill: var(--color-tertiary);
+}
+
+// ---------------------------------------------------------------------------
+// Form fields
+// ---------------------------------------------------------------------------
+
+.crd-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-3);
+  }
+}
+
+.crd-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.crd-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface-0);
+  resize: vertical;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -1px;
+    border-color: transparent;
+  }
+}
+
+.crd-portions-input {
+  width: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface-0);
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -1px;
+    border-color: transparent;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Error message
+// ---------------------------------------------------------------------------
+
+.crd-error {
+  font-size: 0.875rem;
+  color: var(--color-error, #d32f2f);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Actions
+// ---------------------------------------------------------------------------
+
+.crd-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.crd-btn-save {
+  width: 100%;
+  height: 48px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.crd-btn-skip {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover:not(:disabled) {
+    color: var(--color-text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Spinner (save in progress)
+// ---------------------------------------------------------------------------
+
+.crd-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: crd-spin 0.7s linear infinite;
+}
+
+@keyframes crd-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Screen-reader only
+// ---------------------------------------------------------------------------
+
+.crd-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

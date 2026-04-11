@@ -35,7 +35,7 @@
           <span class="cook-subtitle-sep" aria-hidden="true">·</span>
           <span class="cook-subtitle">{{ cookInstance.portions ?? '?' }} portions</span>
         </div>
-        <span class="status-pill" role="status">In Progress</span>
+        <span class="status-pill" [class]="'status-pill ' + pillClass" role="status">{{ pillLabel }}</span>
       </div>
     </header>
 
@@ -50,18 +50,30 @@
       </div>
     </main>
 
-    <!-- Sticky footer -->
-    <footer class="cook-footer">
-      <div class="cook-footer__inner">
-        <button
-          class="btn-complete"
-          type="button"
-          (click)="onCompleteCook()"
-        >
-          Complete Cook
-        </button>
-      </div>
-    </footer>
+    <!-- Sticky footer — only shown when in progress -->
+    @if (cookStatus === 'inProgress') {
+      <footer class="cook-footer">
+        <div class="cook-footer__inner">
+          <button
+            class="btn-complete"
+            type="button"
+            (click)="onCompleteCook()"
+          >
+            Complete Cook
+          </button>
+        </div>
+      </footer>
+    }
 
   </div>
+
+  <!-- Review dialog (rendered outside cook-page for stacking context) -->
+  @if (showReviewDialog) {
+    <app-complete-review-dialog
+      [cookInstanceId]="cookInstance.id"
+      [initialPortions]="cookInstance.portions"
+      (completed)="onReviewCompleted($event)"
+      (dismissed)="onDialogDismissed()"
+    />
+  }
 }
