@@ -53,6 +53,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
 }
 
 /* Burger button — 44×44px touch target */
