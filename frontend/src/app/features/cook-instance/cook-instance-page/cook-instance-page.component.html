@@ -50,6 +50,22 @@
       </div>
     </main>
 
+    <!-- Reviews — shown when cook is completed with reviews -->
+    @if (cookInstance.reviews && cookInstance.reviews.length > 0) {
+      <section class="cook-reviews">
+        <h2 class="cook-reviews__heading">Reviews</h2>
+        @for (review of cookInstance.reviews; track review.userId) {
+          <div class="cook-review-row">
+            <span class="cook-review-row__name">{{ review.userName }}</span>
+            <span class="cook-review-row__stars">{{ starDisplay(review.rating) }}</span>
+            @if (review.notes) {
+              <p class="cook-review-row__notes">{{ review.notes }}</p>
+            }
+          </div>
+        }
+      </section>
+    }
+
     <!-- Sticky footer — only shown when in progress -->
     @if (cookStatus === 'inProgress') {
       <footer class="cook-footer">

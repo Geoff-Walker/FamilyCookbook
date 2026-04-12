@@ -60,6 +60,11 @@
           <!-- Last cooked — AC-D10 -->
           <p class="rr-last-cooked">Last cooked: {{ formatLastCooked(card.latestReview) }}</p>
 
+          <!-- Saved notes display — shown when a review exists with notes -->
+          @if (card.latestReview?.notes) {
+            <p class="rr-notes-display">{{ card.latestReview!.notes }}</p>
+          }
+
           <!-- Cook notes textarea — AC5, AC-D6 -->
           <textarea
             class="rr-notes-input"
