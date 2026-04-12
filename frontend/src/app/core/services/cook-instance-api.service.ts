@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import {
   CompleteCookPayload,
   CookInstanceDetailDto,
+  CookInstanceSummaryDto,
   PatchCookIngredientPayload,
   StartCookPayload
 } from '../models/cook-instance.models';
@@ -41,5 +42,13 @@ export class CookInstanceApiService {
       `${this.baseUrl}/cook-instances/${cookInstanceId}/complete`,
       payload
     );
+  }
+
+  getCookHistory(recipeId: number): Observable<CookInstanceSummaryDto[]> {
+    return this.http.get<CookInstanceSummaryDto[]>(`${this.baseUrl}/recipes/${recipeId}/cook-instances`);
+  }
+
+  deleteCookInstance(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/cook-instances/${id}`);
   }
 }
