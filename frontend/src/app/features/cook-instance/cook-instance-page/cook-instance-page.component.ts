@@ -75,8 +75,9 @@ export class CookInstancePageComponent implements OnInit {
   private deriveCookStatus(data: CookInstanceDetailDto): void {
     if (!data.completedAt) {
       this.cookStatus = 'inProgress';
+    } else if (data.reviews && data.reviews.length > 0) {
+      this.cookStatus = 'completed';
     } else {
-      // Will be refined once reviews are returned in the detail DTO (WAL-74)
       this.cookStatus = 'awaitingReview';
     }
   }
@@ -146,5 +147,11 @@ export class CookInstancePageComponent implements OnInit {
       minute: '2-digit',
       hour12: false
     });
+  }
+
+  starDisplay(rating: number): string {
+    const filled = Math.floor(rating);
+    const half = rating % 1 >= 0.5;
+    return '★'.repeat(filled) + (half ? '½' : '') + '☆'.repeat(5 - filled - (half ? 1 : 0));
   }
 }

@@ -144,6 +144,46 @@
   }
 }
 
+// ---- Reviews section --------------------------------------------------------
+
+.cook-reviews {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.cook-reviews__heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.cook-review-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+
+  &__name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    min-width: 60px;
+  }
+
+  &__stars {
+    font-size: 1.125rem;
+    color: var(--color-tertiary);
+  }
+
+  &__notes {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    flex: 1;
+    margin: 0;
+  }
+}
+
 // ---- Sticky footer ----------------------------------------------------------
 
 .cook-footer {

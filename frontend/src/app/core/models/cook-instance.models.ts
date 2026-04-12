@@ -28,6 +28,13 @@ export interface CookInstanceStageGroupDto {
   ingredients: CookInstanceIngredientDto[];
 }
 
+export interface CookInstanceReviewSummaryDto {
+  userId: number;
+  userName: string;
+  rating: number;
+  notes: string | null;
+}
+
 export interface CookInstanceDetailDto {
   id: number;
   recipeId: number;
@@ -39,6 +46,7 @@ export interface CookInstanceDetailDto {
   portions: number | null;
   notes: string | null;
   stageGroups: CookInstanceStageGroupDto[];
+  reviews: CookInstanceReviewSummaryDto[];
 }
 
 export interface PatchCookIngredientPayload {
