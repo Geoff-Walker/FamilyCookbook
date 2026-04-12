@@ -34,6 +34,7 @@ public class CookInstanceDetailDto
     public int? Portions { get; set; }
     public string? Notes { get; set; }
     public List<CookInstanceStageGroupDto> StageGroups { get; set; } = [];
+    public List<CookInstanceReviewSummaryDto> Reviews { get; set; } = [];
 }
 
 /// <summary>

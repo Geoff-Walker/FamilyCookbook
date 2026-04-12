@@ -186,7 +186,7 @@ public class CookInstanceService
                 RecipeId = cookInstance.RecipeId,
                 UserId = reviewDto.UserId,
                 Rating = reviewDto.Rating,
-                Notes = request.Notes,     // shared notes field per spec
+                Notes = reviewDto.Notes,
                 MadeOn = today,
                 CookInstanceId = cookInstance.Id,
                 CreatedAt = DateTime.UtcNow
@@ -244,12 +244,16 @@ public class CookInstanceService
 
         var cookInstanceIds = cookInstances.Select(ci => ci.Id).ToList();
 
-        // Load reviews for these cook instances via the recipe
-        // Reviews are linked to recipes, not cook instances directly.
-        // We can't join reviews to cook instances — reviews sit on RecipeReview
-        // without a cook_instance_id FK at this stage. Return empty review list.
-        // (The WAL-71 history AC only requires date, portions, notes per row — reviews
-        // are surfaced in the detail view, not the history list summary.)
+        // Load all reviews for these cook instances via the CookInstanceId FK.
+        var reviews = await _db.RecipeReviews
+            .AsNoTracking()
+            .Where(rr => rr.CookInstanceId != null && cookInstanceIds.Contains(rr.CookInstanceId!.Value))
+            .Include(rr => rr.User)
+            .ToListAsync();
+
+        var reviewsByCook = reviews
+            .GroupBy(rr => rr.CookInstanceId!.Value)
+            .ToDictionary(g => g.Key, g => g.ToList());
 
         return cookInstances.Select(ci => new CookInstanceSummaryDto
         {
@@ -260,7 +264,15 @@ public class CookInstanceService
             CompletedAt = ci.CompletedAt,
             Portions = ci.Portions,
             Notes = ci.Notes,
-            Reviews = []
+            Reviews = reviewsByCook.TryGetValue(ci.Id, out var cookReviews)
+                ? cookReviews.Select(rr => new CookInstanceReviewSummaryDto
+                {
+                    UserId = rr.UserId,
+                    UserName = rr.User.Name,
+                    Rating = rr.Rating,
+                    Notes = rr.Notes
+                }).ToList()
+                : []
         }).ToList();
     }
 
@@ -352,6 +364,13 @@ public class CookInstanceService
                 }).ToList()
             }).ToList();
 
+        // Load reviews for this cook instance
+        var ciReviews = await _db.RecipeReviews
+            .AsNoTracking()
+            .Where(rr => rr.CookInstanceId == id)
+            .Include(rr => rr.User)
+            .ToListAsync();
+
         return new CookInstanceDetailDto
         {
             Id = ci.Id,
@@ -363,7 +382,14 @@ public class CookInstanceService
             CompletedAt = ci.CompletedAt,
             Portions = ci.Portions,
             Notes = ci.Notes,
-            StageGroups = grouped
+            StageGroups = grouped,
+            Reviews = ciReviews.Select(rr => new CookInstanceReviewSummaryDto
+            {
+                UserId = rr.UserId,
+                UserName = rr.User.Name,
+                Rating = rr.Rating,
+                Notes = rr.Notes
+            }).ToList()
         };
     }
 }
