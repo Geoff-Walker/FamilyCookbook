@@ -9,6 +9,7 @@ import { RecipeHeroComponent } from '../recipe-hero/recipe-hero.component';
 import { IngredientListComponent } from '../ingredient-list/ingredient-list.component';
 import { MethodStepsComponent } from '../method-steps/method-steps.component';
 import { RatingReviewComponent } from '../rating-review/rating-review.component';
+import { CookHistoryComponent } from '../cook-history/cook-history.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
 import { CookInstanceApiService } from '../../../core/services/cook-instance-api.service';
 import { UserStateService } from '../../../core/services/user-state.service';
@@ -18,7 +19,7 @@ type ViewState = 'loading' | 'loaded' | 'notFound' | 'error';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent, RatingReviewComponent],
+  imports: [CommonModule, RouterLink, RecipeHeroComponent, IngredientListComponent, MethodStepsComponent, RatingReviewComponent, CookHistoryComponent],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
