@@ -66,24 +66,22 @@
         }
       </div>
     </div>
+    <!-- Per-user notes textarea -->
+    <div class="crd-field">
+      <textarea
+        [id]="'crd-notes-' + ur.userId"
+        class="crd-textarea"
+        rows="2"
+        placeholder="Notes..."
+        [(ngModel)]="ur.notes"
+      ></textarea>
+    </div>
   }
 
   <!-- Rating validation error (AC9) -->
   @if (ratingError) {
     <p class="crd-error" role="alert">{{ ratingError }}</p>
   }
-
-  <!-- Notes textarea (AC4) -->
-  <div class="crd-field">
-    <label class="crd-label" for="crd-notes">Notes</label>
-    <textarea
-      id="crd-notes"
-      class="crd-textarea"
-      rows="3"
-      placeholder="Any notes about this cook?"
-      [(ngModel)]="notes"
-    ></textarea>
-  </div>
 
   <!-- Portions field (AC5) -->
   <div class="crd-field crd-field--inline">
