@@ -17,6 +17,7 @@ interface UserRating {
   userName: string;
   rating: number;       // 0 = unset, 0.5–5.0 in 0.5 increments
   hoverRating: number;  // transient hover preview (0 = no hover)
+  notes: string;
 }
 
 @Component({
@@ -37,7 +38,6 @@ export class CompleteReviewDialogComponent implements OnInit {
   @Output() dismissed = new EventEmitter<void>();
 
   // Form state
-  notes = '';
   portions: number | null = null;
 
   // Error state
@@ -54,8 +54,8 @@ export class CompleteReviewDialogComponent implements OnInit {
   ngOnInit(): void {
     this.portions = this.initialPortions;
     this.userRatings = [
-      { userId: 1, userName: 'Geoff', rating: 0, hoverRating: 0 },
-      { userId: 2, userName: 'Helen', rating: 0, hoverRating: 0 }
+      { userId: 1, userName: 'Geoff', rating: 0, hoverRating: 0, notes: '' },
+      { userId: 2, userName: 'Helen', rating: 0, hoverRating: 0, notes: '' }
     ];
   }
 
@@ -136,13 +136,12 @@ export class CompleteReviewDialogComponent implements OnInit {
           this.ratingError = 'Rating must be between 0 and 5 in 0.5 steps.';
           return;
         }
-        reviews.push({ userId: ur.userId, rating: ur.rating });
+        reviews.push({ userId: ur.userId, rating: ur.rating, notes: ur.notes.trim() || null });
       }
     }
 
     const payload: CompleteCookPayload = {
       portions: this.portions,
-      notes: this.notes.trim() || null,
       reviews
     };
 
@@ -152,7 +151,6 @@ export class CompleteReviewDialogComponent implements OnInit {
   onSkip(): void {
     const payload: CompleteCookPayload = {
       portions: this.portions,
-      notes: null,
       reviews: []
     };
     this.completed.emit(payload);

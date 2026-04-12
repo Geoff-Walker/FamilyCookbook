@@ -54,10 +54,10 @@ export interface PatchCookIngredientPayload {
 export interface CookReviewPayload {
   userId: number;
   rating: number;
+  notes: string | null;
 }
 
 export interface CompleteCookPayload {
   portions: number | null;
-  notes: string | null;
   reviews: CookReviewPayload[];
 }
