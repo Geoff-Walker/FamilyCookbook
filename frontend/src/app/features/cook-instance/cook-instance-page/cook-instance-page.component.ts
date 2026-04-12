@@ -106,8 +106,11 @@ export class CookInstancePageComponent implements OnInit {
         // Determine new status from whether reviews were submitted
         if (payload.reviews.length > 0) {
           this.cookStatus = 'completed';
+          // Navigate back to the recipe now that the cook is fully reviewed
+          this.router.navigate(['/recipes', updated.recipeId]);
         } else {
           this.cookStatus = 'awaitingReview';
+          // No review submitted — stay on page (awaiting review state)
         }
       },
       error: () => {
