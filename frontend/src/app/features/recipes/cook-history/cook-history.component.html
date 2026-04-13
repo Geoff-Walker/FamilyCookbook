@@ -1,0 +1,105 @@
+<section class="ch">
+
+  <!-- Header — full row is the toggle button -->
+  <button class="ch__header" type="button" (click)="toggleExpand()" [attr.aria-expanded]="isExpanded">
+    <span class="ch__title">Cook History</span>
+    <span class="ch__badge">({{ cookHistory.length }})</span>
+    <span class="ch__spacer"></span>
+    <svg class="ch__chevron" [class.ch__chevron--open]="isExpanded"
+         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+
+  <!-- Expandable body — max-height transition per AC2 -->
+  <div class="ch__body" [class.ch__body--open]="isExpanded">
+
+    @if (isLoading) {
+      <div class="ch__loading" aria-busy="true" aria-label="Loading cook history">
+        <div class="ch__spinner"></div>
+      </div>
+    } @else if (loadError) {
+      <p class="ch__error">Could not load cook history.</p>
+    } @else if (cookHistory.length === 0) {
+      <p class="ch__empty">No cooks recorded yet.</p>
+    } @else {
+      <div class="ch__table" role="table" aria-label="Cook history">
+
+        <!-- Header row -->
+        <div class="ch__row ch__row--header" role="row">
+          <div class="ch__cell ch__cell--date" role="columnheader">Date</div>
+          <div class="ch__cell ch__cell--rating" role="columnheader">Geoff ★</div>
+          <div class="ch__cell ch__cell--rating" role="columnheader">Helen ★</div>
+          <div class="ch__cell ch__cell--action" role="columnheader"><span class="sr-only">Delete</span></div>
+          <div class="ch__cell ch__cell--action" role="columnheader"><span class="sr-only">Open</span></div>
+        </div>
+
+        <!-- Data rows -->
+        @for (row of cookHistory; track row.id; let odd = $odd) {
+          <div class="ch__row" [class.ch__row--odd]="odd" role="row">
+            <div class="ch__cell ch__cell--date" role="cell">{{ formatDate(row.startedAt) }}</div>
+
+            <div class="ch__cell ch__cell--rating" role="cell">
+              @let geoffRating = getRating(row, 1);
+              @if (geoffRating !== null) {
+                <span [attr.aria-label]="geoffRating + ' out of 5 stars'">{{ starDisplay(geoffRating) }}</span>
+              } @else {
+                <span class="ch__no-rating" aria-label="No rating">—</span>
+              }
+            </div>
+
+            <div class="ch__cell ch__cell--rating" role="cell">
+              @let helenRating = getRating(row, 2);
+              @if (helenRating !== null) {
+                <span [attr.aria-label]="helenRating + ' out of 5 stars'">{{ starDisplay(helenRating) }}</span>
+              } @else {
+                <span class="ch__no-rating" aria-label="No rating">—</span>
+              }
+            </div>
+
+            <div class="ch__cell ch__cell--action" role="cell">
+              <button
+                type="button"
+                class="ch__action-btn ch__action-btn--delete"
+                aria-label="Delete cook"
+                (click)="onDelete(row.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                  <path d="M10 11v6"></path>
+                  <path d="M14 11v6"></path>
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="ch__cell ch__cell--action" role="cell">
+              <button
+                type="button"
+                class="ch__action-btn ch__action-btn--open"
+                aria-label="Open cook"
+                (click)="navigateToCook(row.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+    }
+
+  </div>
+</section>
