@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WalkerFcb.Api.Data;
 using WalkerFcb.Api.Data.Entities;
@@ -7,19 +8,21 @@ namespace WalkerFcb.Api.Services;
 
 /// <summary>
 /// Business logic for the cook instance lifecycle:
-/// start, retrieve, patch ingredients, complete, soft-delete, and list history.
+/// start, retrieve, patch ingredients, complete, soft-delete, list history, and promote.
 /// </summary>
 public class CookInstanceService
 {
     private readonly WalkerDbContext _db;
+    private readonly ILogger<CookInstanceService> _logger;
 
     // Rating must be a multiple of 0.5 in the range [0, 5].
     private static readonly HashSet<decimal> ValidRatings =
         Enumerable.Range(0, 11).Select(i => i * 0.5m).ToHashSet();
 
-    public CookInstanceService(WalkerDbContext db)
+    public CookInstanceService(WalkerDbContext db, ILogger<CookInstanceService> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
     // -----------------------------------------------------------------------
@@ -273,6 +276,192 @@ public class CookInstanceService
                     Notes = rr.Notes
                 }).ToList()
                 : []
+        }).ToList();
+    }
+
+    // -----------------------------------------------------------------------
+    // PROMOTE TO RECIPE
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Atomically snapshots the current recipe_ingredients into recipe_versions and
+    /// overwrites recipe_ingredients with the actuals from the given cook instance.
+    /// Returns null + error string for 400/404 conditions.
+    /// Throws on unexpected DB errors (caller maps to 500).
+    /// </summary>
+    public async Task<(PromoteResultDto? Result, string? Error, bool NotFound)> PromoteCookAsync(
+        int cookInstanceId, int userId)
+    {
+        // Load cook instance (ignore soft-delete filter manually so we can distinguish 404 vs 400)
+        var cook = await _db.CookInstances
+            .IgnoreQueryFilters()
+            .Include(ci => ci.Ingredients)
+            .FirstOrDefaultAsync(ci => ci.Id == cookInstanceId);
+
+        if (cook == null || cook.DeletedAt != null)
+            return (null, null, true); // 404
+
+        if (cook.CompletedAt == null)
+            return (null, "Cannot promote an in-progress cook.", false); // 400
+
+        // Load current recipe_ingredients to snapshot
+        var currentIngredients = await _db.RecipeIngredients
+            .AsNoTracking()
+            .Where(ri => ri.RecipeId == cook.RecipeId)
+            .OrderBy(ri => ri.SortOrder)
+            .ToListAsync();
+
+        // Snapshot serialisation — anonymous objects matching the JSONB structure
+        var snapshotObjects = currentIngredients.Select(ri => new
+        {
+            id = ri.Id,
+            recipeId = ri.RecipeId,
+            stageId = ri.StageId,
+            ingredientId = ri.IngredientId,
+            amount = ri.Amount,
+            unitId = ri.UnitId,
+            notes = ri.Notes,
+            sortOrder = ri.SortOrder,
+            weightGrams = ri.WeightGrams
+        }).ToList();
+
+        var snapshotJson = JsonSerializer.Serialize(snapshotObjects);
+
+        // Determine next version number
+        var maxVersion = await _db.RecipeVersions
+            .Where(rv => rv.RecipeId == cook.RecipeId)
+            .MaxAsync(rv => (int?)rv.VersionNumber) ?? 0;
+
+        var newVersionNumber = maxVersion + 1;
+
+        // Build a lookup of ingredient_id → (stage_id, sort_order) from the original recipe
+        // so we can carry those across to the overwritten rows.
+        var originalLookup = currentIngredients
+            .GroupBy(ri => ri.IngredientId)
+            .ToDictionary(g => g.Key, g => g.First()); // first occurrence wins
+
+        // Determine max sort_order from original for appending new ingredients
+        var maxSortOrder = currentIngredients.Count > 0
+            ? currentIngredients.Max(ri => ri.SortOrder)
+            : 0;
+
+        // Build new recipe_ingredient rows from cook_instance_ingredients
+        var newIngredients = new List<RecipeIngredient>();
+        var appendSortOrder = maxSortOrder;
+
+        foreach (var cii in cook.Ingredients)
+        {
+            var amountStr = cii.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+            if (originalLookup.TryGetValue(cii.IngredientId, out var original))
+            {
+                newIngredients.Add(new RecipeIngredient
+                {
+                    RecipeId = cook.RecipeId,
+                    StageId = original.StageId,
+                    IngredientId = cii.IngredientId,
+                    Amount = amountStr,
+                    UnitId = cii.UnitId,
+                    Notes = cii.Notes,
+                    SortOrder = original.SortOrder
+                });
+            }
+            else
+            {
+                // New ingredient not in original recipe — append
+                appendSortOrder += 1;
+                newIngredients.Add(new RecipeIngredient
+                {
+                    RecipeId = cook.RecipeId,
+                    StageId = null,
+                    IngredientId = cii.IngredientId,
+                    Amount = amountStr,
+                    UnitId = cii.UnitId,
+                    Notes = cii.Notes,
+                    SortOrder = appendSortOrder
+                });
+            }
+        }
+
+        using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            // Write 1: snapshot
+            var version = new RecipeVersion
+            {
+                RecipeId = cook.RecipeId,
+                VersionNumber = newVersionNumber,
+                Snapshot = snapshotJson,
+                // First promotion snapshots the original recipe — not promoted from any cook.
+                // Subsequent promotions snapshot a state that was itself installed by a cook.
+                PromotedFrom = maxVersion == 0 ? null : cookInstanceId,
+                CreatedBy = userId,
+                CreatedAt = DateTime.UtcNow
+            };
+            _db.RecipeVersions.Add(version);
+
+            // Write 2: overwrite ingredients
+            // Delete all existing recipe_ingredients for this recipe
+            var toDelete = await _db.RecipeIngredients
+                .Where(ri => ri.RecipeId == cook.RecipeId)
+                .ToListAsync();
+
+            _db.RecipeIngredients.RemoveRange(toDelete);
+
+            // Add the new rows
+            _db.RecipeIngredients.AddRange(newIngredients);
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return (new PromoteResultDto
+            {
+                VersionId = version.Id,
+                VersionNumber = version.VersionNumber,
+                RecipeId = cook.RecipeId,
+                PromotedAt = version.CreatedAt
+            }, null, false);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Promote failed for cook instance {CookInstanceId}", cookInstanceId);
+            throw;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // VERSION HISTORY
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Returns all recipe_versions for the given recipe, ordered by version_number DESC.
+    /// Returns an empty list if no versions exist. Returns null if the recipe does not exist.
+    /// </summary>
+    public async Task<List<RecipeVersionSummaryDto>?> GetVersionsByRecipeAsync(int recipeId)
+    {
+        // Verify recipe exists (query filter excludes soft-deleted)
+        var recipeExists = await _db.Recipes.AnyAsync(r => r.Id == recipeId);
+        if (!recipeExists)
+            return null;
+
+        var versions = await _db.RecipeVersions
+            .AsNoTracking()
+            .Where(rv => rv.RecipeId == recipeId)
+            .Include(rv => rv.CreatedByUser)
+            .Include(rv => rv.PromotedFromCookInstance)
+            .OrderByDescending(rv => rv.VersionNumber)
+            .ToListAsync();
+
+        return versions.Select(rv => new RecipeVersionSummaryDto
+        {
+            Id = rv.Id,
+            VersionNumber = rv.VersionNumber,
+            CreatedAt = rv.CreatedAt,
+            CreatedByName = rv.CreatedByUser?.Name,
+            PromotedFromCookDate = rv.PromotedFromCookInstance != null
+                ? DateOnly.FromDateTime(rv.PromotedFromCookInstance.StartedAt)
+                : null
         }).ToList();
     }
 
