@@ -25,6 +25,9 @@ public class RecipeSummary
 
     /// <summary>Tags attached to this recipe, ordered by category then tag name.</summary>
     public List<RecipeTagSummary> Tags { get; init; } = [];
+
+    /// <summary>Per-user average ratings for this recipe.</summary>
+    public List<RecipeSummaryRatingDto> PerUserRatings { get; init; } = [];
 }
 
 /// <summary>
