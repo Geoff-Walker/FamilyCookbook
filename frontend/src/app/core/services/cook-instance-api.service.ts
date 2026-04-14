@@ -59,6 +59,12 @@ export class CookInstanceApiService {
     return this.http.delete<void>(`${this.baseUrl}/cook-instances/${id}`);
   }
 
+  removeCookIngredient(cookInstanceId: number, ingredientId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/cook-instances/${cookInstanceId}/ingredients/${ingredientId}`
+    );
+  }
+
   /**
    * Promote a completed cook instance's actuals to the main recipe.
    * The active user ID is passed via the X-User-Id header, required by the backend.

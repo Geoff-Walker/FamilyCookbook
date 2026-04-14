@@ -46,6 +46,7 @@
           [stageGroups]="cookInstance.stageGroups"
           [basePortions]="cookInstance.portions"
           (ingredientPatched)="onIngredientPatched($event)"
+          (ingredientRemoved)="onIngredientRemoved($event)"
         />
       </div>
     </main>

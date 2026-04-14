@@ -6,7 +6,8 @@ import { CookInstanceApiService } from '../../../core/services/cook-instance-api
 import { CompleteCookPayload, CookInstanceDetailDto } from '../../../core/models/cook-instance.models';
 import {
   IngredientChecklistComponent,
-  IngredientPatchEvent
+  IngredientPatchEvent,
+  IngredientRemoveEvent
 } from '../ingredient-checklist/ingredient-checklist.component';
 import { CompleteReviewDialogComponent } from '../complete-review-dialog/complete-review-dialog.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
@@ -97,11 +98,38 @@ export class CookInstancePageComponent implements OnInit {
     });
   }
 
+  onIngredientRemoved(event: IngredientRemoveEvent): void {
+    if (!this.cookInstance) return;
+    this.cookApi.removeCookIngredient(this.cookInstanceId, event.ingredientId).subscribe({
+      next: () => {
+        // Remove the ingredient from the local stageGroups so the checklist re-renders without it
+        if (!this.cookInstance) return;
+        this.cookInstance = {
+          ...this.cookInstance,
+          stageGroups: this.cookInstance.stageGroups
+            .map(stage => ({
+              ...stage,
+              ingredients: stage.ingredients.filter(i => i.id !== event.ingredientId)
+            }))
+            .filter(stage => stage.ingredients.length > 0)
+        };
+      },
+      error: () => {
+        // API failed — reload to restore consistent state
+        this.load();
+      }
+    });
+  }
+
   /** Whether the inline cancel confirmation is visible. */
   showCancelConfirm = false;
 
   /** "Complete Cook" button clicked — open the review modal. */
   onCompleteCook(): void {
+    // Flush any amount change that is still held in a focused input field.
+    // The PATCH fires on blur; if the user taps Complete without leaving the input,
+    // the blur event is triggered here so the last change is not lost.
+    (document.activeElement as HTMLElement)?.blur();
     this.showReviewDialog = true;
   }
 

@@ -19,6 +19,12 @@ export interface IngredientPatchEvent {
   patch: { checked?: boolean; amount?: number; isLimiter?: boolean };
 }
 
+/** Emitted when the user removes an ingredient from the cook instance. */
+export interface IngredientRemoveEvent {
+  /** CookInstanceIngredient.Id */
+  ingredientId: number;
+}
+
 interface RowState {
   ingredient: CookInstanceIngredientDto;
   /** Current displayed amount (base or scaled). */
@@ -44,6 +50,9 @@ export class IngredientChecklistComponent implements OnChanges {
 
   /** Emitted whenever a row needs a PATCH call. */
   @Output() ingredientPatched = new EventEmitter<IngredientPatchEvent>();
+
+  /** Emitted when the user removes an ingredient entirely from the cook. */
+  @Output() ingredientRemoved = new EventEmitter<IngredientRemoveEvent>();
 
   /** Flat map of row states, keyed by cook instance ingredient ID. */
   rowStates = new Map<number, RowState>();
@@ -215,6 +224,16 @@ export class IngredientChecklistComponent implements OnChanges {
     if (!state) return;
     state.limiterQty = qty;
     this.rescaleAll();
+  }
+
+  // -------------------------------------------------------------------------
+  // Remove ingredient
+  // -------------------------------------------------------------------------
+
+  onRemoveIngredient(ingredientId: number): void {
+    // Remove from rowStates immediately so rescaling ignores it
+    this.rowStates.delete(ingredientId);
+    this.ingredientRemoved.emit({ ingredientId });
   }
 
   // -------------------------------------------------------------------------

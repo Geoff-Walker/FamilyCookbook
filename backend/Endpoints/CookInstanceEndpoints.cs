@@ -38,6 +38,12 @@ public static class CookInstanceEndpoints
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound);
 
+        // DELETE /api/cook-instances/{id}/ingredients/{ingredientId}
+        cookGroup.MapDelete("/{id:int}/ingredients/{ingredientId:int}", RemoveCookIngredient)
+            .WithSummary("Permanently remove a single ingredient from a cook instance")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
+
         // POST /api/cook-instances/{id}/complete
         cookGroup.MapPost("/{id:int}/complete", CompleteCook)
             .WithSummary("Mark a cook as complete; optionally submit reviews")
@@ -147,6 +153,17 @@ public static class CookInstanceEndpoints
         return dto == null
             ? Results.NotFound()
             : Results.Ok(dto);
+    }
+
+    private static async Task<IResult> RemoveCookIngredient(
+        int id,
+        int ingredientId,
+        CookInstanceService service)
+    {
+        var found = await service.RemoveCookIngredientAsync(id, ingredientId);
+        return found
+            ? Results.NoContent()
+            : Results.NotFound();
     }
 
     private static async Task<IResult> SoftDeleteCook(

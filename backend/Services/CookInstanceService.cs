@@ -148,6 +148,35 @@ public class CookInstanceService
     }
 
     // -----------------------------------------------------------------------
+    // REMOVE INGREDIENT
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Permanently removes a single cook instance ingredient row.
+    /// Returns false if the cook instance or ingredient is not found.
+    /// </summary>
+    public async Task<bool> RemoveCookIngredientAsync(int cookInstanceId, int ingredientId)
+    {
+        var cookExists = await _db.CookInstances
+            .AnyAsync(ci => ci.Id == cookInstanceId && ci.DeletedAt == null);
+
+        if (!cookExists)
+            return false;
+
+        var ingredient = await _db.CookInstanceIngredients
+            .FirstOrDefaultAsync(cii =>
+                cii.Id == ingredientId &&
+                cii.CookInstanceId == cookInstanceId);
+
+        if (ingredient == null)
+            return false;
+
+        _db.CookInstanceIngredients.Remove(ingredient);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
     // COMPLETE
     // -----------------------------------------------------------------------
 
@@ -358,12 +387,23 @@ public class CookInstanceService
         using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
+            // Replace recipe_ingredients with the original snapshot
             var toDelete = await _db.RecipeIngredients
                 .Where(ri => ri.RecipeId == recipeId)
                 .ToListAsync();
 
             _db.RecipeIngredients.RemoveRange(toDelete);
             _db.RecipeIngredients.AddRange(restoredIngredients);
+
+            // Remove all promotion-linked versions (PromotedFrom != null).
+            // This clears the "Promoted" badges on cook instances in history,
+            // since the recipe is now back at its original state and no cook
+            // is currently the active recipe. The original snapshot (PromotedFrom = null)
+            // is preserved so the restore button remains available in future.
+            var promotionVersions = await _db.RecipeVersions
+                .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom != null)
+                .ToListAsync();
+            _db.RecipeVersions.RemoveRange(promotionVersions);
 
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
