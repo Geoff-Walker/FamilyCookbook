@@ -179,6 +179,14 @@ export class IngredientChecklistComponent implements OnChanges {
     const state = this.rowStates.get(ingredientId);
     if (!state) return;
     const parsed = parseFloat(state.amountFieldValue);
+    console.log('[CookChecklist] blur', {
+      ingredientId,
+      amountFieldValue: state.amountFieldValue,
+      parsed,
+      stateIngredientAmount: state.ingredient.amount,
+      typeofStateAmount: typeof state.ingredient.amount,
+      willPatch: !isNaN(parsed) && parsed !== state.ingredient.amount
+    });
     if (isNaN(parsed)) {
       // Revert to current display amount
       state.amountFieldValue = this.formatAmount(state.displayAmount);

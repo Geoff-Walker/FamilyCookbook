@@ -90,10 +90,18 @@ export class CookInstancePageComponent implements OnInit {
 
   onIngredientPatched(event: IngredientPatchEvent): void {
     if (!this.cookInstance) return;
+    console.log('[CookPage] ingredientPatched — sending PATCH', {
+      cookInstanceId: this.cookInstanceId,
+      ingredientId: event.ingredientId,
+      patch: event.patch
+    });
     this.cookApi.patchIngredient(this.cookInstanceId, event.ingredientId, event.patch).subscribe({
-      error: () => {
+      next: () => {
+        console.log('[CookPage] PATCH succeeded for ingredient', event.ingredientId);
+      },
+      error: (err) => {
+        console.error('[CookPage] PATCH failed for ingredient', event.ingredientId, err);
         // Non-fatal — the UI state is already updated optimistically.
-        // A future ticket can add error recovery.
       }
     });
   }
