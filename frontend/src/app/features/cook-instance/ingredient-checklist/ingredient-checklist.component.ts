@@ -235,6 +235,26 @@ export class IngredientChecklistComponent implements OnChanges {
   }
 
   // -------------------------------------------------------------------------
+  // Flush scaled amounts
+  // -------------------------------------------------------------------------
+
+  /**
+   * Emits ingredientPatched events for any ingredient whose displayed amount
+   * differs from its stored amount (i.e. scaled by limiter but not yet PATCHed).
+   * Called by the parent before opening the complete-cook review dialog so
+   * that scaled quantities are persisted before the cook is finalised.
+   */
+  flushScaledAmounts(): void {
+    for (const [ingredientId, state] of this.rowStates.entries()) {
+      const displayed = Math.round(state.displayAmount * 1000) / 1000;
+      const stored = Math.round(state.ingredient.amount * 1000) / 1000;
+      if (displayed !== stored) {
+        this.ingredientPatched.emit({ ingredientId, patch: { amount: state.displayAmount } });
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Remove ingredient
   // -------------------------------------------------------------------------
 

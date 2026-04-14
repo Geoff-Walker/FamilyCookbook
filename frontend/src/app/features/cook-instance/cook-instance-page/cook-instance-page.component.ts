@@ -144,6 +144,9 @@ export class CookInstancePageComponent implements OnInit {
     // The PATCH fires on blur; if the user taps Complete without leaving the input,
     // the blur event is triggered here so the last change is not lost.
     (document.activeElement as HTMLElement)?.blur();
+    // Flush any limiter-scaled ingredient amounts that haven't been PATCHed yet.
+    // Fire-and-forget — PATCHes land while the user fills in the review dialog.
+    this.checklist?.flushScaledAmounts();
     // Capture the checklist's current scaled portions (accounts for limiter scaling).
     // Falls back to the cook instance's stored portions if no checklist is mounted.
     this.effectivePortions = this.checklist?.scaledPortions ?? this.cookInstance?.portions ?? null;
