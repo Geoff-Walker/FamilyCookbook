@@ -19,6 +19,12 @@ export interface IngredientPatchEvent {
   patch: { checked?: boolean; amount?: number; isLimiter?: boolean };
 }
 
+/** Emitted when the user removes an ingredient from the cook instance. */
+export interface IngredientRemoveEvent {
+  /** CookInstanceIngredient.Id */
+  ingredientId: number;
+}
+
 interface RowState {
   ingredient: CookInstanceIngredientDto;
   /** Current displayed amount (base or scaled). */
@@ -44,6 +50,9 @@ export class IngredientChecklistComponent implements OnChanges {
 
   /** Emitted whenever a row needs a PATCH call. */
   @Output() ingredientPatched = new EventEmitter<IngredientPatchEvent>();
+
+  /** Emitted when the user removes an ingredient entirely from the cook. */
+  @Output() ingredientRemoved = new EventEmitter<IngredientRemoveEvent>();
 
   /** Flat map of row states, keyed by cook instance ingredient ID. */
   rowStates = new Map<number, RowState>();
@@ -170,6 +179,14 @@ export class IngredientChecklistComponent implements OnChanges {
     const state = this.rowStates.get(ingredientId);
     if (!state) return;
     const parsed = parseFloat(state.amountFieldValue);
+    console.log('[CookChecklist] blur', {
+      ingredientId,
+      amountFieldValue: state.amountFieldValue,
+      parsed,
+      stateIngredientAmount: state.ingredient.amount,
+      typeofStateAmount: typeof state.ingredient.amount,
+      willPatch: !isNaN(parsed) && parsed !== state.ingredient.amount
+    });
     if (isNaN(parsed)) {
       // Revert to current display amount
       state.amountFieldValue = this.formatAmount(state.displayAmount);
@@ -215,6 +232,36 @@ export class IngredientChecklistComponent implements OnChanges {
     if (!state) return;
     state.limiterQty = qty;
     this.rescaleAll();
+  }
+
+  // -------------------------------------------------------------------------
+  // Flush scaled amounts
+  // -------------------------------------------------------------------------
+
+  /**
+   * Emits ingredientPatched events for any ingredient whose displayed amount
+   * differs from its stored amount (i.e. scaled by limiter but not yet PATCHed).
+   * Called by the parent before opening the complete-cook review dialog so
+   * that scaled quantities are persisted before the cook is finalised.
+   */
+  flushScaledAmounts(): void {
+    for (const [ingredientId, state] of this.rowStates.entries()) {
+      const displayed = Math.round(state.displayAmount * 1000) / 1000;
+      const stored = Math.round(state.ingredient.amount * 1000) / 1000;
+      if (displayed !== stored) {
+        this.ingredientPatched.emit({ ingredientId, patch: { amount: state.displayAmount } });
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Remove ingredient
+  // -------------------------------------------------------------------------
+
+  onRemoveIngredient(ingredientId: number): void {
+    // Remove from rowStates immediately so rescaling ignores it
+    this.rowStates.delete(ingredientId);
+    this.ingredientRemoved.emit({ ingredientId });
   }
 
   // -------------------------------------------------------------------------

@@ -4,9 +4,12 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CompleteCookPayload,
+  CookHistoryResponseDto,
   CookInstanceDetailDto,
-  CookInstanceSummaryDto,
   PatchCookIngredientPayload,
+  PromoteResultDto,
+  RestoreResultDto,
+  RecipeVersionSummaryDto,
   StartCookPayload
 } from '../models/cook-instance.models';
 
@@ -44,11 +47,44 @@ export class CookInstanceApiService {
     );
   }
 
-  getCookHistory(recipeId: number): Observable<CookInstanceSummaryDto[]> {
-    return this.http.get<CookInstanceSummaryDto[]>(`${this.baseUrl}/recipes/${recipeId}/cook-instances`);
+  getCookHistory(recipeId: number): Observable<CookHistoryResponseDto> {
+    return this.http.get<CookHistoryResponseDto>(`${this.baseUrl}/recipes/${recipeId}/cook-instances`);
+  }
+
+  getVersionsByRecipe(recipeId: number): Observable<RecipeVersionSummaryDto[]> {
+    return this.http.get<RecipeVersionSummaryDto[]>(`${this.baseUrl}/recipes/${recipeId}/versions`);
   }
 
   deleteCookInstance(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/cook-instances/${id}`);
+  }
+
+  removeCookIngredient(cookInstanceId: number, ingredientId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/cook-instances/${cookInstanceId}/ingredients/${ingredientId}`
+    );
+  }
+
+  /**
+   * Promote a completed cook instance's actuals to the main recipe.
+   * The active user ID is passed via the X-User-Id header, required by the backend.
+   */
+  promoteCook(cookInstanceId: number, userId: number): Observable<PromoteResultDto> {
+    return this.http.post<PromoteResultDto>(
+      `${this.baseUrl}/cook-instances/${cookInstanceId}/promote`,
+      {},
+      { headers: { 'X-User-Id': userId.toString() } }
+    );
+  }
+
+  /**
+   * Restore the recipe's ingredient list from the original pre-promotion snapshot.
+   * Only available when hasOriginalSnapshot = true on the cook history response.
+   */
+  restoreOriginal(recipeId: number): Observable<RestoreResultDto> {
+    return this.http.post<RestoreResultDto>(
+      `${this.baseUrl}/recipes/${recipeId}/restore-original`,
+      {}
+    );
   }
 }

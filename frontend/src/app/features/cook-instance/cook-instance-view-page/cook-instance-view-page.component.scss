@@ -1,0 +1,481 @@
+// ---------------------------------------------------------------------------
+// Page shell
+// ---------------------------------------------------------------------------
+
+.civ-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-surface-0);
+}
+
+// ---------------------------------------------------------------------------
+// Loading / error states
+// ---------------------------------------------------------------------------
+
+.civ-state-loading {
+  padding: var(--space-6);
+}
+
+.skeleton-line {
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.civ-state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-10) var(--space-4);
+  text-align: center;
+}
+
+.civ-state-message {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.civ-state-link {
+  font-size: 0.9375rem;
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.civ-btn-retry {
+  background: none;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-5);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Page header (AC2)
+// ---------------------------------------------------------------------------
+
+.civ-header {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-0);
+
+  @media (min-width: 768px) {
+    padding: var(--space-6);
+  }
+}
+
+.civ-header__inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Back link — AC2: font-size 0.9375rem, color-primary, font-weight 500
+.civ-back-link {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: none;
+  align-self: flex-start;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Title — AC2: font-size 1.5rem, font-weight 700, DM Sans
+.civ-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+// Subtitle row
+.civ-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.civ-subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+.civ-subtitle-sep {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+// Status pill
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--space-3);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  &.status-pill--completed {
+    background: var(--color-success);
+  }
+
+  &.status-pill--awaiting {
+    background: var(--color-warning);
+  }
+}
+
+// Ratings row — AC2: font-size 0.9375rem, filled stars color-tertiary
+.civ-ratings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 0.9375rem;
+  margin-top: var(--space-1);
+}
+
+.civ-rating-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.civ-rating-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.civ-rating-stars {
+  color: var(--color-tertiary);
+}
+
+.civ-rating-sep {
+  color: var(--color-text-secondary);
+}
+
+// ---------------------------------------------------------------------------
+// Main content
+// ---------------------------------------------------------------------------
+
+.civ-main {
+  flex: 1;
+  padding: var(--space-4);
+
+  @media (min-width: 768px) {
+    padding: var(--space-6);
+  }
+}
+
+.civ-content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.civ-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+// ---------------------------------------------------------------------------
+// Cook notes section (AC4)
+// ---------------------------------------------------------------------------
+
+.civ-notes-section {
+  gap: var(--space-2);
+}
+
+// AC4: uppercase, font-size 0.875rem, color-text-tertiary
+.civ-section-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+// AC4: surface block
+.civ-notes-block {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.civ-notes-text {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+// ---------------------------------------------------------------------------
+// Promote feedback messages (AC7, AC8)
+// ---------------------------------------------------------------------------
+
+.civ-feedback {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin: 0;
+
+  &--success {
+    color: var(--color-success);
+  }
+
+  &--error {
+    color: var(--color-error);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Promote button section (AC5)
+// ---------------------------------------------------------------------------
+
+.civ-promote-section {
+  gap: var(--space-2);
+}
+
+// AC5: outlined, not filled
+.civ-btn-promote {
+  width: 100%;
+  height: 52px;
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  @media (min-width: 768px) {
+    max-width: 320px;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// AC5: helper text below button
+.civ-promote-helper {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Leave a review section (AC9)
+// ---------------------------------------------------------------------------
+
+.civ-review-section {
+  background: var(--color-surface-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+// AC9: heading — font-size 1.125rem, font-weight 600, DM Sans
+.civ-review-heading {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+// Rating rows
+.civ-rating-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.civ-rating-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  min-width: 48px;
+}
+
+.civ-stars {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.civ-star-btn {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.civ-star-svg {
+  width: 36px;
+  height: 36px;
+  color: var(--color-border);
+}
+
+.civ-star-empty {
+  color: var(--color-border);
+}
+
+.civ-star-filled {
+  fill: var(--color-tertiary);
+}
+
+// Per-user notes textarea
+.civ-review-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.civ-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface-0);
+  resize: vertical;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -1px;
+    border-color: transparent;
+  }
+}
+
+// Validation / save errors
+.civ-review-error {
+  font-size: 0.875rem;
+  color: var(--color-error);
+  margin: 0;
+}
+
+// Save review button
+.civ-btn-save-review {
+  align-self: flex-start;
+  height: 48px;
+  padding: 0 var(--space-6);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: opacity 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Spinner
+// ---------------------------------------------------------------------------
+
+.civ-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: civ-spin 0.7s linear infinite;
+}
+
+@keyframes civ-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Screen-reader only
+// ---------------------------------------------------------------------------
+
+.civ-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

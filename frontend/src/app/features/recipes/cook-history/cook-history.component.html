@@ -23,8 +23,6 @@
       </div>
     } @else if (loadError) {
       <p class="ch__error">Could not load cook history.</p>
-    } @else if (cookHistory.length === 0) {
-      <p class="ch__empty">No cooks recorded yet.</p>
     } @else {
       <div class="ch__table" role="table" aria-label="Cook history">
 
@@ -40,7 +38,12 @@
         <!-- Data rows -->
         @for (row of cookHistory; track row.id; let odd = $odd) {
           <div class="ch__row" [class.ch__row--odd]="odd" role="row">
-            <div class="ch__cell ch__cell--date" role="cell">{{ formatDate(row.startedAt) }}</div>
+            <div class="ch__cell ch__cell--date" role="cell">
+              {{ formatDate(row.startedAt) }}
+              @if (row.wasPromoted) {
+                <span class="ch__promoted-badge">Promoted</span>
+              }
+            </div>
 
             <div class="ch__cell ch__cell--rating" role="cell">
               @let geoffRating = getRating(row, 1);
@@ -96,6 +99,49 @@
               </button>
             </div>
           </div>
+        }
+
+        <!-- Original Recipe row — always last; restore action when snapshot exists -->
+        @if (originalRecipeDate) {
+          <div class="ch__row ch__row--original" role="row">
+            <div class="ch__cell ch__cell--date" role="cell">
+              {{ formatDate(originalRecipeDate) }}
+              <span class="ch__original-badge">Original</span>
+            </div>
+            <div class="ch__cell ch__cell--rating" role="cell">
+              <span class="ch__no-rating" aria-hidden="true">—</span>
+            </div>
+            <div class="ch__cell ch__cell--rating" role="cell">
+              <span class="ch__no-rating" aria-hidden="true">—</span>
+            </div>
+            <div class="ch__cell ch__cell--action" role="cell"></div>
+            <div class="ch__cell ch__cell--action" role="cell">
+              @if (hasOriginalSnapshot) {
+                <button
+                  type="button"
+                  class="ch__action-btn ch__action-btn--restore"
+                  [disabled]="isRestoring"
+                  aria-label="Restore original recipe"
+                  title="Restore original recipe"
+                  (click)="onRestoreOriginal()">
+                  @if (isRestoring) {
+                    <span class="ch__spinner ch__spinner--inline" aria-hidden="true"></span>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+          @if (restoreError) {
+            <p class="ch__error">Restore failed. Please try again.</p>
+          }
         }
 
       </div>

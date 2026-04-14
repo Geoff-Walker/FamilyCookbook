@@ -51,7 +51,16 @@ export const routes: Routes = [
       )
   },
   {
+    // Completed cook view — full ingredient comparison, promote, add review (WAL-76)
     path: 'cook/:id',
+    loadComponent: () =>
+      import('./features/cook-instance/cook-instance-view-page/cook-instance-view-page.component').then(
+        m => m.CookInstanceViewPageComponent
+      )
+  },
+  {
+    // Active in-progress cook — checklist, complete-cook modal (WAL-72)
+    path: 'cook/:id/active',
     loadComponent: () =>
       import('./features/cook-instance/cook-instance-page/cook-instance-page.component').then(
         m => m.CookInstancePageComponent

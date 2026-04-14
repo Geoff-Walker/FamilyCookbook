@@ -89,5 +89,49 @@ export interface CookInstanceSummaryDto {
   completedAt: string | null;
   portions: number | null;
   notes: string | null;
+  wasPromoted: boolean;
   reviews: CookInstanceReviewSummaryDto[];
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/cook-instances/{id}/promote — response (WAL-75 / WAL-76)
+// ---------------------------------------------------------------------------
+
+export interface PromoteResultDto {
+  versionId: number;
+  versionNumber: number;
+  recipeId: number;
+  promotedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/recipes/{recipeId}/cook-instances — response wrapper
+// ---------------------------------------------------------------------------
+
+export interface CookHistoryResponseDto {
+  cookInstances: CookInstanceSummaryDto[];
+  originalRecipeDate: string;
+  /** True when a recipe_versions row with promotedFrom = null exists — restore action is available. */
+  hasOriginalSnapshot: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/recipes/{recipeId}/restore-original — response
+// ---------------------------------------------------------------------------
+
+export interface RestoreResultDto {
+  recipeId: number;
+  restoredAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/recipes/{recipeId}/versions — list item
+// ---------------------------------------------------------------------------
+
+export interface RecipeVersionSummaryDto {
+  id: number;
+  versionNumber: number;
+  createdAt: string;
+  createdByName: string | null;
+  promotedFromCookDate: string | null;
 }

@@ -148,6 +148,35 @@ public class CookInstanceService
     }
 
     // -----------------------------------------------------------------------
+    // REMOVE INGREDIENT
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Permanently removes a single cook instance ingredient row.
+    /// Returns false if the cook instance or ingredient is not found.
+    /// </summary>
+    public async Task<bool> RemoveCookIngredientAsync(int cookInstanceId, int ingredientId)
+    {
+        var cookExists = await _db.CookInstances
+            .AnyAsync(ci => ci.Id == cookInstanceId && ci.DeletedAt == null);
+
+        if (!cookExists)
+            return false;
+
+        var ingredient = await _db.CookInstanceIngredients
+            .FirstOrDefaultAsync(cii =>
+                cii.Id == ingredientId &&
+                cii.CookInstanceId == cookInstanceId);
+
+        if (ingredient == null)
+            return false;
+
+        _db.CookInstanceIngredients.Remove(ingredient);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
     // COMPLETE
     // -----------------------------------------------------------------------
 
@@ -227,14 +256,17 @@ public class CookInstanceService
     // -----------------------------------------------------------------------
 
     /// <summary>
-    /// Returns all non-deleted cook instances for a recipe, ordered by started_at DESC.
+    /// Returns all non-deleted cook instances for a recipe, ordered by started_at DESC,
+    /// along with the original recipe date for rendering the baseline "Original Recipe" row.
     /// Returns null if the recipe does not exist.
     /// </summary>
-    public async Task<List<CookInstanceSummaryDto>?> GetHistoryByRecipeAsync(int recipeId)
+    public async Task<CookHistoryResponseDto?> GetHistoryByRecipeAsync(int recipeId)
     {
         // Verify recipe exists (query filter excludes soft-deleted)
-        var recipeExists = await _db.Recipes.AnyAsync(r => r.Id == recipeId);
-        if (!recipeExists)
+        var recipe = await _db.Recipes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == recipeId);
+        if (recipe == null)
             return null;
 
         // Load cook instances for this recipe with their associated reviews
@@ -258,7 +290,27 @@ public class CookInstanceService
             .GroupBy(rr => rr.CookInstanceId!.Value)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        return cookInstances.Select(ci => new CookInstanceSummaryDto
+        // Determine which cook instances triggered a promotion (PromotedFrom is set on versions 2+).
+        var promotedCookIds = await _db.RecipeVersions
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom != null)
+            .Select(rv => rv.PromotedFrom!.Value)
+            .ToHashSetAsync();
+
+        // Determine the original recipe date:
+        // Use the created_at of the first recipe_version with PromotedFrom = null, if one exists.
+        // Otherwise fall back to recipe.created_at.
+        var originalVersionDate = await _db.RecipeVersions
+            .AsNoTracking()
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom == null)
+            .OrderBy(rv => rv.CreatedAt)
+            .Select(rv => (DateTime?)rv.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        var originalRecipeDate = originalVersionDate.HasValue
+            ? new DateTimeOffset(originalVersionDate.Value, TimeSpan.Zero)
+            : new DateTimeOffset(recipe.CreatedAt, TimeSpan.Zero);
+
+        var cookInstanceDtos = cookInstances.Select(ci => new CookInstanceSummaryDto
         {
             Id = ci.Id,
             UserId = ci.UserId,
@@ -267,6 +319,7 @@ public class CookInstanceService
             CompletedAt = ci.CompletedAt,
             Portions = ci.Portions,
             Notes = ci.Notes,
+            WasPromoted = promotedCookIds.Contains(ci.Id),
             Reviews = reviewsByCook.TryGetValue(ci.Id, out var cookReviews)
                 ? cookReviews.Select(rr => new CookInstanceReviewSummaryDto
                 {
@@ -277,6 +330,96 @@ public class CookInstanceService
                 }).ToList()
                 : []
         }).ToList();
+
+        return new CookHistoryResponseDto
+        {
+            CookInstances = cookInstanceDtos,
+            OriginalRecipeDate = originalRecipeDate,
+            HasOriginalSnapshot = originalVersionDate.HasValue
+        };
+    }
+
+    // -----------------------------------------------------------------------
+    // RESTORE ORIGINAL RECIPE
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Restores the recipe's ingredient list from the first snapshot taken before
+    /// any promotion (PromotedFrom = null). Returns null + error string if no such
+    /// snapshot exists, or if the recipe does not exist.
+    /// </summary>
+    public async Task<(RestoreResultDto? Result, string? Error, bool NotFound)> RestoreOriginalAsync(
+        int recipeId)
+    {
+        var recipeExists = await _db.Recipes.AnyAsync(r => r.Id == recipeId);
+        if (!recipeExists)
+            return (null, null, true); // 404
+
+        var originalVersion = await _db.RecipeVersions
+            .AsNoTracking()
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom == null)
+            .OrderBy(rv => rv.VersionNumber)
+            .FirstOrDefaultAsync();
+
+        if (originalVersion == null)
+            return (null, "No original snapshot found — recipe has not been promoted yet.", false); // 400
+
+        // Deserialise snapshot JSON back to ingredient rows
+        var snapshotItems = JsonSerializer.Deserialize<List<SnapshotIngredientItem>>(
+            originalVersion.Snapshot,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        if (snapshotItems == null || snapshotItems.Count == 0)
+            return (null, "Original snapshot is empty or unreadable.", false); // 400
+
+        var restoredIngredients = snapshotItems.Select(item => new RecipeIngredient
+        {
+            RecipeId = recipeId,
+            StageId = item.StageId,
+            IngredientId = item.IngredientId,
+            Amount = item.Amount,
+            UnitId = item.UnitId,
+            Notes = item.Notes,
+            SortOrder = item.SortOrder,
+            WeightGrams = item.WeightGrams
+        }).ToList();
+
+        using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            // Replace recipe_ingredients with the original snapshot
+            var toDelete = await _db.RecipeIngredients
+                .Where(ri => ri.RecipeId == recipeId)
+                .ToListAsync();
+
+            _db.RecipeIngredients.RemoveRange(toDelete);
+            _db.RecipeIngredients.AddRange(restoredIngredients);
+
+            // Remove all promotion-linked versions (PromotedFrom != null).
+            // This clears the "Promoted" badges on cook instances in history,
+            // since the recipe is now back at its original state and no cook
+            // is currently the active recipe. The original snapshot (PromotedFrom = null)
+            // is preserved so the restore button remains available in future.
+            var promotionVersions = await _db.RecipeVersions
+                .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom != null)
+                .ToListAsync();
+            _db.RecipeVersions.RemoveRange(promotionVersions);
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return (new RestoreResultDto
+            {
+                RecipeId = recipeId,
+                RestoredAt = DateTime.UtcNow
+            }, null, false);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Restore original failed for recipe {RecipeId}", recipeId);
+            throw;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -581,4 +724,24 @@ public class CookInstanceService
             }).ToList()
         };
     }
+
+    // -----------------------------------------------------------------------
+    // Private records
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Mirrors the anonymous object structure written into recipe_versions.Snapshot
+    /// by PromoteCookAsync. Used to deserialise snapshot JSON when restoring the original.
+    /// </summary>
+    private sealed record SnapshotIngredientItem(
+        int Id,
+        int RecipeId,
+        int? StageId,
+        int IngredientId,
+        string? Amount,
+        int? UnitId,
+        string? Notes,
+        int SortOrder,
+        decimal? WeightGrams
+    );
 }

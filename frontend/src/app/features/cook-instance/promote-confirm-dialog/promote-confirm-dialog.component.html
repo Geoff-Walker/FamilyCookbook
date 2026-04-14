@@ -1,0 +1,37 @@
+<!-- Overlay backdrop -->
+<div class="pcd-backdrop" role="presentation" (click)="onBackdropClick()"></div>
+
+<!-- Dialog panel -->
+<div
+  class="pcd-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="pcd-title"
+>
+  <h2 class="pcd-title" id="pcd-title">Promote these quantities to the main recipe?</h2>
+
+  <div class="pcd-actions">
+    <button
+      type="button"
+      class="pcd-btn-promote"
+      [disabled]="isPromoting"
+      (click)="onConfirm()"
+    >
+      @if (isPromoting) {
+        <span class="pcd-spinner" aria-hidden="true"></span>
+        <span class="pcd-sr-only">Promoting…</span>
+      } @else {
+        Promote
+      }
+    </button>
+
+    <button
+      type="button"
+      class="pcd-btn-cancel"
+      [disabled]="isPromoting"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+  </div>
+</div>

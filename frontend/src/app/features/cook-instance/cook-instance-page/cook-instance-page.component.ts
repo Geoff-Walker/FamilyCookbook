@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -6,7 +6,8 @@ import { CookInstanceApiService } from '../../../core/services/cook-instance-api
 import { CompleteCookPayload, CookInstanceDetailDto } from '../../../core/models/cook-instance.models';
 import {
   IngredientChecklistComponent,
-  IngredientPatchEvent
+  IngredientPatchEvent,
+  IngredientRemoveEvent
 } from '../ingredient-checklist/ingredient-checklist.component';
 import { CompleteReviewDialogComponent } from '../complete-review-dialog/complete-review-dialog.component';
 import { HeaderStateService } from '../../../core/services/header-state.service';
@@ -31,6 +32,12 @@ export class CookInstancePageComponent implements OnInit {
   /** Whether the review modal is open. */
   showReviewDialog = false;
 
+  /** Captured from the checklist's scaledPortions when Complete Cook is tapped. */
+  effectivePortions: number | null = null;
+
+  @ViewChild(IngredientChecklistComponent)
+  private checklist?: IngredientChecklistComponent;
+
   /** Derived cook status for the status pill. */
   cookStatus: CookStatus = 'inProgress';
 
@@ -50,6 +57,11 @@ export class CookInstancePageComponent implements OnInit {
     this.viewState = 'loading';
     this.cookApi.getCookInstance(this.cookInstanceId).subscribe({
       next: (data) => {
+        // Guard: if the cook is already completed, redirect to the view page (WAL-76)
+        if (data.completedAt) {
+          this.router.navigate(['/cook', this.cookInstanceId], { replaceUrl: true });
+          return;
+        }
         this.cookInstance = data;
         this.viewState = 'loaded';
         this.headerState.setPageTitle(data.recipeTitle);
@@ -84,17 +96,86 @@ export class CookInstancePageComponent implements OnInit {
 
   onIngredientPatched(event: IngredientPatchEvent): void {
     if (!this.cookInstance) return;
+    console.log('[CookPage] ingredientPatched — sending PATCH', {
+      cookInstanceId: this.cookInstanceId,
+      ingredientId: event.ingredientId,
+      patch: event.patch
+    });
     this.cookApi.patchIngredient(this.cookInstanceId, event.ingredientId, event.patch).subscribe({
-      error: () => {
+      next: () => {
+        console.log('[CookPage] PATCH succeeded for ingredient', event.ingredientId);
+      },
+      error: (err) => {
+        console.error('[CookPage] PATCH failed for ingredient', event.ingredientId, err);
         // Non-fatal — the UI state is already updated optimistically.
-        // A future ticket can add error recovery.
       }
     });
   }
 
+  onIngredientRemoved(event: IngredientRemoveEvent): void {
+    if (!this.cookInstance) return;
+    this.cookApi.removeCookIngredient(this.cookInstanceId, event.ingredientId).subscribe({
+      next: () => {
+        // Remove the ingredient from the local stageGroups so the checklist re-renders without it
+        if (!this.cookInstance) return;
+        this.cookInstance = {
+          ...this.cookInstance,
+          stageGroups: this.cookInstance.stageGroups
+            .map(stage => ({
+              ...stage,
+              ingredients: stage.ingredients.filter(i => i.id !== event.ingredientId)
+            }))
+            .filter(stage => stage.ingredients.length > 0)
+        };
+      },
+      error: () => {
+        // API failed — reload to restore consistent state
+        this.load();
+      }
+    });
+  }
+
+  /** Whether the inline cancel confirmation is visible. */
+  showCancelConfirm = false;
+
   /** "Complete Cook" button clicked — open the review modal. */
   onCompleteCook(): void {
+    // Flush any amount change that is still held in a focused input field.
+    // The PATCH fires on blur; if the user taps Complete without leaving the input,
+    // the blur event is triggered here so the last change is not lost.
+    (document.activeElement as HTMLElement)?.blur();
+    // Flush any limiter-scaled ingredient amounts that haven't been PATCHed yet.
+    // Fire-and-forget — PATCHes land while the user fills in the review dialog.
+    this.checklist?.flushScaledAmounts();
+    // Capture the checklist's current scaled portions (accounts for limiter scaling).
+    // Falls back to the cook instance's stored portions if no checklist is mounted.
+    this.effectivePortions = this.checklist?.scaledPortions ?? this.cookInstance?.portions ?? null;
     this.showReviewDialog = true;
+  }
+
+  /** "Cancel Cook" button clicked — show inline confirmation. */
+  onCancelCook(): void {
+    this.showCancelConfirm = true;
+  }
+
+  /** Confirmed cancel — soft-delete this cook instance and navigate back to the recipe. */
+  onCancelConfirmed(): void {
+    if (!this.cookInstance) return;
+    const recipeId = this.cookInstance.recipeId;
+    this.cookApi.deleteCookInstance(this.cookInstanceId).subscribe({
+      next: () => {
+        this.router.navigate(['/recipes', recipeId]);
+      },
+      error: () => {
+        // Reset confirmation state so the user can try again or navigate away manually
+        this.showCancelConfirm = false;
+      }
+    });
+  }
+
+  /** Back button on cancel confirmation — dismiss without cancelling. */
+  onCancelDismissed(): void {
+    this.showCancelConfirm = false;
   }
 
   /** The review dialog emitted a payload (Save Review or Do this later). */
@@ -103,14 +184,12 @@ export class CookInstancePageComponent implements OnInit {
     this.cookApi.completeCook(this.cookInstanceId, payload).subscribe({
       next: (updated) => {
         this.cookInstance = updated;
-        // Determine new status from whether reviews were submitted
         if (payload.reviews.length > 0) {
-          this.cookStatus = 'completed';
-          // Navigate back to the recipe now that the cook is fully reviewed
+          // Reviewed — navigate to recipe detail
           this.router.navigate(['/recipes', updated.recipeId]);
         } else {
-          this.cookStatus = 'awaitingReview';
-          // No review submitted — stay on page (awaiting review state)
+          // Cook is complete but no review yet — go to the view page (WAL-76)
+          this.router.navigate(['/cook', this.cookInstanceId], { replaceUrl: true });
         }
       },
       error: () => {

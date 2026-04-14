@@ -46,6 +46,7 @@
           [stageGroups]="cookInstance.stageGroups"
           [basePortions]="cookInstance.portions"
           (ingredientPatched)="onIngredientPatched($event)"
+          (ingredientRemoved)="onIngredientRemoved($event)"
         />
       </div>
     </main>
@@ -70,13 +71,42 @@
     @if (cookStatus === 'inProgress') {
       <footer class="cook-footer">
         <div class="cook-footer__inner">
-          <button
-            class="btn-complete"
-            type="button"
-            (click)="onCompleteCook()"
-          >
-            Complete Cook
-          </button>
+          @if (showCancelConfirm) {
+            <!-- Cancel confirmation state -->
+            <p class="cook-footer__confirm-text">Cancel this cook? It will not be saved.</p>
+            <div class="cook-footer__confirm-actions">
+              <button
+                class="btn-cancel-confirm"
+                type="button"
+                (click)="onCancelConfirmed()"
+              >
+                Yes, cancel
+              </button>
+              <button
+                class="btn-cancel-dismiss"
+                type="button"
+                (click)="onCancelDismissed()"
+              >
+                Go back
+              </button>
+            </div>
+          } @else {
+            <!-- Default footer actions -->
+            <button
+              class="btn-complete"
+              type="button"
+              (click)="onCompleteCook()"
+            >
+              Complete Cook
+            </button>
+            <button
+              class="btn-cancel"
+              type="button"
+              (click)="onCancelCook()"
+            >
+              Cancel Cook
+            </button>
+          }
         </div>
       </footer>
     }
@@ -87,7 +117,7 @@
   @if (showReviewDialog) {
     <app-complete-review-dialog
       [cookInstanceId]="cookInstance.id"
-      [initialPortions]="cookInstance.portions"
+      [initialPortions]="effectivePortions"
       (completed)="onReviewCompleted($event)"
       (dismissed)="onDialogDismissed()"
     />

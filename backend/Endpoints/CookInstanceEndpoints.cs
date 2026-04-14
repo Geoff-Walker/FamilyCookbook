@@ -38,6 +38,12 @@ public static class CookInstanceEndpoints
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status404NotFound);
 
+        // DELETE /api/cook-instances/{id}/ingredients/{ingredientId}
+        cookGroup.MapDelete("/{id:int}/ingredients/{ingredientId:int}", RemoveCookIngredient)
+            .WithSummary("Permanently remove a single ingredient from a cook instance")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
+
         // POST /api/cook-instances/{id}/complete
         cookGroup.MapPost("/{id:int}/complete", CompleteCook)
             .WithSummary("Mark a cook as complete; optionally submit reviews")
@@ -65,7 +71,7 @@ public static class CookInstanceEndpoints
         app.MapGet("/api/recipes/{recipeId:int}/cook-instances", GetCookHistory)
             .WithTags("CookInstances")
             .WithSummary("List cook instances for a recipe, ordered by started_at DESC")
-            .Produces<List<CookInstanceSummaryDto>>(StatusCodes.Status200OK)
+            .Produces<CookHistoryResponseDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         // GET /api/recipes/{recipeId}/versions
@@ -74,6 +80,15 @@ public static class CookInstanceEndpoints
             .WithSummary("List version history for a recipe, ordered by version_number DESC")
             .Produces<List<RecipeVersionSummaryDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
+
+        // POST /api/recipes/{recipeId}/restore-original
+        app.MapPost("/api/recipes/{recipeId:int}/restore-original", RestoreOriginal)
+            .WithTags("CookInstances")
+            .WithSummary("Restore recipe ingredients from the original snapshot (before any promotions)")
+            .Produces<RestoreResultDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status500InternalServerError);
 
         return app;
     }
@@ -140,6 +155,17 @@ public static class CookInstanceEndpoints
             : Results.Ok(dto);
     }
 
+    private static async Task<IResult> RemoveCookIngredient(
+        int id,
+        int ingredientId,
+        CookInstanceService service)
+    {
+        var found = await service.RemoveCookIngredientAsync(id, ingredientId);
+        return found
+            ? Results.NoContent()
+            : Results.NotFound();
+    }
+
     private static async Task<IResult> SoftDeleteCook(
         int id,
         CookInstanceService service)
@@ -197,5 +223,29 @@ public static class CookInstanceEndpoints
         return versions == null
             ? Results.NotFound()
             : Results.Ok(versions);
+    }
+
+    private static async Task<IResult> RestoreOriginal(
+        int recipeId,
+        CookInstanceService service)
+    {
+        try
+        {
+            var (result, error, notFound) = await service.RestoreOriginalAsync(recipeId);
+
+            if (notFound)
+                return Results.NotFound();
+
+            if (error != null)
+                return Results.BadRequest(new { error });
+
+            return Results.Ok(result);
+        }
+        catch
+        {
+            return Results.Json(
+                new { error = "Restore failed. No changes were made." },
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 }

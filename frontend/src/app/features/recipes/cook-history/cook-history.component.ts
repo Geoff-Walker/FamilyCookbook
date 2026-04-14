@@ -14,9 +14,13 @@ export class CookHistoryComponent implements OnInit {
   @Input({ required: true }) recipeId!: number;
 
   cookHistory: CookInstanceSummaryDto[] = [];
+  originalRecipeDate: string | null = null;
+  hasOriginalSnapshot = false;
   isExpanded = false;
   isLoading = true;
   loadError = false;
+  isRestoring = false;
+  restoreError = false;
 
   constructor(
     private readonly cookApi: CookInstanceApiService,
@@ -25,8 +29,10 @@ export class CookHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.cookApi.getCookHistory(this.recipeId).subscribe({
-      next: (history) => {
-        this.cookHistory = history;
+      next: (response) => {
+        this.cookHistory = response.cookInstances;
+        this.originalRecipeDate = response.originalRecipeDate;
+        this.hasOriginalSnapshot = response.hasOriginalSnapshot;
         this.isLoading = false;
       },
       error: () => {
@@ -50,6 +56,21 @@ export class CookHistoryComponent implements OnInit {
 
   navigateToCook(id: number): void {
     this.router.navigate(['/cook', id]);
+  }
+
+  onRestoreOriginal(): void {
+    this.isRestoring = true;
+    this.restoreError = false;
+    this.cookApi.restoreOriginal(this.recipeId).subscribe({
+      next: () => {
+        // Full page reload — the ingredient list on the recipe detail page must reflect the restore
+        window.location.reload();
+      },
+      error: () => {
+        this.isRestoring = false;
+        this.restoreError = true;
+      }
+    });
   }
 
   formatDate(iso: string): string {
