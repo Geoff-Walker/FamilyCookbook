@@ -1,5 +1,6 @@
 using WalkerFcb.Api.DTOs;
 using WalkerFcb.Api.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace WalkerFcb.Api.Endpoints;
 
@@ -50,6 +51,14 @@ public static class CookInstanceEndpoints
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
+        // POST /api/cook-instances/{id}/promote
+        cookGroup.MapPost("/{id:int}/promote", PromoteCook)
+            .WithSummary("Promote cook instance actuals to recipe ingredient baseline; snapshots previous state into recipe_versions")
+            .Produces<PromoteResultDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status500InternalServerError);
+
         // -----------------------------------------------------------------------
         // History route nested under recipes — /api/recipes/{recipeId}/cook-instances
         // -----------------------------------------------------------------------
@@ -57,6 +66,13 @@ public static class CookInstanceEndpoints
             .WithTags("CookInstances")
             .WithSummary("List cook instances for a recipe, ordered by started_at DESC")
             .Produces<List<CookInstanceSummaryDto>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
+
+        // GET /api/recipes/{recipeId}/versions
+        app.MapGet("/api/recipes/{recipeId:int}/versions", GetVersionHistory)
+            .WithTags("CookInstances")
+            .WithSummary("List version history for a recipe, ordered by version_number DESC")
+            .Produces<List<RecipeVersionSummaryDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         return app;
@@ -142,5 +158,44 @@ public static class CookInstanceEndpoints
         return history == null
             ? Results.NotFound()
             : Results.Ok(history);
+    }
+
+    private static async Task<IResult> PromoteCook(
+        int id,
+        HttpRequest request,
+        CookInstanceService service)
+    {
+        // Active user passed via X-User-Id header (1 = Geoff, 2 = Helen)
+        if (!int.TryParse(request.Headers["X-User-Id"].FirstOrDefault(), out var userId) || userId <= 0)
+            return Results.BadRequest(new { error = "X-User-Id header is required and must be a valid user ID" });
+
+        try
+        {
+            var (result, error, notFound) = await service.PromoteCookAsync(id, userId);
+
+            if (notFound)
+                return Results.NotFound();
+
+            if (error != null)
+                return Results.BadRequest(new { error });
+
+            return Results.Ok(result);
+        }
+        catch
+        {
+            return Results.Json(
+                new { error = "Promote failed. No changes were made." },
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private static async Task<IResult> GetVersionHistory(
+        int recipeId,
+        CookInstanceService service)
+    {
+        var versions = await service.GetVersionsByRecipeAsync(recipeId);
+        return versions == null
+            ? Results.NotFound()
+            : Results.Ok(versions);
     }
 }
