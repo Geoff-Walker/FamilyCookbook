@@ -305,8 +305,81 @@ public class CookInstanceService
         return new CookHistoryResponseDto
         {
             CookInstances = cookInstanceDtos,
-            OriginalRecipeDate = originalRecipeDate
+            OriginalRecipeDate = originalRecipeDate,
+            HasOriginalSnapshot = originalVersionDate.HasValue
         };
+    }
+
+    // -----------------------------------------------------------------------
+    // RESTORE ORIGINAL RECIPE
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Restores the recipe's ingredient list from the first snapshot taken before
+    /// any promotion (PromotedFrom = null). Returns null + error string if no such
+    /// snapshot exists, or if the recipe does not exist.
+    /// </summary>
+    public async Task<(RestoreResultDto? Result, string? Error, bool NotFound)> RestoreOriginalAsync(
+        int recipeId)
+    {
+        var recipeExists = await _db.Recipes.AnyAsync(r => r.Id == recipeId);
+        if (!recipeExists)
+            return (null, null, true); // 404
+
+        var originalVersion = await _db.RecipeVersions
+            .AsNoTracking()
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom == null)
+            .OrderBy(rv => rv.VersionNumber)
+            .FirstOrDefaultAsync();
+
+        if (originalVersion == null)
+            return (null, "No original snapshot found — recipe has not been promoted yet.", false); // 400
+
+        // Deserialise snapshot JSON back to ingredient rows
+        var snapshotItems = JsonSerializer.Deserialize<List<SnapshotIngredientItem>>(
+            originalVersion.Snapshot,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        if (snapshotItems == null || snapshotItems.Count == 0)
+            return (null, "Original snapshot is empty or unreadable.", false); // 400
+
+        var restoredIngredients = snapshotItems.Select(item => new RecipeIngredient
+        {
+            RecipeId = recipeId,
+            StageId = item.StageId,
+            IngredientId = item.IngredientId,
+            Amount = item.Amount,
+            UnitId = item.UnitId,
+            Notes = item.Notes,
+            SortOrder = item.SortOrder,
+            WeightGrams = item.WeightGrams
+        }).ToList();
+
+        using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var toDelete = await _db.RecipeIngredients
+                .Where(ri => ri.RecipeId == recipeId)
+                .ToListAsync();
+
+            _db.RecipeIngredients.RemoveRange(toDelete);
+            _db.RecipeIngredients.AddRange(restoredIngredients);
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return (new RestoreResultDto
+            {
+                RecipeId = recipeId,
+                RestoredAt = DateTime.UtcNow
+            }, null, false);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Restore original failed for recipe {RecipeId}", recipeId);
+            throw;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -611,4 +684,24 @@ public class CookInstanceService
             }).ToList()
         };
     }
+
+    // -----------------------------------------------------------------------
+    // Private records
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Mirrors the anonymous object structure written into recipe_versions.Snapshot
+    /// by PromoteCookAsync. Used to deserialise snapshot JSON when restoring the original.
+    /// </summary>
+    private sealed record SnapshotIngredientItem(
+        int Id,
+        int RecipeId,
+        int? StageId,
+        int IngredientId,
+        string? Amount,
+        int? UnitId,
+        string? Notes,
+        int SortOrder,
+        decimal? WeightGrams
+    );
 }

@@ -111,6 +111,17 @@ export interface PromoteResultDto {
 export interface CookHistoryResponseDto {
   cookInstances: CookInstanceSummaryDto[];
   originalRecipeDate: string;
+  /** True when a recipe_versions row with promotedFrom = null exists — restore action is available. */
+  hasOriginalSnapshot: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/recipes/{recipeId}/restore-original — response
+// ---------------------------------------------------------------------------
+
+export interface RestoreResultDto {
+  recipeId: number;
+  restoredAt: string;
 }
 
 // ---------------------------------------------------------------------------

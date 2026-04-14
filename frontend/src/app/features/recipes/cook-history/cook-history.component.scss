@@ -203,6 +203,25 @@
   &--open {
     color: var(--color-primary);
   }
+
+  &--restore {
+    color: var(--color-primary);
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.ch__spinner--inline {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: ch-spin 0.7s linear infinite;
 }
 
 // Screen reader only utility

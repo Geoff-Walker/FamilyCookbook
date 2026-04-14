@@ -8,6 +8,7 @@ import {
   CookInstanceDetailDto,
   PatchCookIngredientPayload,
   PromoteResultDto,
+  RestoreResultDto,
   RecipeVersionSummaryDto,
   StartCookPayload
 } from '../models/cook-instance.models';
@@ -67,6 +68,17 @@ export class CookInstanceApiService {
       `${this.baseUrl}/cook-instances/${cookInstanceId}/promote`,
       {},
       { headers: { 'X-User-Id': userId.toString() } }
+    );
+  }
+
+  /**
+   * Restore the recipe's ingredient list from the original pre-promotion snapshot.
+   * Only available when hasOriginalSnapshot = true on the cook history response.
+   */
+  restoreOriginal(recipeId: number): Observable<RestoreResultDto> {
+    return this.http.post<RestoreResultDto>(
+      `${this.baseUrl}/recipes/${recipeId}/restore-original`,
+      {}
     );
   }
 }

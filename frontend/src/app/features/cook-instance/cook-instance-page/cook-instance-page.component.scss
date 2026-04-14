@@ -193,37 +193,121 @@
   background: var(--color-surface-0);
   border-top: 1px solid var(--color-border);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
-  height: 72px;
+  // Allow extra height when showing cancel confirmation
+  min-height: 72px;
+  height: auto;
 }
 
 .cook-footer__inner {
-  height: 100%;
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-3);
   padding: var(--space-4);
   max-width: 800px;
   margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.cook-footer__confirm-text {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.cook-footer__confirm-actions {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  justify-content: center;
 }
 
 .btn-complete {
-  width: 100%;
-  height: 52px;
+  flex: 1;
+  height: 48px;
   background: var(--color-primary);
   color: var(--color-on-primary);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 1.125rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  max-width: 240px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 48px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  max-width: 240px;
+
+  &:hover {
+    border-color: var(--color-error, #d32f2f);
+    color: var(--color-error, #d32f2f);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.btn-cancel-confirm {
+  height: 44px;
+  padding: 0 var(--space-5);
+  background: var(--color-error, #d32f2f);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s ease;
 
-  @media (min-width: 768px) {
-    max-width: 280px;
-  }
-
   &:hover {
     opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.btn-cancel-dismiss {
+  height: 44px;
+  padding: 0 var(--space-5);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-text-secondary);
   }
 
   &:focus-visible {

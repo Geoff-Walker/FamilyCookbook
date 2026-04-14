@@ -97,9 +97,37 @@ export class CookInstancePageComponent implements OnInit {
     });
   }
 
+  /** Whether the inline cancel confirmation is visible. */
+  showCancelConfirm = false;
+
   /** "Complete Cook" button clicked — open the review modal. */
   onCompleteCook(): void {
     this.showReviewDialog = true;
+  }
+
+  /** "Cancel Cook" button clicked — show inline confirmation. */
+  onCancelCook(): void {
+    this.showCancelConfirm = true;
+  }
+
+  /** Confirmed cancel — soft-delete this cook instance and navigate back to the recipe. */
+  onCancelConfirmed(): void {
+    if (!this.cookInstance) return;
+    const recipeId = this.cookInstance.recipeId;
+    this.cookApi.deleteCookInstance(this.cookInstanceId).subscribe({
+      next: () => {
+        this.router.navigate(['/recipes', recipeId]);
+      },
+      error: () => {
+        // Reset confirmation state so the user can try again or navigate away manually
+        this.showCancelConfirm = false;
+      }
+    });
+  }
+
+  /** Back button on cancel confirmation — dismiss without cancelling. */
+  onCancelDismissed(): void {
+    this.showCancelConfirm = false;
   }
 
   /** The review dialog emitted a payload (Save Review or Do this later). */

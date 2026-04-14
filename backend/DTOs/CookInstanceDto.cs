@@ -153,4 +153,22 @@ public class CookHistoryResponseDto
     /// or recipe.created_at as a fallback when no versions exist.
     /// </summary>
     public DateTimeOffset OriginalRecipeDate { get; set; }
+    /// <summary>
+    /// True when a recipe_versions snapshot with PromotedFrom = null exists for this recipe.
+    /// Only when true can the original recipe be restored via the restore-original endpoint.
+    /// </summary>
+    public bool HasOriginalSnapshot { get; set; }
+}
+
+// ---------------------------------------------------------------------------
+// POST /api/recipes/{recipeId}/restore-original — response
+// ---------------------------------------------------------------------------
+
+/// <summary>
+/// Response returned after successfully restoring the original recipe ingredient snapshot.
+/// </summary>
+public class RestoreResultDto
+{
+    public int RecipeId { get; set; }
+    public DateTime RestoredAt { get; set; }
 }

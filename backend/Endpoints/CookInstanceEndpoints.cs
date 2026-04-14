@@ -75,6 +75,15 @@ public static class CookInstanceEndpoints
             .Produces<List<RecipeVersionSummaryDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
+        // POST /api/recipes/{recipeId}/restore-original
+        app.MapPost("/api/recipes/{recipeId:int}/restore-original", RestoreOriginal)
+            .WithTags("CookInstances")
+            .WithSummary("Restore recipe ingredients from the original snapshot (before any promotions)")
+            .Produces<RestoreResultDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status500InternalServerError);
+
         return app;
     }
 
@@ -197,5 +206,29 @@ public static class CookInstanceEndpoints
         return versions == null
             ? Results.NotFound()
             : Results.Ok(versions);
+    }
+
+    private static async Task<IResult> RestoreOriginal(
+        int recipeId,
+        CookInstanceService service)
+    {
+        try
+        {
+            var (result, error, notFound) = await service.RestoreOriginalAsync(recipeId);
+
+            if (notFound)
+                return Results.NotFound();
+
+            if (error != null)
+                return Results.BadRequest(new { error });
+
+            return Results.Ok(result);
+        }
+        catch
+        {
+            return Results.Json(
+                new { error = "Restore failed. No changes were made." },
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 }
