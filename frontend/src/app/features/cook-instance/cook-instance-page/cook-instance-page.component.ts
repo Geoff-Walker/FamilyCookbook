@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,6 +31,12 @@ export class CookInstancePageComponent implements OnInit {
 
   /** Whether the review modal is open. */
   showReviewDialog = false;
+
+  /** Captured from the checklist's scaledPortions when Complete Cook is tapped. */
+  effectivePortions: number | null = null;
+
+  @ViewChild(IngredientChecklistComponent)
+  private checklist?: IngredientChecklistComponent;
 
   /** Derived cook status for the status pill. */
   cookStatus: CookStatus = 'inProgress';
@@ -138,6 +144,9 @@ export class CookInstancePageComponent implements OnInit {
     // The PATCH fires on blur; if the user taps Complete without leaving the input,
     // the blur event is triggered here so the last change is not lost.
     (document.activeElement as HTMLElement)?.blur();
+    // Capture the checklist's current scaled portions (accounts for limiter scaling).
+    // Falls back to the cook instance's stored portions if no checklist is mounted.
+    this.effectivePortions = this.checklist?.scaledPortions ?? this.cookInstance?.portions ?? null;
     this.showReviewDialog = true;
   }
 

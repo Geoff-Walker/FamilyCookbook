@@ -117,7 +117,7 @@
   @if (showReviewDialog) {
     <app-complete-review-dialog
       [cookInstanceId]="cookInstance.id"
-      [initialPortions]="cookInstance.portions"
+      [initialPortions]="effectivePortions"
       (completed)="onReviewCompleted($event)"
       (dismissed)="onDialogDismissed()"
     />
