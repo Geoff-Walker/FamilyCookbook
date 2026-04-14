@@ -52,7 +52,7 @@ public class RecipeService
                 Name = t.TagName,
                 CategoryName = t.CategoryName
             }).ToList(),
-            Ratings = []
+            Ratings = r.PerUserRatings
         }).ToList();
     }
 

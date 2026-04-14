@@ -47,6 +47,15 @@ public class RecipeRepository : IRecipeRepository
                         TagSlug = rt.Tag.Slug,
                         CategoryName = rt.Tag.Category.Name
                     })
+                    .ToList(),
+                PerUserRatings = r.Reviews
+                    .GroupBy(rv => new { rv.UserId, rv.User.Name })
+                    .Select(g => new RecipeSummaryRatingDto
+                    {
+                        UserId = g.Key.UserId,
+                        UserName = g.Key.Name,
+                        AverageRating = g.Average(rv => (double)rv.Rating)
+                    })
                     .ToList()
             })
             .OrderByDescending(r => r.CreatedAt)
