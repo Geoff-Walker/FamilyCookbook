@@ -65,7 +65,7 @@ public static class CookInstanceEndpoints
         app.MapGet("/api/recipes/{recipeId:int}/cook-instances", GetCookHistory)
             .WithTags("CookInstances")
             .WithSummary("List cook instances for a recipe, ordered by started_at DESC")
-            .Produces<List<CookInstanceSummaryDto>>(StatusCodes.Status200OK)
+            .Produces<CookHistoryResponseDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         // GET /api/recipes/{recipeId}/versions

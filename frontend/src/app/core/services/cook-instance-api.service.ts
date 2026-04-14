@@ -4,9 +4,11 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CompleteCookPayload,
+  CookHistoryResponseDto,
   CookInstanceDetailDto,
-  CookInstanceSummaryDto,
   PatchCookIngredientPayload,
+  PromoteResultDto,
+  RecipeVersionSummaryDto,
   StartCookPayload
 } from '../models/cook-instance.models';
 
@@ -44,11 +46,27 @@ export class CookInstanceApiService {
     );
   }
 
-  getCookHistory(recipeId: number): Observable<CookInstanceSummaryDto[]> {
-    return this.http.get<CookInstanceSummaryDto[]>(`${this.baseUrl}/recipes/${recipeId}/cook-instances`);
+  getCookHistory(recipeId: number): Observable<CookHistoryResponseDto> {
+    return this.http.get<CookHistoryResponseDto>(`${this.baseUrl}/recipes/${recipeId}/cook-instances`);
+  }
+
+  getVersionsByRecipe(recipeId: number): Observable<RecipeVersionSummaryDto[]> {
+    return this.http.get<RecipeVersionSummaryDto[]>(`${this.baseUrl}/recipes/${recipeId}/versions`);
   }
 
   deleteCookInstance(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/cook-instances/${id}`);
+  }
+
+  /**
+   * Promote a completed cook instance's actuals to the main recipe.
+   * The active user ID is passed via the X-User-Id header, required by the backend.
+   */
+  promoteCook(cookInstanceId: number, userId: number): Observable<PromoteResultDto> {
+    return this.http.post<PromoteResultDto>(
+      `${this.baseUrl}/cook-instances/${cookInstanceId}/promote`,
+      {},
+      { headers: { 'X-User-Id': userId.toString() } }
+    );
   }
 }

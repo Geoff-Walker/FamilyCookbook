@@ -121,6 +121,7 @@ public class CookInstanceSummaryDto
     public DateTime? CompletedAt { get; set; }
     public int? Portions { get; set; }
     public string? Notes { get; set; }
+    public bool WasPromoted { get; set; }
     public List<CookInstanceReviewSummaryDto> Reviews { get; set; } = [];
 }
 
@@ -133,4 +134,23 @@ public class CookInstanceReviewSummaryDto
     public string UserName { get; set; } = string.Empty;
     public decimal Rating { get; set; }
     public string? Notes { get; set; }
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/recipes/{recipeId}/cook-instances — response wrapper
+// ---------------------------------------------------------------------------
+
+/// <summary>
+/// Response wrapper for the cook history endpoint.
+/// Includes the list of cook instances plus the original recipe date
+/// (used to render the static "Original Recipe" baseline row in the UI).
+/// </summary>
+public class CookHistoryResponseDto
+{
+    public List<CookInstanceSummaryDto> CookInstances { get; set; } = [];
+    /// <summary>
+    /// The created_at of the first recipe_version with PromotedFrom = null,
+    /// or recipe.created_at as a fallback when no versions exist.
+    /// </summary>
+    public DateTimeOffset OriginalRecipeDate { get; set; }
 }

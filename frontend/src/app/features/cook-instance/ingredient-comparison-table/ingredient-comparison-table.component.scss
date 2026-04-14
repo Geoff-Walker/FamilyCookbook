@@ -1,0 +1,123 @@
+// ---------------------------------------------------------------------------
+// Comparison table — CSS Grid layout
+// Grid: 40px (tick) | 1fr (ingredient) | 120px (actual) | 120px (base)
+// ---------------------------------------------------------------------------
+
+.ict-grid {
+  display: grid;
+  grid-template-columns: 40px 1fr 120px 120px;
+  align-items: center;
+}
+
+// ---------------------------------------------------------------------------
+// Header row
+// ---------------------------------------------------------------------------
+
+.ict-header-row {
+  padding: 0 0 var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-1);
+}
+
+.ict-header-cell {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.04em;
+
+  &--right {
+    text-align: right;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Data rows
+// ---------------------------------------------------------------------------
+
+.ict-row {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.ict-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &--right {
+    align-items: flex-end;
+  }
+
+  &--tick {
+    align-items: center;
+  }
+
+  &--ingredient {
+    gap: var(--space-1);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Checkbox — greyed out, read-only
+// ---------------------------------------------------------------------------
+
+.ict-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-text-tertiary);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+// ---------------------------------------------------------------------------
+// Ingredient name + notes
+// ---------------------------------------------------------------------------
+
+.ict-ingredient-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.ict-ingredient-notes {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------------------
+// Actual amount
+// ---------------------------------------------------------------------------
+
+.ict-actual-amount {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+
+  // Highlight where actual differs from base
+  &--different {
+    color: var(--color-primary);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Base amount
+// ---------------------------------------------------------------------------
+
+.ict-base-amount {
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+  text-align: right;
+
+  &--none {
+    opacity: 0.4;
+  }
+}

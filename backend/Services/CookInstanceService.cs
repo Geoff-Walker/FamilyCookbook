@@ -227,14 +227,17 @@ public class CookInstanceService
     // -----------------------------------------------------------------------
 
     /// <summary>
-    /// Returns all non-deleted cook instances for a recipe, ordered by started_at DESC.
+    /// Returns all non-deleted cook instances for a recipe, ordered by started_at DESC,
+    /// along with the original recipe date for rendering the baseline "Original Recipe" row.
     /// Returns null if the recipe does not exist.
     /// </summary>
-    public async Task<List<CookInstanceSummaryDto>?> GetHistoryByRecipeAsync(int recipeId)
+    public async Task<CookHistoryResponseDto?> GetHistoryByRecipeAsync(int recipeId)
     {
         // Verify recipe exists (query filter excludes soft-deleted)
-        var recipeExists = await _db.Recipes.AnyAsync(r => r.Id == recipeId);
-        if (!recipeExists)
+        var recipe = await _db.Recipes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == recipeId);
+        if (recipe == null)
             return null;
 
         // Load cook instances for this recipe with their associated reviews
@@ -258,7 +261,27 @@ public class CookInstanceService
             .GroupBy(rr => rr.CookInstanceId!.Value)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        return cookInstances.Select(ci => new CookInstanceSummaryDto
+        // Determine which cook instances triggered a promotion (PromotedFrom is set on versions 2+).
+        var promotedCookIds = await _db.RecipeVersions
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom != null)
+            .Select(rv => rv.PromotedFrom!.Value)
+            .ToHashSetAsync();
+
+        // Determine the original recipe date:
+        // Use the created_at of the first recipe_version with PromotedFrom = null, if one exists.
+        // Otherwise fall back to recipe.created_at.
+        var originalVersionDate = await _db.RecipeVersions
+            .AsNoTracking()
+            .Where(rv => rv.RecipeId == recipeId && rv.PromotedFrom == null)
+            .OrderBy(rv => rv.CreatedAt)
+            .Select(rv => (DateTime?)rv.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        var originalRecipeDate = originalVersionDate.HasValue
+            ? new DateTimeOffset(originalVersionDate.Value, TimeSpan.Zero)
+            : new DateTimeOffset(recipe.CreatedAt, TimeSpan.Zero);
+
+        var cookInstanceDtos = cookInstances.Select(ci => new CookInstanceSummaryDto
         {
             Id = ci.Id,
             UserId = ci.UserId,
@@ -267,6 +290,7 @@ public class CookInstanceService
             CompletedAt = ci.CompletedAt,
             Portions = ci.Portions,
             Notes = ci.Notes,
+            WasPromoted = promotedCookIds.Contains(ci.Id),
             Reviews = reviewsByCook.TryGetValue(ci.Id, out var cookReviews)
                 ? cookReviews.Select(rr => new CookInstanceReviewSummaryDto
                 {
@@ -277,6 +301,12 @@ public class CookInstanceService
                 }).ToList()
                 : []
         }).ToList();
+
+        return new CookHistoryResponseDto
+        {
+            CookInstances = cookInstanceDtos,
+            OriginalRecipeDate = originalRecipeDate
+        };
     }
 
     // -----------------------------------------------------------------------

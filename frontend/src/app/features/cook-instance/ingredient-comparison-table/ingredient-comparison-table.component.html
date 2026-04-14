@@ -1,0 +1,48 @@
+<!-- Column headers -->
+<div class="ict-grid ict-header-row" aria-hidden="true">
+  <span class="ict-header-cell"></span>
+  <span class="ict-header-cell">Ingredient</span>
+  <span class="ict-header-cell ict-header-cell--right">Actual</span>
+  <span class="ict-header-cell ict-header-cell--right">{{ baseLabel }}</span>
+</div>
+
+<!-- Ingredient rows -->
+@for (row of rows; track trackByIndex($index)) {
+  <div class="ict-grid ict-row">
+    <!-- Greyed-out read-only checkbox reflecting the cook's checked state -->
+    <div class="ict-cell ict-cell--tick">
+      <input
+        type="checkbox"
+        class="ict-checkbox"
+        [checked]="row.checked"
+        [disabled]="true"
+        [attr.aria-label]="row.ingredientName + (row.checked ? ' (checked)' : ' (unchecked)')"
+      />
+    </div>
+
+    <!-- Ingredient name + notes -->
+    <div class="ict-cell ict-cell--ingredient">
+      <span class="ict-ingredient-name">{{ row.ingredientName }}</span>
+      @if (row.notes) {
+        <span class="ict-ingredient-notes">{{ row.notes }}</span>
+      }
+    </div>
+
+    <!-- Actual amount — highlighted if different from base -->
+    <div class="ict-cell ict-cell--amount ict-cell--right">
+      <span
+        class="ict-actual-amount"
+        [class.ict-actual-amount--different]="row.isDifferent"
+      >{{ formatAmount(row.actualAmount) }}{{ row.actualUnit ? ' ' + row.actualUnit : '' }}</span>
+    </div>
+
+    <!-- Base amount -->
+    <div class="ict-cell ict-cell--amount ict-cell--right">
+      @if (row.baseAmount) {
+        <span class="ict-base-amount">{{ row.baseAmount }}{{ row.baseUnit ? ' ' + row.baseUnit : '' }}</span>
+      } @else {
+        <span class="ict-base-amount ict-base-amount--none">—</span>
+      }
+    </div>
+  </div>
+}

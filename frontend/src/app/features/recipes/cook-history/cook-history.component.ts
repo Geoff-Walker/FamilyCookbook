@@ -14,6 +14,7 @@ export class CookHistoryComponent implements OnInit {
   @Input({ required: true }) recipeId!: number;
 
   cookHistory: CookInstanceSummaryDto[] = [];
+  originalRecipeDate: string | null = null;
   isExpanded = false;
   isLoading = true;
   loadError = false;
@@ -25,8 +26,9 @@ export class CookHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.cookApi.getCookHistory(this.recipeId).subscribe({
-      next: (history) => {
-        this.cookHistory = history;
+      next: (response) => {
+        this.cookHistory = response.cookInstances;
+        this.originalRecipeDate = response.originalRecipeDate;
         this.isLoading = false;
       },
       error: () => {

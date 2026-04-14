@@ -1,0 +1,221 @@
+<!-- Loading -->
+@if (viewState === 'loading') {
+  <div class="civ-state-loading" aria-busy="true" aria-label="Loading cook">
+    <div class="skeleton-line shimmer" style="width: 30%; height: 14px;"></div>
+    <div class="skeleton-line shimmer" style="width: 55%; height: 28px; margin-top: 8px;"></div>
+    <div class="skeleton-line shimmer" style="width: 70%; height: 16px; margin-top: 6px;"></div>
+  </div>
+}
+
+<!-- Not found -->
+@if (viewState === 'notFound') {
+  <div class="civ-state-panel">
+    <p class="civ-state-message">Cook not found.</p>
+    <a routerLink="/" class="civ-state-link">← Back to recipes</a>
+  </div>
+}
+
+<!-- Error -->
+@if (viewState === 'error') {
+  <div class="civ-state-panel">
+    <p class="civ-state-message">Could not load cook. Please try again.</p>
+    <button class="civ-btn-retry" type="button" (click)="load()">Retry</button>
+  </div>
+}
+
+<!-- Loaded -->
+@if (viewState === 'loaded' && cookInstance) {
+  <div class="civ-page">
+
+    <!-- Page header (AC2) -->
+    <header class="civ-header">
+      <div class="civ-header__inner">
+
+        <!-- Back link -->
+        <a
+          class="civ-back-link"
+          [routerLink]="['/recipes', cookInstance.recipeId]"
+        >← {{ cookInstance.recipeTitle }}</a>
+
+        <!-- Title -->
+        <h1 class="civ-title">Cook — {{ formatDate(cookInstance.startedAt) }}</h1>
+
+        <!-- Subtitle row -->
+        <div class="civ-subtitle-row">
+          <span class="civ-subtitle">Cooked by {{ cookInstance.userName }}</span>
+          <span class="civ-subtitle-sep" aria-hidden="true">·</span>
+          <span class="civ-subtitle">{{ cookInstance.portions ?? '?' }} portions</span>
+          <span class="civ-subtitle-sep" aria-hidden="true">·</span>
+          <span class="status-pill" [class]="'status-pill ' + pillClass" role="status">{{ pillLabel }}</span>
+        </div>
+
+        <!-- Ratings row (shown if either user has reviewed) -->
+        @if (hasRatings) {
+          <div class="civ-ratings-row" aria-label="Ratings">
+            @for (review of ratings; track review.userId) {
+              <span class="civ-rating-item">
+                <span class="civ-rating-name">{{ review.userName }}</span>
+                <span class="civ-rating-stars">{{ starDisplay(review.rating) }}</span>
+              </span>
+              @if (!$last) {
+                <span class="civ-rating-sep" aria-hidden="true">·</span>
+              }
+            }
+          </div>
+        }
+
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="civ-main">
+      <div class="civ-content">
+
+        <!-- Ingredient comparison table (AC3) -->
+        @if (recipe) {
+          <section class="civ-section">
+            <app-ingredient-comparison-table
+              [stageGroups]="cookInstance.stageGroups"
+              [recipeStages]="recipe.stages"
+              [baseLabel]="baseLabel"
+            />
+          </section>
+        }
+
+        <!-- Cook notes (AC4) -->
+        @if (cookInstance.notes) {
+          <section class="civ-section civ-notes-section">
+            <p class="civ-section-label">Cook Notes</p>
+            <div class="civ-notes-block">
+              <p class="civ-notes-text">{{ cookInstance.notes }}</p>
+            </div>
+          </section>
+        }
+
+        <!-- Promote feedback messages -->
+        @if (promoteSuccessMessage) {
+          <p class="civ-feedback civ-feedback--success" role="status">{{ promoteSuccessMessage }}</p>
+        }
+        @if (promoteErrorMessage) {
+          <p class="civ-feedback civ-feedback--error" role="alert">{{ promoteErrorMessage }}</p>
+        }
+
+        <!-- Promote to Main Recipe (AC5) -->
+        <section class="civ-section civ-promote-section">
+          <button
+            type="button"
+            class="civ-btn-promote"
+            [disabled]="promoteDisabled"
+            (click)="onPromoteClick()"
+          >
+            Promote to Main Recipe
+          </button>
+          <p class="civ-promote-helper">This will save the current recipe as a version snapshot before updating.</p>
+        </section>
+
+        <!-- Leave a review (AC9) — shown when no reviews exist and not yet submitted -->
+        @if (showReviewForm && !reviewSubmitted) {
+          <section class="civ-review-section">
+            <h2 class="civ-review-heading">Leave a review</h2>
+
+            <!-- Rating rows — one per user -->
+            @for (ur of userRatings; track ur.userId) {
+              <div class="civ-rating-row">
+                <span class="civ-rating-label">{{ ur.userName }}</span>
+                <div
+                  class="civ-stars"
+                  [attr.aria-label]="ur.userName + ' rating: ' + ratingLabel(ur)"
+                  (mouseleave)="onStarLeave(ur)"
+                >
+                  @for (star of starValues; track star) {
+                    <button
+                      type="button"
+                      class="civ-star-btn"
+                      [attr.aria-label]="starAriaLabel(star)"
+                      (click)="onStarClick(ur, star, $event)"
+                      (mousemove)="onStarHover(ur, star, $event)"
+                    >
+                      <svg class="civ-star-svg" viewBox="0 0 24 24" aria-hidden="true">
+                        <defs>
+                          <clipPath [id]="'civ-left-' + ur.userId + '-' + star">
+                            <rect x="0" y="0" width="12" height="24" />
+                          </clipPath>
+                          <clipPath [id]="'civ-right-' + ur.userId + '-' + star">
+                            <rect x="12" y="0" width="12" height="24" />
+                          </clipPath>
+                        </defs>
+                        <path
+                          class="civ-star-empty"
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                        />
+                        @if (leftHalfFilled(ur, star)) {
+                          <path
+                            class="civ-star-filled"
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                            [attr.clip-path]="'url(#civ-left-' + ur.userId + '-' + star + ')'"
+                          />
+                        }
+                        @if (rightHalfFilled(ur, star)) {
+                          <path
+                            class="civ-star-filled"
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                            [attr.clip-path]="'url(#civ-right-' + ur.userId + '-' + star + ')'"
+                          />
+                        }
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+              <!-- Per-user notes -->
+              <div class="civ-review-field">
+                <textarea
+                  [id]="'civ-notes-' + ur.userId"
+                  class="civ-textarea"
+                  rows="2"
+                  placeholder="Notes..."
+                  [(ngModel)]="ur.notes"
+                ></textarea>
+              </div>
+            }
+
+            @if (reviewRatingError) {
+              <p class="civ-review-error" role="alert">{{ reviewRatingError }}</p>
+            }
+            @if (reviewSaveError) {
+              <p class="civ-review-error" role="alert">{{ reviewSaveError }}</p>
+            }
+
+            <button
+              type="button"
+              class="civ-btn-save-review"
+              [disabled]="isSavingReview"
+              (click)="onSubmitReview()"
+            >
+              @if (isSavingReview) {
+                <span class="civ-spinner" aria-hidden="true"></span>
+                <span class="civ-sr-only">Saving…</span>
+              } @else {
+                Save Review
+              }
+            </button>
+          </section>
+        }
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Promote confirm dialog (rendered outside page for stacking context) -->
+  @if (showPromoteDialog) {
+    <app-promote-confirm-dialog
+      [isPromoting]="isPromoting"
+      (confirmed)="onPromoteConfirmed()"
+      (cancelled)="onPromoteCancelled()"
+    />
+  }
+}

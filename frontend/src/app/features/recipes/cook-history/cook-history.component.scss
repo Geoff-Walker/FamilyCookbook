@@ -147,6 +147,39 @@
   color: var(--color-text-tertiary);
 }
 
+.ch__promoted-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+.ch__original-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-tertiary);
+  background: color-mix(in srgb, var(--color-text-tertiary) 12%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+.ch__row--original {
+  opacity: 0.7;
+  font-style: italic;
+}
+
 // Action buttons — 48×48px touch targets
 .ch__action-btn {
   display: flex;

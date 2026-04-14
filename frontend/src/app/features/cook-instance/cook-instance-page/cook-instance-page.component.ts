@@ -50,6 +50,11 @@ export class CookInstancePageComponent implements OnInit {
     this.viewState = 'loading';
     this.cookApi.getCookInstance(this.cookInstanceId).subscribe({
       next: (data) => {
+        // Guard: if the cook is already completed, redirect to the view page (WAL-76)
+        if (data.completedAt) {
+          this.router.navigate(['/cook', this.cookInstanceId], { replaceUrl: true });
+          return;
+        }
         this.cookInstance = data;
         this.viewState = 'loaded';
         this.headerState.setPageTitle(data.recipeTitle);
@@ -103,14 +108,12 @@ export class CookInstancePageComponent implements OnInit {
     this.cookApi.completeCook(this.cookInstanceId, payload).subscribe({
       next: (updated) => {
         this.cookInstance = updated;
-        // Determine new status from whether reviews were submitted
         if (payload.reviews.length > 0) {
-          this.cookStatus = 'completed';
-          // Navigate back to the recipe now that the cook is fully reviewed
+          // Reviewed — navigate to recipe detail
           this.router.navigate(['/recipes', updated.recipeId]);
         } else {
-          this.cookStatus = 'awaitingReview';
-          // No review submitted — stay on page (awaiting review state)
+          // Cook is complete but no review yet — go to the view page (WAL-76)
+          this.router.navigate(['/cook', this.cookInstanceId], { replaceUrl: true });
         }
       },
       error: () => {

@@ -23,8 +23,6 @@
       </div>
     } @else if (loadError) {
       <p class="ch__error">Could not load cook history.</p>
-    } @else if (cookHistory.length === 0) {
-      <p class="ch__empty">No cooks recorded yet.</p>
     } @else {
       <div class="ch__table" role="table" aria-label="Cook history">
 
@@ -40,7 +38,12 @@
         <!-- Data rows -->
         @for (row of cookHistory; track row.id; let odd = $odd) {
           <div class="ch__row" [class.ch__row--odd]="odd" role="row">
-            <div class="ch__cell ch__cell--date" role="cell">{{ formatDate(row.startedAt) }}</div>
+            <div class="ch__cell ch__cell--date" role="cell">
+              {{ formatDate(row.startedAt) }}
+              @if (row.wasPromoted) {
+                <span class="ch__promoted-badge">Promoted</span>
+              }
+            </div>
 
             <div class="ch__cell ch__cell--rating" role="cell">
               @let geoffRating = getRating(row, 1);
@@ -95,6 +98,24 @@
                 </svg>
               </button>
             </div>
+          </div>
+        }
+
+        <!-- Original Recipe row — always last, read-only baseline -->
+        @if (originalRecipeDate) {
+          <div class="ch__row ch__row--original" role="row">
+            <div class="ch__cell ch__cell--date" role="cell">
+              {{ formatDate(originalRecipeDate) }}
+              <span class="ch__original-badge">Original</span>
+            </div>
+            <div class="ch__cell ch__cell--rating" role="cell">
+              <span class="ch__no-rating" aria-hidden="true">—</span>
+            </div>
+            <div class="ch__cell ch__cell--rating" role="cell">
+              <span class="ch__no-rating" aria-hidden="true">—</span>
+            </div>
+            <div class="ch__cell ch__cell--action" role="cell"></div>
+            <div class="ch__cell ch__cell--action" role="cell"></div>
           </div>
         }
 
