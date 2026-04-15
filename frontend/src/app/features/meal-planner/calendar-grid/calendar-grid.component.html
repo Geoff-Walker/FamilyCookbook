@@ -1,0 +1,22 @@
+<!-- Day-of-week header row -->
+<div class="cal-grid__headers" aria-hidden="true">
+  @for (label of dayHeaders; track label) {
+    <div class="cal-grid__header-cell">{{ label }}</div>
+  }
+</div>
+
+<!-- Calendar day cells -->
+<div class="cal-grid__body">
+  @for (day of calendarDays; track day.date) {
+    <app-day-cell
+      [date]="day.date"
+      [slots]="day.slots"
+      [isCurrentMonth]="day.isCurrentMonth"
+      [isToday]="day.isToday"
+      (addRecipe)="addRecipe.emit($event)"
+      (addIfIts)="addIfIts.emit($event)"
+      (addTbd)="addTbd.emit($event)"
+      (deleteSlot)="deleteSlot.emit($event)"
+    ></app-day-cell>
+  }
+</div>

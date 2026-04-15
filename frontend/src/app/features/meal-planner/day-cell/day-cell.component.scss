@@ -1,0 +1,201 @@
+.day-cell {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-0);
+  border: 1px solid var(--color-border-subtle);
+  /* Mobile: full-width card, min 80px */
+  min-height: 80px;
+  padding: var(--space-1);
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    /* Tablet: cells in the 7-column grid */
+    min-height: 140px;
+  }
+
+  @media (min-width: 1200px) {
+    /* Desktop: taller cells */
+    min-height: 180px;
+  }
+
+  &--outside-month {
+    background: var(--color-surface-1);
+  }
+}
+
+/* ============================================================
+   MOBILE DAY LABEL (shown only below 768px)
+   ============================================================ */
+.day-cell__mobile-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  flex-shrink: 0;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* ============================================================
+   DATE NUMBER (shown only on tablet+)
+   ============================================================ */
+.day-cell__date-wrap {
+  display: none;
+  justify-content: flex-end;
+  padding: var(--space-2);
+  flex-shrink: 0;
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
+}
+
+.day-cell__date {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+
+  &--outside {
+    color: var(--color-text-tertiary);
+  }
+
+  &--today {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-full);
+  }
+}
+
+/* ============================================================
+   SLOTS
+   ============================================================ */
+.day-cell__slots {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  min-height: 0;
+}
+
+/* ============================================================
+   INLINE "IF IT'S" INPUT
+   ============================================================ */
+.day-cell__ifits-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1);
+}
+
+.day-cell__ifits-input {
+  width: 100%;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  padding: 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface-0);
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
+  }
+}
+
+.day-cell__ifits-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.day-cell__ifits-btn {
+  flex: 1;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--confirm {
+    color: var(--color-success, #2e7d32);
+    border-color: var(--color-success, #2e7d32);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-success, #2e7d32) 10%, transparent);
+    }
+  }
+
+  &--cancel {
+    color: var(--color-text-tertiary);
+
+    &:hover {
+      background: var(--color-surface-2);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 1px;
+  }
+}
+
+/* ============================================================
+   ADD BUTTONS ROW
+   ============================================================ */
+.day-cell__add-row {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1) var(--space-1);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.day-cell__add-btn {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}

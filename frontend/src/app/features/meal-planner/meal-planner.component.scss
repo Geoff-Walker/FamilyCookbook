@@ -1,0 +1,173 @@
+.mp-page {
+  width: 100%;
+  min-height: 100%;
+}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.mp-header {
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mp-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ============================================================
+   MONTH NAVIGATION
+   ============================================================ */
+.mp-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.mp-nav-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.mp-month-label {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 180px;
+  text-align: center;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.mp-tabs {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.mp-tab {
+  height: 40px;
+  padding: 0 var(--space-5);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  transition: background 150ms ease, color 150ms ease;
+
+  &--active {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  &:hover:not(&--active) {
+    background: var(--color-surface-3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+.mp-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-12, 3rem) var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}
+
+.mp-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: mp-spin 0.6s linear infinite;
+}
+
+@keyframes mp-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+.mp-error {
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+
+  p {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+  }
+}
+
+.mp-retry-btn {
+  height: 40px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   COMING SOON (Shopping Week placeholder)
+   ============================================================ */
+.mp-coming-soon {
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}

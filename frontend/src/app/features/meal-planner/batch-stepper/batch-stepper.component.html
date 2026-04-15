@@ -1,0 +1,18 @@
+<div class="stepper" role="group" aria-label="Batch multiplier">
+  <button
+    type="button"
+    class="stepper__btn"
+    [disabled]="isAtMin"
+    (click)="decrement()"
+    aria-label="Decrease batch count"
+  >&#8722;</button>
+
+  <span class="stepper__count" aria-live="polite" aria-atomic="true">{{ displayValue }}</span>
+
+  <button
+    type="button"
+    class="stepper__btn"
+    (click)="increment()"
+    aria-label="Increase batch count"
+  >&#43;</button>
+</div>

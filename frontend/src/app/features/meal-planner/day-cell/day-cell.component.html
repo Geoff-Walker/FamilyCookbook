@@ -1,0 +1,80 @@
+<div
+  class="day-cell"
+  [class.day-cell--outside-month]="!isCurrentMonth"
+  [class.day-cell--today]="isToday"
+>
+  <!-- Mobile day label (hidden on tablet+) -->
+  <div class="day-cell__mobile-label" aria-hidden="true">{{ mobileDayLabel }}</div>
+
+  <!-- Date number — top right (hidden on mobile) -->
+  <div class="day-cell__date-wrap">
+    <span
+      class="day-cell__date"
+      [class.day-cell__date--today]="isToday"
+      [class.day-cell__date--outside]="!isCurrentMonth"
+      [attr.aria-label]="isToday ? 'Today, ' + dayNumber : dayNumber.toString()"
+    >{{ dayNumber }}</span>
+  </div>
+
+  <!-- Slot chips -->
+  <div class="day-cell__slots">
+    @for (slot of slots; track slot.id) {
+      <app-meal-slot-chip
+        [slot]="slot"
+        (deleted)="onDeleteSlot($event)"
+      ></app-meal-slot-chip>
+    }
+  </div>
+
+  <!-- Inline "if it's" input -->
+  @if (showIfItsInput) {
+    <div class="day-cell__ifits-input-wrap">
+      <input
+        type="text"
+        class="day-cell__ifits-input"
+        [(ngModel)]="ifItsText"
+        (keydown)="onIfItsKeydown($event)"
+        placeholder="What is it?"
+        autofocus
+        maxlength="120"
+        aria-label="If it's — enter description"
+      />
+      <div class="day-cell__ifits-actions">
+        <button
+          type="button"
+          class="day-cell__ifits-btn day-cell__ifits-btn--confirm"
+          (click)="onIfItsConfirm()"
+          aria-label="Confirm"
+        >&#10003;</button>
+        <button
+          type="button"
+          class="day-cell__ifits-btn day-cell__ifits-btn--cancel"
+          (click)="onIfItsCancel()"
+          aria-label="Cancel"
+        >&#x2715;</button>
+      </div>
+    </div>
+  }
+
+  <!-- Add buttons row — bottom of cell -->
+  <div class="day-cell__add-row" aria-label="Add meal to this day">
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddRecipe()"
+      aria-label="Add recipe"
+    >+ Recipe</button>
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddIfIts()"
+      aria-label="Add if it's"
+    >+ If it's</button>
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddTbd()"
+      aria-label="Add TBD slot"
+    >+ TBD</button>
+  </div>
+</div>
