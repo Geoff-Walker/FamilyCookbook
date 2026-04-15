@@ -94,7 +94,7 @@ export class MealPlannerComponent implements OnInit, OnDestroy {
   // Data loading
   // ---------------------------------------------------------------------------
 
-  private loadMonth(): void {
+  loadMonth(): void {
     this.isLoading = true;
     this.loadError = null;
 
