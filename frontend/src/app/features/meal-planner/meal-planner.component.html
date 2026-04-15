@@ -65,15 +65,17 @@
 
   <!-- Full Calendar tab -->
   @if (activeTab === 'full-calendar' && !isLoading && !loadError) {
-    <app-calendar-grid
-      [year]="displayYear"
-      [month]="displayMonth"
-      [slots]="slots"
-      (addRecipe)="onAddRecipe($event)"
-      (addIfIts)="onAddIfIts($event)"
-      (addTbd)="onAddTbd($event)"
-      (deleteSlot)="onDeleteSlot($event)"
-    ></app-calendar-grid>
+    <div class="mp-calendar-wrap">
+      <app-calendar-grid
+        [year]="displayYear"
+        [month]="displayMonth"
+        [slots]="slots"
+        (addRecipe)="onAddRecipe($event)"
+        (addIfIts)="onAddIfIts($event)"
+        (addTbd)="onAddTbd($event)"
+        (deleteSlot)="onDeleteSlot($event)"
+      ></app-calendar-grid>
+    </div>
   }
 
   <!-- Shopping Week tab — placeholder (next ticket) -->

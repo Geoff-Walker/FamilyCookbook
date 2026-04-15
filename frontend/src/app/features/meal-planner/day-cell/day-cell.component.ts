@@ -6,7 +6,6 @@ import {
   Output
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { MealPlanSlotDto } from '../../../core/models/meal-planner.models';
 import { MealSlotChipComponent } from '../meal-slot-chip/meal-slot-chip.component';
 
@@ -16,7 +15,6 @@ export interface AddRecipeEvent {
 
 export interface AddIfItsEvent {
   date: string;
-  text: string;
 }
 
 export interface AddTbdEvent {
@@ -35,7 +33,7 @@ export interface DeleteSlotEvent {
 @Component({
   selector: 'app-day-cell',
   standalone: true,
-  imports: [CommonModule, FormsModule, MealSlotChipComponent],
+  imports: [CommonModule, MealSlotChipComponent],
   templateUrl: './day-cell.component.html',
   styleUrl: './day-cell.component.scss'
 })
@@ -70,12 +68,6 @@ export class DayCellComponent implements OnChanges {
   /** Full mobile day label e.g. "Monday 14 April" (AC8). */
   mobileDayLabel = '';
 
-  /** Whether the inline "if it's" input is visible. */
-  showIfItsInput = false;
-
-  /** Text value for the inline "if it's" input. */
-  ifItsText = '';
-
   private static readonly WEEK_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   private static readonly MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
@@ -93,32 +85,8 @@ export class DayCellComponent implements OnChanges {
   }
 
   onAddIfIts(): void {
-    this.showIfItsInput = true;
-    this.ifItsText = '';
-  }
-
-  onIfItsConfirm(): void {
-    const text = this.ifItsText.trim();
-    if (!text) {
-      this.showIfItsInput = false;
-      return;
-    }
-    this.addIfIts.emit({ date: this.date, text });
-    this.showIfItsInput = false;
-    this.ifItsText = '';
-  }
-
-  onIfItsCancel(): void {
-    this.showIfItsInput = false;
-    this.ifItsText = '';
-  }
-
-  onIfItsKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      this.onIfItsConfirm();
-    } else if (event.key === 'Escape') {
-      this.onIfItsCancel();
-    }
+    // "If it's" is a slot category — emit immediately, no inline input.
+    this.addIfIts.emit({ date: this.date });
   }
 
   onAddTbd(): void {

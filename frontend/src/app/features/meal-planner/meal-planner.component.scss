@@ -163,6 +163,29 @@
 }
 
 /* ============================================================
+   CALENDAR WRAPPER
+   Mobile + tablet: full-width, no extra treatment.
+   Desktop (≥ 1200px): centred container with breathing room and
+   a subtle card border so the grid doesn't feel edge-to-edge.
+   ============================================================ */
+.mp-calendar-wrap {
+  width: 100%;
+
+  @media (min-width: 1200px) {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+
+    app-calendar-grid {
+      display: block;
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+  }
+}
+
+/* ============================================================
    COMING SOON (Shopping Week placeholder)
    ============================================================ */
 .mp-coming-soon {

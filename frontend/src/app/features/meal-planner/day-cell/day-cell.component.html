@@ -26,36 +26,6 @@
     }
   </div>
 
-  <!-- Inline "if it's" input -->
-  @if (showIfItsInput) {
-    <div class="day-cell__ifits-input-wrap">
-      <input
-        type="text"
-        class="day-cell__ifits-input"
-        [(ngModel)]="ifItsText"
-        (keydown)="onIfItsKeydown($event)"
-        placeholder="What is it?"
-        autofocus
-        maxlength="120"
-        aria-label="If it's — enter description"
-      />
-      <div class="day-cell__ifits-actions">
-        <button
-          type="button"
-          class="day-cell__ifits-btn day-cell__ifits-btn--confirm"
-          (click)="onIfItsConfirm()"
-          aria-label="Confirm"
-        >&#10003;</button>
-        <button
-          type="button"
-          class="day-cell__ifits-btn day-cell__ifits-btn--cancel"
-          (click)="onIfItsCancel()"
-          aria-label="Cancel"
-        >&#x2715;</button>
-      </div>
-    </div>
-  }
-
   <!-- Add buttons row — bottom of cell -->
   <div class="day-cell__add-row" aria-label="Add meal to this day">
     <button

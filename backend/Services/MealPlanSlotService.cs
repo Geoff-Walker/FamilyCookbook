@@ -77,9 +77,8 @@ public class MealPlanSlotService
                 return (null, null, true); // 404 — recipe not found or soft-deleted
         }
 
-        // AC 6 — if slot_type = 'if_its', notes is required
-        if (request.SlotType == "if_its" && string.IsNullOrWhiteSpace(request.Notes))
-            return (null, "notes is required when slotType is 'if_its'", false);
+        // AC 6 — 'if_its' slots do not require notes; notes may be null or empty.
+        // (Previous validation requiring notes for if_its was based on an incorrect spec — removed.)
 
         var slot = new MealPlanSlot
         {

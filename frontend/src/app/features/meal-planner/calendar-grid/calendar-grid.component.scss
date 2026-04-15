@@ -1,4 +1,17 @@
 /* ============================================================
+   HOST ELEMENT
+   Ensure the component host is a block-level container that
+   never exceeds the viewport width — prevents the 7-column grid
+   from pushing Sunday off-screen on tablet.
+   ============================================================ */
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ============================================================
    DAY HEADERS ROW
    ============================================================ */
 .cal-grid__headers {

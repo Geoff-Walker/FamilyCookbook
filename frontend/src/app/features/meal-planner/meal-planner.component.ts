@@ -130,7 +130,7 @@ export class MealPlannerComponent implements OnInit, OnDestroy {
       slotType: 'if_its',
       recipeId: null,
       batchMultiplier: 1,
-      notes: event.text,
+      notes: null,
       sortOrder: 0
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (slot) => this.addSlotLocally(slot),
