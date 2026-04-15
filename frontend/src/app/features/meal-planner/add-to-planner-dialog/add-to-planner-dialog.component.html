@@ -1,0 +1,109 @@
+<!-- Backdrop -->
+<div class="atp-backdrop" role="presentation" (click)="onBackdropClick()"></div>
+
+<!-- Dialog panel -->
+<div
+  class="atp-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="atp-title"
+>
+  <!-- Header -->
+  <div class="atp-header">
+    <h2 class="atp-title" id="atp-title">Add to Planner</h2>
+    <button
+      type="button"
+      class="atp-close"
+      aria-label="Close dialog"
+      [disabled]="isSaving"
+      (click)="onCancel()"
+    >&#x2715;</button>
+  </div>
+
+  <!-- Recipe search -->
+  <div class="atp-field">
+    @if (selectedRecipe) {
+      <!-- Selected recipe chip -->
+      <div class="atp-selected-chip">
+        <span class="atp-selected-chip__name">{{ selectedRecipe.title }}</span>
+        <button
+          type="button"
+          class="atp-selected-chip__clear"
+          aria-label="Clear selected recipe"
+          (click)="clearRecipe()"
+        >&#x2715;</button>
+      </div>
+    } @else {
+      <!-- Search input -->
+      <div class="atp-search-wrap">
+        <input
+          type="search"
+          class="atp-search-input"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          placeholder="Search recipes…"
+          autocomplete="off"
+          aria-label="Search recipes"
+          aria-autocomplete="list"
+          [attr.aria-expanded]="showDropdown"
+        />
+        @if (isSearching) {
+          <span class="atp-search-spinner" aria-hidden="true"></span>
+        }
+
+        <!-- Results dropdown -->
+        @if (showDropdown && searchResults.length > 0) {
+          <ul class="atp-dropdown" role="listbox" aria-label="Recipe suggestions">
+            @for (recipe of searchResults; track recipe.id) {
+              <li
+                class="atp-dropdown__item"
+                role="option"
+                (click)="selectRecipe(recipe)"
+                (keydown.enter)="selectRecipe(recipe)"
+                tabindex="0"
+              >{{ recipe.title }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Batch multiplier -->
+  <div class="atp-field">
+    <label class="atp-label">How many batches?</label>
+    <app-batch-stepper
+      [value]="batchMultiplier"
+      [min]="1"
+      (valueChange)="onBatchChange($event)"
+    ></app-batch-stepper>
+  </div>
+
+  <!-- Error message -->
+  @if (saveError) {
+    <p class="atp-error" role="alert">{{ saveError }}</p>
+  }
+
+  <!-- Actions -->
+  <div class="atp-actions">
+    <button
+      type="button"
+      class="atp-btn-primary"
+      [disabled]="!canSubmit"
+      (click)="onSubmit()"
+    >
+      @if (isSaving) {
+        <span class="atp-spinner" aria-hidden="true"></span>
+        <span class="atp-sr-only">Adding…</span>
+      } @else {
+        Add to Planner
+      }
+    </button>
+    <button
+      type="button"
+      class="atp-btn-cancel"
+      [disabled]="isSaving"
+      (click)="onCancel()"
+    >Cancel</button>
+  </div>
+</div>

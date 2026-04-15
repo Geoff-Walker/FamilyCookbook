@@ -1,0 +1,15 @@
+<div
+  class="chip"
+  [class.chip--recipe]="slot.slotType === 'recipe'"
+  [class.chip--if-its]="slot.slotType === 'if_its'"
+  [class.chip--not-defined]="slot.slotType === 'not_defined'"
+  [title]="label"
+>
+  <span class="chip__label">{{ label }}</span>
+  <button
+    type="button"
+    class="chip__delete"
+    (click)="onDelete($event)"
+    [attr.aria-label]="'Remove ' + label"
+  >&#x2715;</button>
+</div>

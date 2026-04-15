@@ -1,0 +1,50 @@
+<div
+  class="day-cell"
+  [class.day-cell--outside-month]="!isCurrentMonth"
+  [class.day-cell--today]="isToday"
+>
+  <!-- Mobile day label (hidden on tablet+) -->
+  <div class="day-cell__mobile-label" aria-hidden="true">{{ mobileDayLabel }}</div>
+
+  <!-- Date number — top right (hidden on mobile) -->
+  <div class="day-cell__date-wrap">
+    <span
+      class="day-cell__date"
+      [class.day-cell__date--today]="isToday"
+      [class.day-cell__date--outside]="!isCurrentMonth"
+      [attr.aria-label]="isToday ? 'Today, ' + dayNumber : dayNumber.toString()"
+    >{{ dayNumber }}</span>
+  </div>
+
+  <!-- Slot chips -->
+  <div class="day-cell__slots">
+    @for (slot of slots; track slot.id) {
+      <app-meal-slot-chip
+        [slot]="slot"
+        (deleted)="onDeleteSlot($event)"
+      ></app-meal-slot-chip>
+    }
+  </div>
+
+  <!-- Add buttons row — bottom of cell -->
+  <div class="day-cell__add-row" aria-label="Add meal to this day">
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddRecipe()"
+      aria-label="Add recipe"
+    >+ Recipe</button>
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddIfIts()"
+      aria-label="Add if it's"
+    >+ If it's</button>
+    <button
+      type="button"
+      class="day-cell__add-btn"
+      (click)="onAddTbd()"
+      aria-label="Add TBD slot"
+    >+ TBD</button>
+  </div>
+</div>

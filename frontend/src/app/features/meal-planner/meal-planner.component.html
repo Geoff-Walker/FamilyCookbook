@@ -1,0 +1,97 @@
+<div class="mp-page">
+
+  <!-- Page header -->
+  <header class="mp-header">
+    <h1 class="mp-title">Meal Planner</h1>
+
+    <!-- Month navigation row -->
+    <div class="mp-nav-row" role="navigation" aria-label="Month navigation">
+      <button
+        type="button"
+        class="mp-nav-btn"
+        (click)="previousMonth()"
+        aria-label="Previous month"
+      >&#8592;</button>
+
+      <span class="mp-month-label" aria-live="polite" aria-atomic="true">
+        {{ monthLabel }}
+      </span>
+
+      <button
+        type="button"
+        class="mp-nav-btn"
+        (click)="nextMonth()"
+        aria-label="Next month"
+      >&#8594;</button>
+    </div>
+
+    <!-- Tab pills -->
+    <div class="mp-tabs" role="tablist" aria-label="Meal planner view">
+      <button
+        type="button"
+        role="tab"
+        class="mp-tab"
+        [class.mp-tab--active]="activeTab === 'full-calendar'"
+        [attr.aria-selected]="activeTab === 'full-calendar'"
+        (click)="setTab('full-calendar')"
+      >Full Calendar</button>
+
+      <button
+        type="button"
+        role="tab"
+        class="mp-tab"
+        [class.mp-tab--active]="activeTab === 'shopping-week'"
+        [attr.aria-selected]="activeTab === 'shopping-week'"
+        (click)="setTab('shopping-week')"
+      >Shopping Week</button>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  @if (isLoading) {
+    <div class="mp-loading" aria-live="polite">
+      <span class="mp-spinner" aria-hidden="true"></span>
+      <span>Loading…</span>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (loadError && !isLoading) {
+    <div class="mp-error" role="alert">
+      <p>{{ loadError }}</p>
+      <button type="button" class="mp-retry-btn" (click)="loadMonth()">Retry</button>
+    </div>
+  }
+
+  <!-- Full Calendar tab -->
+  @if (activeTab === 'full-calendar' && !isLoading && !loadError) {
+    <div class="mp-calendar-wrap">
+      <app-calendar-grid
+        [year]="displayYear"
+        [month]="displayMonth"
+        [slots]="slots"
+        (addRecipe)="onAddRecipe($event)"
+        (addIfIts)="onAddIfIts($event)"
+        (addTbd)="onAddTbd($event)"
+        (deleteSlot)="onDeleteSlot($event)"
+      ></app-calendar-grid>
+    </div>
+  }
+
+  <!-- Shopping Week tab — placeholder (next ticket) -->
+  @if (activeTab === 'shopping-week') {
+    <div class="mp-coming-soon">
+      <p>Shopping Week view — coming soon.</p>
+    </div>
+  }
+
+</div>
+
+<!-- Add to Planner dialog -->
+@if (showAddDialog && dialogDate) {
+  <app-add-to-planner-dialog
+    [slotDate]="dialogDate"
+    (slotAdded)="onSlotAdded($event)"
+    (dismissed)="onDialogDismissed()"
+  ></app-add-to-planner-dialog>
+}
