@@ -47,6 +47,7 @@ builder.Services.AddScoped<ImageGenerationService>();
 builder.Services.AddHttpClient<ImageIdealiseService>();
 builder.Services.AddScoped<ImageIdealiseService>();
 builder.Services.AddScoped<CookInstanceService>();
+builder.Services.AddScoped<MealPlanSlotService>();
 
 // ---------------------------------------------------------------------------
 // CORS
@@ -148,5 +149,6 @@ app.MapReferenceDataEndpoints();
 app.MapReviewEndpoints();
 app.MapSearchEndpoints();
 app.MapCookInstanceEndpoints();
+app.MapMealPlanSlotEndpoints();
 
 app.Run();
