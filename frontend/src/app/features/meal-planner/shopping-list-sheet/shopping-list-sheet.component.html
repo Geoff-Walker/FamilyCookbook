@@ -1,0 +1,81 @@
+<!-- Mobile backdrop (tap to close) -->
+<div
+  class="sls-backdrop"
+  [class.sls-backdrop--visible]="visible"
+  (click)="onBackdropClick()"
+  aria-hidden="true"
+></div>
+
+<!-- Sheet panel -->
+<aside
+  class="sls-panel"
+  [class.sls-panel--visible]="visible"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Shopping List"
+>
+
+  <!-- Header -->
+  <header class="sls-header">
+    <div class="sls-header__text">
+      <h2 class="sls-title">Shopping List</h2>
+      <p class="sls-subtitle">{{ windowRangeLabel }}</p>
+    </div>
+    <button
+      type="button"
+      class="sls-close-btn"
+      (click)="close()"
+      aria-label="Close shopping list"
+    >&#215;</button>
+  </header>
+
+  <!-- Item list / empty state -->
+  <div class="sls-content">
+    @if (items.length === 0) {
+      <p class="sls-empty">
+        No Recipe slots in this week's plan. Add some meals first.
+      </p>
+    } @else {
+      <ul class="sls-list" role="list">
+        @for (item of items; track itemKey(item)) {
+          <li
+            class="sls-item"
+            [class.sls-item--checked]="isChecked(item)"
+          >
+            <!-- Checkbox -->
+            <button
+              type="button"
+              class="sls-item__checkbox"
+              role="checkbox"
+              [attr.aria-checked]="isChecked(item)"
+              [attr.aria-label]="'Mark ' + item.ingredientName + ' as collected'"
+              (click)="toggleCheck(item)"
+            >
+              @if (isChecked(item)) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              }
+            </button>
+
+            <!-- Name -->
+            <span class="sls-item__name">{{ item.ingredientName }}</span>
+
+            <!-- Quantity -->
+            @if (formatQuantity(item)) {
+              <span class="sls-item__qty">{{ formatQuantity(item) }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <!-- Footer -->
+  <footer class="sls-footer">
+    <p class="sls-footer__note">
+      Shopping list is not saved — it will be cleared when you close this panel.
+    </p>
+  </footer>
+
+</aside>
