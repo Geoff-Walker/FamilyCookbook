@@ -1,14 +1,15 @@
 /* ============================================================
    HOST ELEMENT
-   Ensure the component host is a block-level container that
-   never exceeds the viewport width — prevents the 7-column grid
-   from pushing Sunday off-screen on tablet.
+   Block-level container that fits within whatever width its
+   parent provides. box-sizing:border-box ensures padding/border
+   are included in the width calculation so the 7-column grid
+   never exceeds the available space.
    ============================================================ */
 :host {
   display: block;
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -44,11 +45,13 @@
   /* Mobile: single-column day list */
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 
   @media (min-width: 768px) {
     /* Tablet+: 7-column grid, auto rows — cells grow to fit content */
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: auto;
+    width: 100%;
   }
 }

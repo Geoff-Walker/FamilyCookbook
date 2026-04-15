@@ -1,8 +1,21 @@
+/* ============================================================
+   HOST ELEMENT
+   Must be display:block so the custom element participates
+   in the parent CSS grid as a block-level item — the default
+   display:inline for custom elements causes header/cell
+   misalignment in the 7-column grid.
+   ============================================================ */
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .day-cell {
   display: flex;
   flex-direction: column;
   background: var(--color-surface-0);
   border: 1px solid var(--color-border-subtle);
+  height: 100%;
   /* Mobile: full-width card, min 80px */
   min-height: 80px;
   padding: var(--space-1);
