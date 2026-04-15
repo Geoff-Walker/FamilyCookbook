@@ -26,7 +26,7 @@
             type="date"
             class="sw-edge__date-input"
             [value]="windowStart"
-            (change)="onStartDateChange(($event.target as HTMLInputElement).value)"
+            (change)="onStartDateChange($any($event.target).value)"
             (click)="$event.stopPropagation()"
             aria-label="Start date"
           />
@@ -83,7 +83,7 @@
             type="date"
             class="sw-edge__date-input"
             [value]="windowEnd"
-            (change)="onEndDateChange(($event.target as HTMLInputElement).value)"
+            (change)="onEndDateChange($any($event.target).value)"
             (click)="$event.stopPropagation()"
             aria-label="End date"
           />
