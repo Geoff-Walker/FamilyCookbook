@@ -5,6 +5,7 @@ import { MealPlannerApiService } from '../../core/services/meal-planner-api.serv
 import { MealPlanSlotDto } from '../../core/models/meal-planner.models';
 import { CalendarGridComponent } from './calendar-grid/calendar-grid.component';
 import { AddToPlannerDialogComponent } from './add-to-planner-dialog/add-to-planner-dialog.component';
+import { ShoppingWeekViewComponent } from './shopping-week-view/shopping-week-view.component';
 import {
   AddRecipeEvent,
   AddIfItsEvent,
@@ -26,7 +27,7 @@ const MONTH_NAMES = [
 @Component({
   selector: 'app-meal-planner',
   standalone: true,
-  imports: [CommonModule, CalendarGridComponent, AddToPlannerDialogComponent],
+  imports: [CommonModule, CalendarGridComponent, AddToPlannerDialogComponent, ShoppingWeekViewComponent],
   templateUrl: './meal-planner.component.html',
   styleUrl: './meal-planner.component.scss'
 })

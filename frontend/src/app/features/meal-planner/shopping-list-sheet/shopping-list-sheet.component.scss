@@ -1,0 +1,250 @@
+/* ============================================================
+   BACKDROP
+   Mobile: full-screen overlay behind the centred dialog.
+   Tablet+: hidden (no backdrop needed for side drawer).
+   ============================================================ */
+.sls-backdrop {
+  display: none;
+
+  @media (max-width: 767px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay, rgba(0, 0, 0, 0.5));
+    z-index: 390;
+    opacity: 0;
+    transition: opacity 300ms ease;
+
+    &--visible {
+      opacity: 1;
+    }
+  }
+}
+
+/* ============================================================
+   PANEL
+   Mobile: centred dialog.
+   Tablet+: right-side drawer, 360px, full height.
+   ============================================================ */
+.sls-panel {
+  position: fixed;
+  z-index: 400;
+  background: var(--color-surface-0);
+  display: flex;
+  flex-direction: column;
+
+  /* ---- Mobile: centred dialog ---- */
+  @media (max-width: 767px) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 90vw;
+    max-width: 420px;
+    max-height: 85vh;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-4, 0 16px 48px rgba(0, 0, 0, 0.2));
+    opacity: 0;
+    transition: opacity 300ms ease, transform 300ms ease;
+
+    &--visible {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  /* ---- Tablet/desktop: right-side drawer ---- */
+  @media (min-width: 768px) {
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 360px;
+    box-shadow: var(--shadow-4, -8px 0 32px rgba(0, 0, 0, 0.15));
+    transform: translateX(100%);
+    transition: transform 300ms ease;
+
+    &--visible {
+      transform: translateX(0);
+    }
+  }
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.sls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  flex-shrink: 0;
+  padding: 0 var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sls-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sls-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sls-subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.sls-close-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 1.375rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+
+  &:hover {
+    background: var(--color-surface-2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   CONTENT (scrollable)
+   ============================================================ */
+.sls-content {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.sls-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+/* ============================================================
+   ITEM LIST
+   ============================================================ */
+.sls-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sls-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 52px;
+  padding: 0 var(--space-5);
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: opacity 150ms ease;
+
+  &--checked {
+    opacity: 0.55;
+
+    .sls-item__name {
+      text-decoration: line-through;
+      color: var(--color-text-tertiary);
+    }
+  }
+}
+
+/* Checkbox button */
+.sls-item__checkbox {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-border-strong, var(--color-border));
+  border-radius: var(--radius-xs);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+  padding: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-on-primary);
+  }
+
+  &[aria-checked="true"] {
+    background: var(--color-success, var(--color-primary));
+    border-color: var(--color-success, var(--color-primary));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Ingredient name */
+.sls-item__name {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Quantity */
+.sls-item__qty {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.sls-footer {
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.sls-footer__note {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+}

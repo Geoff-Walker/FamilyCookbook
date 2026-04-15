@@ -1,0 +1,184 @@
+<div class="sw-page">
+
+  <!-- Window configurator -->
+  <div class="sw-configurator" role="toolbar" aria-label="Shopping week window">
+
+    <!-- Start edge -->
+    <div class="sw-edge sw-edge--start">
+      <span class="sw-edge__label">START</span>
+      <div class="sw-edge__picker-wrap">
+        <button
+          type="button"
+          class="sw-edge__icon-btn"
+          (click)="toggleStartPicker(); $event.stopPropagation()"
+          [attr.aria-label]="'Change start date, currently ' + windowStart"
+          [attr.aria-expanded]="showStartPicker"
+        >
+          <svg class="sw-edge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
+        @if (showStartPicker) {
+          <input
+            type="date"
+            class="sw-edge__date-input"
+            [value]="windowStart"
+            (change)="onStartDateChange($any($event.target).value)"
+            (click)="$event.stopPropagation()"
+            aria-label="Start date"
+          />
+        }
+      </div>
+      <span class="sw-edge__date-display">{{ windowStart | date:'d MMM' }}</span>
+    </div>
+
+    <!-- Divider -->
+    <div class="sw-divider" aria-hidden="true"></div>
+
+    <!-- Week stepper -->
+    <div class="sw-stepper" role="group" aria-label="Week navigation">
+      <button
+        type="button"
+        class="sw-stepper__nav"
+        (click)="stepWeekBack()"
+        aria-label="Previous week"
+      >&#8592;</button>
+      <span class="sw-stepper__label" aria-live="polite" aria-atomic="true">
+        {{ windowLabel }}
+      </span>
+      <button
+        type="button"
+        class="sw-stepper__nav"
+        (click)="stepWeekForward()"
+        aria-label="Next week"
+      >&#8594;</button>
+    </div>
+
+    <!-- Divider -->
+    <div class="sw-divider" aria-hidden="true"></div>
+
+    <!-- End edge -->
+    <div class="sw-edge sw-edge--end">
+      <span class="sw-edge__label">END</span>
+      <div class="sw-edge__picker-wrap">
+        <button
+          type="button"
+          class="sw-edge__icon-btn"
+          (click)="toggleEndPicker(); $event.stopPropagation()"
+          [attr.aria-label]="'Change end date, currently ' + windowEnd"
+          [attr.aria-expanded]="showEndPicker"
+        >
+          <svg class="sw-edge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
+        @if (showEndPicker) {
+          <input
+            type="date"
+            class="sw-edge__date-input"
+            [value]="windowEnd"
+            (change)="onEndDateChange($any($event.target).value)"
+            (click)="$event.stopPropagation()"
+            aria-label="End date"
+          />
+        }
+      </div>
+      <span class="sw-edge__date-display">{{ windowEnd | date:'d MMM' }}</span>
+    </div>
+
+    <!-- Generate button -->
+    <button
+      type="button"
+      class="sw-generate-btn"
+      [disabled]="!hasRecipeSlots || isGenerating"
+      (click)="generateShoppingList()"
+    >
+      @if (isGenerating) {
+        Generating…
+      } @else {
+        Generate Shopping List
+      }
+    </button>
+
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="sw-loading" aria-live="polite">
+      <span class="sw-spinner" aria-hidden="true"></span>
+      <span>Loading…</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (loadError && !isLoading) {
+    <div class="sw-error" role="alert">
+      <p>{{ loadError }}</p>
+      <button type="button" class="sw-retry-btn" (click)="loadWindow()">Retry</button>
+    </div>
+  }
+
+  <!-- Day grid -->
+  @if (!isLoading && !loadError) {
+    <!-- Mobile: single column list -->
+    <div class="sw-grid-mobile" aria-label="Shopping week days">
+      @for (date of windowDates; track date) {
+        <app-day-cell
+          [date]="date"
+          [slots]="slotsForDate(date)"
+          [isCurrentMonth]="true"
+          [isToday]="isToday(date)"
+          (addRecipe)="onAddRecipe($event)"
+          (addIfIts)="onAddIfIts($event)"
+          (addTbd)="onAddTbd($event)"
+          (deleteSlot)="onDeleteSlot($event)"
+        ></app-day-cell>
+      }
+    </div>
+
+    <!-- Tablet+: N-column grid -->
+    <div
+      class="sw-grid"
+      [style.--sw-cols]="windowDayCount"
+      aria-label="Shopping week days"
+    >
+      @for (date of windowDates; track date) {
+        <app-day-cell
+          [date]="date"
+          [slots]="slotsForDate(date)"
+          [isCurrentMonth]="true"
+          [isToday]="isToday(date)"
+          (addRecipe)="onAddRecipe($event)"
+          (addIfIts)="onAddIfIts($event)"
+          (addTbd)="onAddTbd($event)"
+          (deleteSlot)="onDeleteSlot($event)"
+        ></app-day-cell>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Add to Planner dialog -->
+@if (showAddDialog && dialogDate) {
+  <app-add-to-planner-dialog
+    [slotDate]="dialogDate"
+    (slotAdded)="onSlotAdded($event)"
+    (dismissed)="onDialogDismissed()"
+  ></app-add-to-planner-dialog>
+}
+
+<!-- Shopping list sheet -->
+@if (showShoppingList) {
+  <app-shopping-list-sheet
+    [items]="shoppingItems"
+    [windowRangeLabel]="windowRangeLabel"
+    (closed)="onShoppingListClosed()"
+  ></app-shopping-list-sheet>
+}

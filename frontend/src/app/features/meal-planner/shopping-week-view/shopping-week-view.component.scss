@@ -1,0 +1,319 @@
+/* ============================================================
+   HOST
+   ============================================================ */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* ============================================================
+   PAGE WRAPPER
+   Work-mode background — slightly darker surface
+   ============================================================ */
+.sw-page {
+  width: 100%;
+  min-height: 100%;
+  background: var(--color-surface-1);
+}
+
+/* ============================================================
+   WINDOW CONFIGURATOR
+   Single flex row: [Start edge] | [Week stepper] | [End edge] + [Generate]
+   ============================================================ */
+.sw-configurator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-surface-0);
+  border-bottom: 1px solid var(--color-border-subtle);
+  flex-wrap: wrap;
+
+  @media (min-width: 768px) {
+    flex-wrap: nowrap;
+  }
+}
+
+/* ============================================================
+   VERTICAL DIVIDER
+   ============================================================ */
+.sw-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--color-border);
+  flex-shrink: 0;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+/* ============================================================
+   EDGE CONTROLS (Start / End)
+   ============================================================ */
+.sw-edge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sw-edge__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.sw-edge__picker-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sw-edge__icon-btn {
+  width: 36px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.sw-edge__icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Native date input — appears below the icon button as a popover-style overlay */
+.sw-edge__date-input {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  height: 36px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-2, 0 4px 12px rgba(0,0,0,0.1));
+  white-space: nowrap;
+
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.sw-edge__date-display {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* ============================================================
+   WEEK STEPPER (centre)
+   ============================================================ */
+.sw-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.sw-stepper__nav {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background 150ms ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.sw-stepper__label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 200px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   GENERATE BUTTON
+   Right-aligned on tablet+, full-width on mobile
+   ============================================================ */
+.sw-generate-btn {
+  height: 44px;
+  padding: 0 var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 150ms ease;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: auto;
+    margin-left: auto;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   LOADING / ERROR
+   ============================================================ */
+.sw-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-12, 3rem) var(--space-6);
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}
+
+.sw-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: sw-spin 0.6s linear infinite;
+}
+
+@keyframes sw-spin {
+  to { transform: rotate(360deg); }
+}
+
+.sw-error {
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+
+  p {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+  }
+}
+
+.sw-retry-btn {
+  height: 40px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+}
+
+/* ============================================================
+   DAY GRID — MOBILE (single column, hidden on tablet+)
+   ============================================================ */
+.sw-grid-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4);
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* ============================================================
+   DAY GRID — TABLET+ (N-column, hidden on mobile)
+   Recipe slots get border-left treatment (AC4) via CSS custom property
+   passed to DayCellComponent's host element.
+   ============================================================ */
+.sw-grid {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(var(--sw-cols, 7), 1fr);
+    width: 100%;
+
+    /* Shopping week recipe chips use border-left instead of background fill (AC4) */
+    ::ng-deep app-day-cell .chip--recipe {
+      background: transparent;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-primary);
+      padding-left: calc(var(--space-2) - 3px);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
