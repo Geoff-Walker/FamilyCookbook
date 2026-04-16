@@ -129,8 +129,9 @@
 }
 
 .side-panel__nav-icon {
-  font-size: 1.25rem; /* ~20px — close to spec 24px, emoji size varies */
-  width: 28px;
+  width: 20px;
+  height: 20px;
+  font-size: 1.25rem;
   text-align: center;
   color: var(--color-text-tertiary);
   flex-shrink: 0;
