@@ -29,7 +29,7 @@
     >
       Queue
       @if (queueCount > 0) {
-        <span class="gf-tab-badge" aria-label="{{ queueCount }} pending">{{ queueCount }}</span>
+        <span class="gf-tab-badge" [attr.aria-label]="queueCount + ' pending'">{{ queueCount }}</span>
       }
     </button>
 
