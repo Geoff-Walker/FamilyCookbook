@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RecipeSuggestionDto } from '../../../core/models/geoff-filter.models';
 
-export type CardTab = 'queue' | 'backlog';
+export type CardTab = 'queue' | 'created';
 
 export interface AcceptEvent { suggestionId: number; }
 export interface BacklogEvent { suggestionId: number; }
