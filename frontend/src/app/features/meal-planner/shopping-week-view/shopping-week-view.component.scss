@@ -129,6 +129,12 @@
   }
 }
 
+/* Start-edge picker opens rightward to stay in viewport */
+.sw-edge--start .sw-edge__date-input {
+  left: 0;
+  transform: none;
+}
+
 .sw-edge__date-display {
   font-size: 0.75rem;
   color: var(--color-text-secondary);

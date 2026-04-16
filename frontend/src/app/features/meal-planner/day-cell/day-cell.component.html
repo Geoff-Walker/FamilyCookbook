@@ -28,23 +28,48 @@
 
   <!-- Add buttons row — bottom of cell -->
   <div class="day-cell__add-row" aria-label="Add meal to this day">
+    <!-- Add Recipe -->
     <button
       type="button"
       class="day-cell__add-btn"
       (click)="onAddRecipe()"
       aria-label="Add recipe"
-    >+ Recipe</button>
+      title="Add recipe"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        <line x1="12" y1="7" x2="12" y2="13"></line>
+        <line x1="9" y1="10" x2="15" y2="10"></line>
+      </svg>
+    </button>
+    <!-- Add If it's -->
     <button
       type="button"
       class="day-cell__add-btn"
       (click)="onAddIfIts()"
-      aria-label="Add if it's"
-    >+ If it's</button>
+      aria-label="Add if it's slot"
+      title="Add if it's"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </button>
+    <!-- Add TBD -->
     <button
       type="button"
       class="day-cell__add-btn"
       (click)="onAddTbd()"
       aria-label="Add TBD slot"
-    >+ TBD</button>
+      title="Add TBD"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </button>
   </div>
 </div>

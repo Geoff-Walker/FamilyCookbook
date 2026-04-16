@@ -73,6 +73,9 @@
 
   <!-- Footer -->
   <footer class="sls-footer">
+    @if (ifItsCount > 0) {
+      <p class="sls-footer__ifits">If it's… &times;{{ ifItsCount }}</p>
+    }
     <p class="sls-footer__note">
       Shopping list is not saved — it will be cleared when you close this panel.
     </p>

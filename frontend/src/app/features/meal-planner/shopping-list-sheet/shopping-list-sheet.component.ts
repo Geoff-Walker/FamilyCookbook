@@ -33,6 +33,7 @@ export interface ShoppingItem {
 export class ShoppingListSheetComponent implements OnInit {
   @Input({ required: true }) items: ShoppingItem[] = [];
   @Input({ required: true }) windowRangeLabel!: string;
+  @Input() ifItsCount = 0;
 
   /** Emitted when the user closes the sheet. */
   @Output() closed = new EventEmitter<void>();
