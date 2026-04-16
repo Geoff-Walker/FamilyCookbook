@@ -354,6 +354,20 @@
   color: var(--color-text-secondary);
 }
 
+.civ-review-card__stars-display {
+  font-size: 1.5rem;
+  color: var(--color-tertiary);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.civ-review-card__notes {
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
 .civ-review-card__no-rating {
   font-size: 0.875rem;
   color: var(--color-text-secondary);

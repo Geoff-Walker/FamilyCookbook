@@ -169,6 +169,11 @@ export class CookInstanceViewPageComponent implements OnInit {
     return this.cookInstance?.reviews ?? [];
   }
 
+  /** Look up a submitted review for a specific user, or null if not reviewed. */
+  getReview(userId: number): CookInstanceReviewSummaryDto | null {
+    return this.cookInstance?.reviews.find(r => r.userId === userId) ?? null;
+  }
+
   starDisplay(rating: number): string {
     const filled = Math.floor(rating);
     const half = rating % 1 >= 0.5;

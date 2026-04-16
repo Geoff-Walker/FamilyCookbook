@@ -71,61 +71,45 @@
     <main class="civ-main">
       <div class="civ-content">
 
-        <!-- Ingredient comparison table (AC3) -->
-        @if (recipe) {
-          <section class="civ-section">
-            <app-ingredient-comparison-table
-              [stageGroups]="cookInstance.stageGroups"
-              [recipeStages]="recipe.stages"
-              [baseLabel]="baseLabel"
-            />
-          </section>
-        }
+        <!-- ================================================================
+             Ratings & Reviews — always first; display or form depending on
+             whether reviews have been submitted
+             ================================================================ -->
+        <section class="civ-review-section">
+          <h2 class="civ-review-heading">Ratings &amp; Reviews</h2>
 
-        <!-- Cook notes (AC4) -->
-        @if (cookInstance.notes) {
-          <section class="civ-section civ-notes-section">
-            <p class="civ-section-label">Cook Notes</p>
-            <div class="civ-notes-block">
-              <p class="civ-notes-text">{{ cookInstance.notes }}</p>
+          @if (cookInstance.reviews.length > 0) {
+
+            <!-- Display mode: submitted reviews -->
+            <div class="civ-review-cards">
+              @for (ur of userRatings; track ur.userId) {
+                @let review = getReview(ur.userId);
+                <div class="civ-review-card" [class.civ-review-card--helen]="ur.userId === 2">
+                  <span class="civ-review-card__name">{{ ur.userName | uppercase }}</span>
+                  @if (review) {
+                    <p class="civ-review-card__stars-display" [attr.aria-label]="ur.userName + ': ' + review.rating + ' out of 5 stars'">
+                      {{ starDisplay(review.rating) }}
+                    </p>
+                    @if (review.notes) {
+                      <p class="civ-review-card__notes">{{ review.notes }}</p>
+                    }
+                  } @else {
+                    <p class="civ-review-card__no-rating">No rating yet</p>
+                  }
+                  <p class="civ-review-card__last-cooked">Last cooked: {{ formatDate(cookInstance.startedAt) }}</p>
+                </div>
+              }
             </div>
-          </section>
-        }
 
-        <!-- Promote feedback messages -->
-        @if (promoteSuccessMessage) {
-          <p class="civ-feedback civ-feedback--success" role="status">{{ promoteSuccessMessage }}</p>
-        }
-        @if (promoteErrorMessage) {
-          <p class="civ-feedback civ-feedback--error" role="alert">{{ promoteErrorMessage }}</p>
-        }
+          } @else if (!reviewSubmitted) {
 
-        <!-- Promote to Main Recipe (AC5) -->
-        <section class="civ-section civ-promote-section">
-          <button
-            type="button"
-            class="civ-btn-promote"
-            [disabled]="promoteDisabled"
-            (click)="onPromoteClick()"
-          >
-            Promote to Main Recipe
-          </button>
-          <p class="civ-promote-helper">This will save the current recipe as a version snapshot before updating.</p>
-        </section>
-
-        <!-- Leave a review (AC9) — shown when no reviews exist and not yet submitted -->
-        @if (showReviewForm && !reviewSubmitted) {
-          <section class="civ-review-section">
-            <h2 class="civ-review-heading">Ratings &amp; Reviews</h2>
-
-            <!-- Two-card layout — one card per user -->
+            <!-- Form mode: interactive rating cards -->
             <div class="civ-review-cards">
               @for (ur of userRatings; track ur.userId) {
                 <div class="civ-review-card" [class.civ-review-card--helen]="ur.userId === 2">
 
                   <span class="civ-review-card__name">{{ ur.userName | uppercase }}</span>
 
-                  <!-- Interactive stars -->
                   <div
                     class="civ-stars"
                     [attr.aria-label]="ur.userName + ' rating: ' + ratingLabel(ur)"
@@ -178,7 +162,7 @@
                     <p class="civ-review-card__no-rating">No rating yet</p>
                   }
 
-                  <p class="civ-review-card__last-cooked">Last cooked: {{ formatDate(cookInstance!.startedAt) }}</p>
+                  <p class="civ-review-card__last-cooked">Last cooked: {{ formatDate(cookInstance.startedAt) }}</p>
 
                   <textarea
                     [id]="'civ-notes-' + ur.userId"
@@ -212,8 +196,51 @@
                 Submit Review
               }
             </button>
+
+          }
+        </section>
+
+        <!-- Ingredient comparison table (AC3) -->
+        @if (recipe) {
+          <section class="civ-section">
+            <app-ingredient-comparison-table
+              [stageGroups]="cookInstance.stageGroups"
+              [recipeStages]="recipe.stages"
+              [baseLabel]="baseLabel"
+            />
           </section>
         }
+
+        <!-- Cook notes (AC4) -->
+        @if (cookInstance.notes) {
+          <section class="civ-section civ-notes-section">
+            <p class="civ-section-label">Cook Notes</p>
+            <div class="civ-notes-block">
+              <p class="civ-notes-text">{{ cookInstance.notes }}</p>
+            </div>
+          </section>
+        }
+
+        <!-- Promote feedback messages -->
+        @if (promoteSuccessMessage) {
+          <p class="civ-feedback civ-feedback--success" role="status">{{ promoteSuccessMessage }}</p>
+        }
+        @if (promoteErrorMessage) {
+          <p class="civ-feedback civ-feedback--error" role="alert">{{ promoteErrorMessage }}</p>
+        }
+
+        <!-- Promote to Main Recipe (AC5) -->
+        <section class="civ-section civ-promote-section">
+          <button
+            type="button"
+            class="civ-btn-promote"
+            [disabled]="promoteDisabled"
+            (click)="onPromoteClick()"
+          >
+            Promote to Main Recipe
+          </button>
+          <p class="civ-promote-helper">This will save the current recipe as a version snapshot before updating.</p>
+        </section>
 
       </div>
     </main>
