@@ -1,0 +1,77 @@
+<article
+  class="sc-card"
+  [class.sc-card--accepted]="isAccepted"
+  [class.sc-card--fading]="fading"
+>
+
+  <!-- ── Meta row ─────────────────────────────────────────────── -->
+  <div class="sc-meta">
+    <span
+      class="sc-user-pill"
+      [class.sc-user-pill--geoff]="submitterIsGeoff"
+      [class.sc-user-pill--helen]="!submitterIsGeoff"
+    >{{ submitterName }}</span>
+    <span class="sc-date">{{ formattedDate }}</span>
+  </div>
+
+  <!-- ── Content area ──────────────────────────────────────────── -->
+  <div class="sc-content">
+    @if (suggestion.url) {
+      <a
+        class="sc-url"
+        [href]="suggestion.url"
+        target="_blank"
+        rel="noopener noreferrer"
+      >{{ suggestion.url }}<span class="sc-url-icon" aria-hidden="true">&#x2197;</span></a>
+    }
+    @if (suggestion.text) {
+      <p class="sc-text" [class.sc-text--with-gap]="!!suggestion.url">{{ suggestion.text }}</p>
+    }
+  </div>
+
+  <!-- ── Accepted state ────────────────────────────────────────── -->
+  @if (isAccepted && suggestion.recipeId) {
+    <div class="sc-accepted-row">
+      <a
+        class="sc-accepted-link"
+        [routerLink]="['/recipes', suggestion.recipeId, 'edit']"
+      >&#x2713; Created — {{ suggestion.recipeName }}</a>
+    </div>
+  }
+
+  <!-- ── Action row (not shown when accepted) ──────────────────── -->
+  @if (!isAccepted) {
+    <div class="sc-actions">
+
+      @if (acceptError) {
+        <span class="sc-accept-error">{{ acceptError }}</span>
+      }
+
+      <!-- Create Recipe — Geoff only, must not exist in DOM for Helen -->
+      @if (isGeoff) {
+        <button
+          type="button"
+          class="sc-btn sc-btn--create"
+          (click)="onAccept()"
+        >Create Recipe</button>
+      }
+
+      <!-- Backlog — Queue tab only -->
+      @if (tab === 'queue') {
+        <button
+          type="button"
+          class="sc-btn sc-btn--backlog"
+          (click)="onBacklog()"
+        >Backlog</button>
+      }
+
+      <button
+        type="button"
+        class="sc-btn sc-btn--delete"
+        (click)="onDelete()"
+      >Delete</button>
+
+    </div>
+  }
+
+</article>

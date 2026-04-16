@@ -1,0 +1,185 @@
+/* ============================================================
+   SUGGESTION CARD
+   ============================================================ */
+
+.sc-card {
+  background: var(--color-surface-0);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  border-left: 4px solid transparent;
+  transition: opacity 300ms ease, border-left-color 200ms ease;
+
+  &--accepted {
+    border-left-color: var(--color-success);
+  }
+
+  &--fading {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ── Meta row ──────────────────────────────────────────────────── */
+
+.sc-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.sc-user-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+
+  &--helen {
+    background: #D4623A;
+    color: #fff;
+  }
+
+  &--geoff {
+    background: #1E5FA8;
+    color: #fff;
+  }
+}
+
+.sc-date {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+/* ── Content area ──────────────────────────────────────────────── */
+
+.sc-content {
+  margin-bottom: var(--space-4);
+}
+
+.sc-url {
+  display: block;
+  color: var(--color-primary);
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.sc-url-icon {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+.sc-text {
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  /* Clamp to 3 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &--with-gap {
+    margin-top: var(--space-2);
+  }
+}
+
+/* ── Accepted state ────────────────────────────────────────────── */
+
+.sc-accepted-row {
+  padding-top: var(--space-2);
+}
+
+.sc-accepted-link {
+  color: var(--color-success);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ── Action row ────────────────────────────────────────────────── */
+
+.sc-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.sc-accept-error {
+  font-size: 0.875rem;
+  color: var(--color-error);
+  flex: 0 0 100%;
+  margin-bottom: var(--space-1);
+}
+
+.sc-btn {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease, color 150ms ease;
+  line-height: 1;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Create Recipe — filled green */
+  &--create {
+    height: 40px;
+    padding: 0 var(--space-5);
+    background: var(--color-success);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-success) 85%, #000);
+    }
+  }
+
+  /* Backlog — outlined */
+  &--backlog {
+    height: 40px;
+    padding: 0 var(--space-4);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+
+    &:hover {
+      background: var(--color-surface-2);
+    }
+  }
+
+  /* Delete — ghost red */
+  &--delete {
+    height: 40px;
+    padding: 0 var(--space-3);
+    background: transparent;
+    border: none;
+    color: var(--color-error);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-error) 10%, transparent);
+    }
+  }
+}
