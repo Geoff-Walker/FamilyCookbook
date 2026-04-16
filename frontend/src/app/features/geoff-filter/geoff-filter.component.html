@@ -1,0 +1,90 @@
+<div class="gf-page">
+
+  <!-- ── Page header ──────────────────────────────────────────── -->
+  <header class="gf-header">
+    <h1 class="gf-title">The Geoff Filter</h1>
+    <p class="gf-subtitle">Review suggestions at your own pace.</p>
+
+    @if (!isGeoff) {
+      <p class="gf-context-note gf-context-note--helen">
+        You can submit and delete your own suggestions. Only Geoff can create recipes from suggestions.
+      </p>
+    } @else {
+      <p class="gf-context-note gf-context-note--geoff">
+        You can create recipes from suggestions, move them to backlog, or delete them.
+      </p>
+    }
+  </header>
+
+  <!-- ── Tab row ──────────────────────────────────────────────── -->
+  <div class="gf-tabs" role="tablist" aria-label="Suggestion views">
+
+    <button
+      type="button"
+      role="tab"
+      class="gf-tab"
+      [class.gf-tab--active]="activeTab === 'queue'"
+      [attr.aria-selected]="activeTab === 'queue'"
+      (click)="setTab('queue')"
+    >
+      Queue
+      @if (queueCount > 0) {
+        <span class="gf-tab-badge" aria-label="{{ queueCount }} pending">{{ queueCount }}</span>
+      }
+    </button>
+
+    <button
+      type="button"
+      role="tab"
+      class="gf-tab"
+      [class.gf-tab--active]="activeTab === 'backlog'"
+      [attr.aria-selected]="activeTab === 'backlog'"
+      (click)="setTab('backlog')"
+    >Backlog</button>
+
+  </div>
+
+  <!-- ── Loading ──────────────────────────────────────────────── -->
+  @if (isLoading) {
+    <div class="gf-loading" aria-live="polite">
+      <span class="gf-spinner" aria-hidden="true"></span>
+      <span>Loading…</span>
+    </div>
+  }
+
+  <!-- ── Error ────────────────────────────────────────────────── -->
+  @if (loadError && !isLoading) {
+    <div class="gf-error" role="alert">
+      <p>{{ loadError }}</p>
+      <button
+        type="button"
+        class="gf-retry-btn"
+        (click)="activeTab === 'queue' ? loadQueue() : loadBacklog()"
+      >Retry</button>
+    </div>
+  }
+
+  <!-- ── Suggestion list ──────────────────────────────────────── -->
+  @if (!isLoading && !loadError) {
+    <div class="gf-list">
+
+      @if (currentSuggestions.length === 0) {
+        <p class="gf-empty">No pending suggestions.</p>
+      }
+
+      @for (suggestion of currentSuggestions; track trackById($index, suggestion)) {
+        <app-suggestion-card
+          [suggestion]="suggestion"
+          [activeUserId]="activeUserId"
+          [tab]="activeTab"
+          [acceptError]="getCardAcceptError(suggestion.id)"
+          (accept)="onAccept($event)"
+          (backlog)="onBacklog($event)"
+          (delete)="onDelete($event)"
+        ></app-suggestion-card>
+      }
+
+    </div>
+  }
+
+</div>
