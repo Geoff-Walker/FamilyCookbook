@@ -143,6 +143,11 @@ export class ShoppingWeekViewComponent implements OnInit, OnDestroy {
     return days === 7 ? base : `${base} (${days} days)`;
   }
 
+  /** Mobile: just the start month abbreviation e.g. "Apr" */
+  get windowLabelMobile(): string {
+    return new Date(this.windowStart + 'T00:00:00').toLocaleDateString('en-GB', { month: 'short' });
+  }
+
   get windowDayCount(): number {
     const start = new Date(this.windowStart + 'T00:00:00');
     const end = new Date(this.windowEnd + 'T00:00:00');

@@ -29,8 +29,8 @@
         <!-- Header row -->
         <div class="ch__row ch__row--header" role="row">
           <div class="ch__cell ch__cell--date" role="columnheader">Date</div>
-          <div class="ch__cell ch__cell--rating" role="columnheader">Geoff ★</div>
-          <div class="ch__cell ch__cell--rating" role="columnheader">Helen ★</div>
+          <div class="ch__cell ch__cell--rating" role="columnheader"><span class="ch__col-label--full">Geoff ★</span><span class="ch__col-label--short">G</span></div>
+          <div class="ch__cell ch__cell--rating" role="columnheader"><span class="ch__col-label--full">Helen ★</span><span class="ch__col-label--short">H</span></div>
           <div class="ch__cell ch__cell--action" role="columnheader"><span class="sr-only">Delete</span></div>
           <div class="ch__cell ch__cell--action" role="columnheader"><span class="sr-only">Open</span></div>
         </div>
@@ -39,7 +39,8 @@
         @for (row of cookHistory; track row.id; let odd = $odd) {
           <div class="ch__row" [class.ch__row--odd]="odd" role="row">
             <div class="ch__cell ch__cell--date" role="cell">
-              {{ formatDate(row.startedAt) }}
+              <span class="ch__date--full">{{ formatDate(row.startedAt) }}</span>
+              <span class="ch__date--short">{{ formatDateShort(row.startedAt) }}</span>
               @if (row.wasPromoted) {
                 <span class="ch__promoted-badge">Promoted</span>
               }
@@ -48,7 +49,8 @@
             <div class="ch__cell ch__cell--rating" role="cell">
               @let geoffRating = getRating(row, 1);
               @if (geoffRating !== null) {
-                <span [attr.aria-label]="geoffRating + ' out of 5 stars'">{{ starDisplay(geoffRating) }}</span>
+                <span class="ch__stars" [attr.aria-label]="geoffRating + ' out of 5 stars'">{{ starDisplay(geoffRating) }}</span>
+                <span class="ch__rating-num" aria-hidden="true">{{ geoffRating }}</span>
               } @else {
                 <span class="ch__no-rating" aria-label="No rating">—</span>
               }
@@ -57,7 +59,8 @@
             <div class="ch__cell ch__cell--rating" role="cell">
               @let helenRating = getRating(row, 2);
               @if (helenRating !== null) {
-                <span [attr.aria-label]="helenRating + ' out of 5 stars'">{{ starDisplay(helenRating) }}</span>
+                <span class="ch__stars" [attr.aria-label]="helenRating + ' out of 5 stars'">{{ starDisplay(helenRating) }}</span>
+                <span class="ch__rating-num" aria-hidden="true">{{ helenRating }}</span>
               } @else {
                 <span class="ch__no-rating" aria-label="No rating">—</span>
               }
@@ -105,7 +108,8 @@
         @if (originalRecipeDate) {
           <div class="ch__row ch__row--original" role="row">
             <div class="ch__cell ch__cell--date" role="cell">
-              {{ formatDate(originalRecipeDate) }}
+              <span class="ch__date--full">{{ formatDate(originalRecipeDate) }}</span>
+              <span class="ch__date--short">{{ formatDateShort(originalRecipeDate) }}</span>
               <span class="ch__original-badge">Original</span>
             </div>
             <div class="ch__cell ch__cell--rating" role="cell">

@@ -81,6 +81,13 @@ export class CookHistoryComponent implements OnInit {
     });
   }
 
+  formatDateShort(iso: string): string {
+    return new Date(iso).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short'
+    });
+  }
+
   starDisplay(rating: number): string {
     const rounded = Math.round(rating);
     return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
