@@ -12,6 +12,7 @@ import {
   SaveRecipePayload,
   UserDto,
   ReviewDto,
+  AdminReviewDto,
   CreateReviewPayload,
   GenerateImagePayload,
   IdealiseImagePayload
@@ -131,6 +132,16 @@ export class RecipeApiService {
   /** Create a new review for a recipe (always POSTs — backend stores multiple per user per date). */
   createReview(recipeId: number, dto: CreateReviewPayload): Observable<ReviewDto> {
     return this.http.post<ReviewDto>(`${this.baseUrl}/recipes/${recipeId}/reviews`, dto);
+  }
+
+  /** Admin: return all reviews across all recipes, ordered by created_at descending. */
+  getAllReviews(): Observable<AdminReviewDto[]> {
+    return this.http.get<AdminReviewDto[]>(`${this.baseUrl}/reviews`);
+  }
+
+  /** Admin: hard-delete a review by ID. */
+  deleteReview(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/reviews/${id}`);
   }
 
   /** Combined semantic search + ingredient filter + tag filter (AC11). */

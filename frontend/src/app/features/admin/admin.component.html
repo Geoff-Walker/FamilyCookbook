@@ -25,40 +25,55 @@
         </p>
       }
 
-      <!-- List -->
+      <!-- Search + list -->
       @if (ingredientsState === 'ready') {
+        <mat-form-field appearance="outline" class="admin-search-field">
+          <mat-label>Search ingredients</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            [(ngModel)]="ingredientSearch"
+            autocomplete="off"
+            placeholder="Filter by name…"
+          />
+        </mat-form-field>
+
         @if (ingredientRows.length === 0) {
           <p class="admin-panel__empty">No ingredients yet.</p>
+        } @else if (filteredIngredientRows.length === 0) {
+          <p class="admin-panel__empty">No ingredients match "{{ ingredientSearch }}".</p>
         } @else {
-          <ul class="admin-ingredient-list" role="list">
-            @for (row of ingredientRows; track row.ingredient.id) {
-              <li class="admin-ingredient-list__item">
-                <span class="admin-ingredient-list__name">
-                  {{ row.ingredient.name | ingredientCase }}
-                </span>
-
-                <button
-                  type="button"
-                  class="admin-ingredient-list__delete-btn"
-                  [disabled]="row.deleting"
-                  [attr.aria-label]="'Delete ' + (row.ingredient.name | ingredientCase)"
-                  (click)="deleteIngredient(row)"
-                >
-                  @if (row.deleting) {
-                    <mat-spinner diameter="18" />
-                  } @else {
-                    Delete
-                  }
-                </button>
-
-                @if (row.error) {
-                  <span class="admin-ingredient-list__row-error" role="alert">
-                    {{ row.error }}
+          <div class="admin-scroll-list">
+            <ul class="admin-ingredient-list" role="list">
+              @for (row of filteredIngredientRows; track row.ingredient.id) {
+                <li class="admin-ingredient-list__item">
+                  <span class="admin-ingredient-list__name">
+                    {{ row.ingredient.name | ingredientCase }}
                   </span>
-                }
-              </li>
-            }
-          </ul>
+
+                  <button
+                    type="button"
+                    class="admin-ingredient-list__delete-btn"
+                    [disabled]="row.deleting"
+                    [attr.aria-label]="'Delete ' + (row.ingredient.name | ingredientCase)"
+                    (click)="deleteIngredient(row)"
+                  >
+                    @if (row.deleting) {
+                      <mat-spinner diameter="18" />
+                    } @else {
+                      <mat-icon>delete_outline</mat-icon>
+                    }
+                  </button>
+
+                  @if (row.error) {
+                    <span class="admin-ingredient-list__row-error" role="alert">
+                      {{ row.error }}
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
         }
       }
     </mat-expansion-panel>
@@ -71,23 +86,39 @@
         <mat-panel-title class="admin-panel__title">Units</mat-panel-title>
       </mat-expansion-panel-header>
 
+      <!-- Search box -->
+      <mat-form-field appearance="outline" class="admin-search-field">
+        <mat-label>Search units</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          [(ngModel)]="unitSearch"
+          autocomplete="off"
+          placeholder="Filter by name or abbreviation…"
+        />
+      </mat-form-field>
+
       <!-- Display list -->
       @if (units.length === 0) {
         <p class="admin-panel__empty">No units loaded.</p>
+      } @else if (filteredUnits.length === 0) {
+        <p class="admin-panel__empty">No units match "{{ unitSearch }}".</p>
       } @else {
-        <ul class="admin-unit-list" role="list">
-          @for (unit of units; track unit.id) {
-            <li class="admin-unit-list__item">
-              <span class="admin-unit-list__name">{{ unit.name }}</span>
-              @if (unit.abbreviation) {
-                <span class="admin-unit-list__abbr">({{ unit.abbreviation }})</span>
-              }
-              @if (unit.unitType) {
-                <span class="admin-unit-list__type">{{ unit.unitType }}</span>
-              }
-            </li>
-          }
-        </ul>
+        <div class="admin-scroll-list">
+          <ul class="admin-unit-list" role="list">
+            @for (unit of filteredUnits; track unit.id) {
+              <li class="admin-unit-list__item">
+                <span class="admin-unit-list__name">{{ unit.name }}</span>
+                @if (unit.abbreviation) {
+                  <span class="admin-unit-list__abbr">({{ unit.abbreviation }})</span>
+                }
+                @if (unit.unitType) {
+                  <span class="admin-unit-list__type">{{ unit.unitType }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
       }
 
       <!-- Add unit form -->
@@ -143,16 +174,84 @@
     </mat-expansion-panel>
 
     <!-- ===================================================================
-         Reviews section (Phase 3 placeholder)
+         Reviews section
          =================================================================== -->
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title class="admin-panel__title">Reviews</mat-panel-title>
       </mat-expansion-panel-header>
 
-      <p class="admin-panel__coming-soon">
-        Review management is coming in Phase 3.
-      </p>
+      <!-- Loading -->
+      @if (reviewsState === 'loading') {
+        <div class="admin-panel__loading" aria-label="Loading reviews">
+          <mat-spinner diameter="32" />
+        </div>
+      }
+
+      <!-- Error -->
+      @if (reviewsState === 'error') {
+        <p class="admin-panel__error" role="alert">
+          Failed to load reviews. Please refresh the page.
+        </p>
+      }
+
+      <!-- Search + list -->
+      @if (reviewsState === 'ready') {
+        <mat-form-field appearance="outline" class="admin-search-field">
+          <mat-label>Search reviews</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            [(ngModel)]="reviewSearch"
+            autocomplete="off"
+            placeholder="Filter by recipe or user…"
+          />
+        </mat-form-field>
+
+        @if (reviewRows.length === 0) {
+          <p class="admin-panel__empty">No reviews yet.</p>
+        } @else if (filteredReviewRows.length === 0) {
+          <p class="admin-panel__empty">No reviews match "{{ reviewSearch }}".</p>
+        } @else {
+          <div class="admin-scroll-list">
+            <ul class="admin-review-list" role="list">
+              @for (row of filteredReviewRows; track row.review.id) {
+                <li class="admin-review-list__item">
+                  <span class="admin-review-list__recipe">{{ row.review.recipeTitle }}</span>
+                  <span class="admin-review-list__user">{{ row.review.userName }}</span>
+                  <span class="admin-review-list__rating">★ {{ row.review.rating }}</span>
+                  <span class="admin-review-list__notes">
+                    {{ row.review.notes ?? '—' }}
+                  </span>
+                  <span class="admin-review-list__date">
+                    {{ row.review.madeOn ?? (row.review.createdAt | date:'yyyy-MM-dd') }}
+                  </span>
+
+                  <button
+                    type="button"
+                    class="admin-review-list__delete-btn"
+                    [disabled]="row.deleting"
+                    [attr.aria-label]="'Delete review by ' + row.review.userName + ' for ' + row.review.recipeTitle"
+                    (click)="deleteReview(row)"
+                  >
+                    @if (row.deleting) {
+                      <mat-spinner diameter="18" />
+                    } @else {
+                      <mat-icon>delete_outline</mat-icon>
+                    }
+                  </button>
+
+                  @if (row.error) {
+                    <span class="admin-review-list__row-error" role="alert">
+                      {{ row.error }}
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
     </mat-expansion-panel>
 
   </mat-accordion>

@@ -11,6 +11,19 @@ export interface ReviewDto {
   createdAt: string;
 }
 
+/** Flat review entry returned by GET /api/reviews (admin endpoint). */
+export interface AdminReviewDto {
+  id: number;
+  recipeId: number;
+  recipeTitle: string;
+  userId: number;
+  userName: string;
+  rating: number;
+  notes: string | null;
+  madeOn: string | null;
+  createdAt: string;
+}
+
 export interface CreateReviewPayload {
   userId: number;
   rating: number;
