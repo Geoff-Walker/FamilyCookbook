@@ -48,11 +48,11 @@ export class SuggestionCardComponent implements OnChanges {
   }
 
   get submitterName(): string {
-    return this.suggestion.submittedByUserName;
+    return this.suggestion.suggestedByName;
   }
 
   get submitterIsGeoff(): boolean {
-    return this.suggestion.submittedByUserId === 1;
+    return this.suggestion.suggestedBy === 1;
   }
 
   onAccept(): void {

@@ -2,10 +2,10 @@ export type SuggestionStatus = 'pending' | 'backlogged' | 'accepted' | 'deleted'
 
 export interface RecipeSuggestionDto {
   id: number;
-  submittedByUserId: number;
-  submittedByUserName: string;
-  url: string | null;
-  text: string | null;
+  suggestedBy: number;
+  suggestedByName: string;
+  suggestionUrl: string | null;
+  suggestionText: string | null;
   status: SuggestionStatus;
   createdAt: string; // ISO 8601
   recipeId: number | null;

@@ -16,16 +16,16 @@
 
   <!-- ── Content area ──────────────────────────────────────────── -->
   <div class="sc-content">
-    @if (suggestion.url) {
+    @if (suggestion.suggestionUrl) {
       <a
         class="sc-url"
-        [href]="suggestion.url"
+        [href]="suggestion.suggestionUrl"
         target="_blank"
         rel="noopener noreferrer"
-      >{{ suggestion.url }}<span class="sc-url-icon" aria-hidden="true">&#x2197;</span></a>
+      >{{ suggestion.suggestionUrl }}<span class="sc-url-icon" aria-hidden="true">&#x2197;</span></a>
     }
-    @if (suggestion.text) {
-      <p class="sc-text" [class.sc-text--with-gap]="!!suggestion.url">{{ suggestion.text }}</p>
+    @if (suggestion.suggestionText) {
+      <p class="sc-text" [class.sc-text--with-gap]="!!suggestion.suggestionUrl">{{ suggestion.suggestionText }}</p>
     }
   </div>
 
