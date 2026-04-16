@@ -12,13 +12,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class SidePanelComponent {
   @Input() isOpen = false;
   @Output() closed = new EventEmitter<void>();
+  @Output() suggestClicked = new EventEmitter<void>();
 
   close(): void {
     this.closed.emit();
   }
 
   onSuggestClick(): void {
-    // WAL-82: Submit Suggestion modal — not yet implemented
-    console.log('Submit Suggestion tapped — modal coming in WAL-82');
+    this.suggestClicked.emit();
   }
 }

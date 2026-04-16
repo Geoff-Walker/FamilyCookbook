@@ -1,0 +1,80 @@
+<!-- Backdrop -->
+<div class="ssd-backdrop" role="presentation" (click)="onBackdropClick()"></div>
+
+<!-- Dialog panel -->
+<div
+  class="ssd-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="ssd-title"
+>
+
+  <!-- Header -->
+  <div class="ssd-header">
+    <h2 class="ssd-title" id="ssd-title">Submit a suggestion</h2>
+    <button
+      type="button"
+      class="ssd-close"
+      aria-label="Close dialog"
+      [disabled]="isSubmitting"
+      (click)="onCancel()"
+    >&#x2715;</button>
+  </div>
+
+  <!-- Submitted as indicator -->
+  <p class="ssd-submitted-as">Submitted as: <strong>{{ activeUserName }}</strong></p>
+
+  <!-- URL field -->
+  <div class="ssd-field">
+    <label class="ssd-label" for="ssd-url">Recipe link (optional)</label>
+    <input
+      id="ssd-url"
+      type="url"
+      class="ssd-input"
+      [(ngModel)]="urlValue"
+      placeholder="https://…"
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- Text field -->
+  <div class="ssd-field">
+    <label class="ssd-label" for="ssd-text">What are you thinking? (optional)</label>
+    <textarea
+      id="ssd-text"
+      class="ssd-textarea"
+      rows="4"
+      [(ngModel)]="textValue"
+      placeholder="Something with aubergine, maybe…"
+    ></textarea>
+  </div>
+
+  <!-- Validation note -->
+  @if (!hasContent) {
+    <p class="ssd-validation-note" role="alert" aria-live="polite">
+      At least one field is required.
+    </p>
+  }
+
+  <!-- Inline error -->
+  @if (submitError) {
+    <p class="ssd-error" role="alert">{{ submitError }}</p>
+  }
+
+  <!-- Actions -->
+  <div class="ssd-actions">
+    <button
+      type="button"
+      class="ssd-btn-primary"
+      [disabled]="!canSubmit"
+      (click)="onSubmit()"
+    >Submit</button>
+    <button
+      type="button"
+      class="ssd-btn-cancel"
+      [disabled]="isSubmitting"
+      (click)="onCancel()"
+    >Cancel</button>
+  </div>
+
+</div>
