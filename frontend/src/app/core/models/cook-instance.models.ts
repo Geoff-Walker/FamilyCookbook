@@ -74,13 +74,6 @@ export interface CompleteCookPayload {
 // GET /api/recipes/{recipeId}/cook-instances — history list items (WAL-74)
 // ---------------------------------------------------------------------------
 
-export interface CookInstanceReviewSummaryDto {
-  userId: number;
-  userName: string;
-  rating: number;
-  notes: string | null;
-}
-
 export interface CookInstanceSummaryDto {
   id: number;
   userId: number;

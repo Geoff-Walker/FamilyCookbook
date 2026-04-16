@@ -49,21 +49,6 @@
           <span class="status-pill" [class]="'status-pill ' + pillClass" role="status">{{ pillLabel }}</span>
         </div>
 
-        <!-- Ratings row (shown if either user has reviewed) -->
-        @if (hasRatings) {
-          <div class="civ-ratings-row" aria-label="Ratings">
-            @for (review of ratings; track review.userId) {
-              <span class="civ-rating-item">
-                <span class="civ-rating-name">{{ review.userName }}</span>
-                <span class="civ-rating-stars">{{ starDisplay(review.rating) }}</span>
-              </span>
-              @if (!$last) {
-                <span class="civ-rating-sep" aria-hidden="true">·</span>
-              }
-            }
-          </div>
-        }
-
       </div>
     </header>
 
