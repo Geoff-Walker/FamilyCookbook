@@ -13,7 +13,7 @@ import {
   DeleteEvent
 } from './suggestion-card/suggestion-card.component';
 
-type TabId = 'queue' | 'backlog';
+type TabId = 'queue' | 'created';
 
 @Component({
   selector: 'app-geoff-filter',
@@ -29,11 +29,11 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
   activeUserName = '';
 
   queueSuggestions: RecipeSuggestionDto[] = [];
-  backlogSuggestions: RecipeSuggestionDto[] = [];
+  createdSuggestions: RecipeSuggestionDto[] = [];
 
   isLoading = false;
   loadError: string | null = null;
-  backlogLoaded = false;
+  createdLoaded = false;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -73,7 +73,7 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
   }
 
   get currentSuggestions(): RecipeSuggestionDto[] {
-    return this.activeTab === 'queue' ? this.queueSuggestions : this.backlogSuggestions;
+    return this.activeTab === 'queue' ? this.queueSuggestions : this.createdSuggestions;
   }
 
   // ---------------------------------------------------------------------------
@@ -82,8 +82,8 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
 
   setTab(tab: TabId): void {
     this.activeTab = tab;
-    if (tab === 'backlog' && !this.backlogLoaded) {
-      this.loadBacklog();
+    if (tab === 'created' && !this.createdLoaded) {
+      this.loadCreated();
     }
   }
 
@@ -108,19 +108,19 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadBacklog(): void {
+  loadCreated(): void {
     this.isLoading = true;
     this.loadError = null;
-    this.api.getSuggestions('backlogged')
+    this.api.getSuggestions('accepted')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (items) => {
-          this.backlogSuggestions = items;
-          this.backlogLoaded = true;
+          this.createdSuggestions = items;
+          this.createdLoaded = true;
           this.isLoading = false;
         },
         error: () => {
-          this.loadError = 'Failed to load backlog. Please try again.';
+          this.loadError = 'Failed to load created recipes. Please try again.';
           this.isLoading = false;
         }
       });
@@ -160,8 +160,6 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.queueSuggestions = this.queueSuggestions.filter(s => s.id !== event.suggestionId);
-          // Invalidate backlog cache so it reloads on next visit
-          this.backlogLoaded = false;
         },
         error: () => {
           // Silently ignore — card remains in queue
@@ -177,7 +175,7 @@ export class GeoffFilterComponent implements OnInit, OnDestroy {
           if (this.activeTab === 'queue') {
             this.queueSuggestions = this.queueSuggestions.filter(s => s.id !== event.suggestionId);
           } else {
-            this.backlogSuggestions = this.backlogSuggestions.filter(s => s.id !== event.suggestionId);
+            this.createdSuggestions = this.createdSuggestions.filter(s => s.id !== event.suggestionId);
           }
         },
         error: () => {

@@ -15,9 +15,9 @@ public static class RecipeSuggestionEndpoints
         var group = app.MapGroup("/api/recipe-suggestions")
             .WithTags("RecipeSuggestions");
 
-        // GET /api/recipe-suggestions?status=pending|backlogged
+        // GET /api/recipe-suggestions?status=pending|backlogged|accepted
         group.MapGet("/", GetByStatus)
-            .WithSummary("Return suggestions by status (pending or backlogged), ordered oldest first")
+            .WithSummary("Return suggestions by status (pending, backlogged, or accepted), ordered oldest first")
             .Produces<List<RecipeSuggestionDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest);
 
@@ -59,10 +59,10 @@ public static class RecipeSuggestionEndpoints
         RecipeSuggestionService service)
     {
         if (string.IsNullOrWhiteSpace(status))
-            return Results.BadRequest(new { error = "'status' query parameter is required (pending or backlogged)" });
+            return Results.BadRequest(new { error = "'status' query parameter is required (pending, backlogged, or accepted)" });
 
-        if (status != "pending" && status != "backlogged")
-            return Results.BadRequest(new { error = $"'status' value '{status}' is not valid. Expected 'pending' or 'backlogged'." });
+        if (status != "pending" && status != "backlogged" && status != "accepted")
+            return Results.BadRequest(new { error = $"'status' value '{status}' is not valid. Expected 'pending', 'backlogged', or 'accepted'." });
 
         var suggestions = await service.GetByStatusAsync(status);
         return Results.Ok(suggestions);

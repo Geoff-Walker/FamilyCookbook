@@ -28,10 +28,10 @@
       type="button"
       role="tab"
       class="gf-tab"
-      [class.gf-tab--active]="activeTab === 'backlog'"
-      [attr.aria-selected]="activeTab === 'backlog'"
-      (click)="setTab('backlog')"
-    >Backlog</button>
+      [class.gf-tab--active]="activeTab === 'created'"
+      [attr.aria-selected]="activeTab === 'created'"
+      (click)="setTab('created')"
+    >Created</button>
 
   </div>
 
@@ -50,7 +50,7 @@
       <button
         type="button"
         class="gf-retry-btn"
-        (click)="activeTab === 'queue' ? loadQueue() : loadBacklog()"
+        (click)="activeTab === 'queue' ? loadQueue() : loadCreated()"
       >Retry</button>
     </div>
   }
@@ -60,7 +60,11 @@
     <div class="gf-list">
 
       @if (currentSuggestions.length === 0) {
-        <p class="gf-empty">No pending suggestions.</p>
+        @if (activeTab === 'queue') {
+          <p class="gf-empty">No pending suggestions.</p>
+        } @else {
+          <p class="gf-empty">No recipes created from suggestions yet.</p>
+        }
       }
 
       @for (suggestion of currentSuggestions; track trackById($index, suggestion)) {
