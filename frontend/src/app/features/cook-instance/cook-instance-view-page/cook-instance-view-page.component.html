@@ -71,6 +71,135 @@
     <main class="civ-main">
       <div class="civ-content">
 
+        <!-- ================================================================
+             Ratings & Reviews — always first; display or form depending on
+             whether reviews have been submitted
+             ================================================================ -->
+        <section class="civ-review-section">
+          <h2 class="civ-review-heading">Ratings &amp; Reviews</h2>
+
+          @if (cookInstance.reviews.length > 0) {
+
+            <!-- Display mode: submitted reviews -->
+            <div class="civ-review-cards">
+              @for (ur of userRatings; track ur.userId) {
+                @let review = getReview(ur.userId);
+                <div class="civ-review-card" [class.civ-review-card--helen]="ur.userId === 2">
+                  <span class="civ-review-card__name">{{ ur.userName | uppercase }}</span>
+                  @if (review) {
+                    <p class="civ-review-card__stars-display" [attr.aria-label]="ur.userName + ': ' + review.rating + ' out of 5 stars'">
+                      {{ starDisplay(review.rating) }}
+                    </p>
+                    @if (review.notes) {
+                      <p class="civ-review-card__notes">{{ review.notes }}</p>
+                    }
+                  } @else {
+                    <p class="civ-review-card__no-rating">No rating yet</p>
+                  }
+                  <p class="civ-review-card__last-cooked">Last cooked: {{ formatDate(cookInstance.startedAt) }}</p>
+                </div>
+              }
+            </div>
+
+          } @else if (!reviewSubmitted) {
+
+            <!-- Form mode: interactive rating cards -->
+            <div class="civ-review-cards">
+              @for (ur of userRatings; track ur.userId) {
+                <div class="civ-review-card" [class.civ-review-card--helen]="ur.userId === 2">
+
+                  <span class="civ-review-card__name">{{ ur.userName | uppercase }}</span>
+
+                  <div
+                    class="civ-stars"
+                    [attr.aria-label]="ur.userName + ' rating: ' + ratingLabel(ur)"
+                    (mouseleave)="onStarLeave(ur)"
+                  >
+                    @for (star of starValues; track star) {
+                      <button
+                        type="button"
+                        class="civ-star-btn"
+                        [attr.aria-label]="starAriaLabel(star)"
+                        (click)="onStarClick(ur, star, $event)"
+                        (mousemove)="onStarHover(ur, star, $event)"
+                      >
+                        <svg class="civ-star-svg" viewBox="0 0 24 24" aria-hidden="true">
+                          <defs>
+                            <clipPath [id]="'civ-left-' + ur.userId + '-' + star">
+                              <rect x="0" y="0" width="12" height="24" />
+                            </clipPath>
+                            <clipPath [id]="'civ-right-' + ur.userId + '-' + star">
+                              <rect x="12" y="0" width="12" height="24" />
+                            </clipPath>
+                          </defs>
+                          <path
+                            class="civ-star-empty"
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                          />
+                          @if (leftHalfFilled(ur, star)) {
+                            <path
+                              class="civ-star-filled"
+                              d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                              [attr.clip-path]="'url(#civ-left-' + ur.userId + '-' + star + ')'"
+                            />
+                          }
+                          @if (rightHalfFilled(ur, star)) {
+                            <path
+                              class="civ-star-filled"
+                              d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
+                              [attr.clip-path]="'url(#civ-right-' + ur.userId + '-' + star + ')'"
+                            />
+                          }
+                        </svg>
+                      </button>
+                    }
+                  </div>
+
+                  @if (ur.rating === 0) {
+                    <p class="civ-review-card__no-rating">No rating yet</p>
+                  }
+
+                  <p class="civ-review-card__last-cooked">Last cooked: {{ formatDate(cookInstance.startedAt) }}</p>
+
+                  <textarea
+                    [id]="'civ-notes-' + ur.userId"
+                    class="civ-textarea"
+                    rows="3"
+                    placeholder="How did it go? Any tweaks?"
+                    [(ngModel)]="ur.notes"
+                  ></textarea>
+
+                </div>
+              }
+            </div>
+
+            @if (reviewRatingError) {
+              <p class="civ-review-error" role="alert">{{ reviewRatingError }}</p>
+            }
+            @if (reviewSaveError) {
+              <p class="civ-review-error" role="alert">{{ reviewSaveError }}</p>
+            }
+
+            <button
+              type="button"
+              class="civ-btn-save-review"
+              [disabled]="isSavingReview"
+              (click)="onSubmitReview()"
+            >
+              @if (isSavingReview) {
+                <span class="civ-spinner" aria-hidden="true"></span>
+                <span class="civ-sr-only">Saving…</span>
+              } @else {
+                Submit Review
+              }
+            </button>
+
+          }
+        </section>
+
         <!-- Ingredient comparison table (AC3) -->
         @if (recipe) {
           <section class="civ-section">
@@ -112,98 +241,6 @@
           </button>
           <p class="civ-promote-helper">This will save the current recipe as a version snapshot before updating.</p>
         </section>
-
-        <!-- Leave a review (AC9) — shown when no reviews exist and not yet submitted -->
-        @if (showReviewForm && !reviewSubmitted) {
-          <section class="civ-review-section">
-            <h2 class="civ-review-heading">Leave a review</h2>
-
-            <!-- Rating rows — one per user -->
-            @for (ur of userRatings; track ur.userId) {
-              <div class="civ-rating-row">
-                <span class="civ-rating-label">{{ ur.userName }}</span>
-                <div
-                  class="civ-stars"
-                  [attr.aria-label]="ur.userName + ' rating: ' + ratingLabel(ur)"
-                  (mouseleave)="onStarLeave(ur)"
-                >
-                  @for (star of starValues; track star) {
-                    <button
-                      type="button"
-                      class="civ-star-btn"
-                      [attr.aria-label]="starAriaLabel(star)"
-                      (click)="onStarClick(ur, star, $event)"
-                      (mousemove)="onStarHover(ur, star, $event)"
-                    >
-                      <svg class="civ-star-svg" viewBox="0 0 24 24" aria-hidden="true">
-                        <defs>
-                          <clipPath [id]="'civ-left-' + ur.userId + '-' + star">
-                            <rect x="0" y="0" width="12" height="24" />
-                          </clipPath>
-                          <clipPath [id]="'civ-right-' + ur.userId + '-' + star">
-                            <rect x="12" y="0" width="12" height="24" />
-                          </clipPath>
-                        </defs>
-                        <path
-                          class="civ-star-empty"
-                          d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                        />
-                        @if (leftHalfFilled(ur, star)) {
-                          <path
-                            class="civ-star-filled"
-                            d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
-                            [attr.clip-path]="'url(#civ-left-' + ur.userId + '-' + star + ')'"
-                          />
-                        }
-                        @if (rightHalfFilled(ur, star)) {
-                          <path
-                            class="civ-star-filled"
-                            d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"
-                            [attr.clip-path]="'url(#civ-right-' + ur.userId + '-' + star + ')'"
-                          />
-                        }
-                      </svg>
-                    </button>
-                  }
-                </div>
-              </div>
-              <!-- Per-user notes -->
-              <div class="civ-review-field">
-                <textarea
-                  [id]="'civ-notes-' + ur.userId"
-                  class="civ-textarea"
-                  rows="2"
-                  placeholder="Notes..."
-                  [(ngModel)]="ur.notes"
-                ></textarea>
-              </div>
-            }
-
-            @if (reviewRatingError) {
-              <p class="civ-review-error" role="alert">{{ reviewRatingError }}</p>
-            }
-            @if (reviewSaveError) {
-              <p class="civ-review-error" role="alert">{{ reviewSaveError }}</p>
-            }
-
-            <button
-              type="button"
-              class="civ-btn-save-review"
-              [disabled]="isSavingReview"
-              (click)="onSubmitReview()"
-            >
-              @if (isSavingReview) {
-                <span class="civ-spinner" aria-hidden="true"></span>
-                <span class="civ-sr-only">Saving…</span>
-              } @else {
-                Save Review
-              }
-            </button>
-          </section>
-        }
 
       </div>
     </main>

@@ -303,46 +303,88 @@
 }
 
 // ---------------------------------------------------------------------------
-// Leave a review section (AC9)
+// Ratings & Reviews section (AC9)
 // ---------------------------------------------------------------------------
 
 .civ-review-section {
-  background: var(--color-surface-1);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  margin-top: var(--space-8);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
+  margin-top: var(--space-4);
 }
 
-// AC9: heading — font-size 1.125rem, font-weight 600, DM Sans
 .civ-review-heading {
   font-family: var(--font-heading);
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
 }
 
-// Rating rows
-.civ-rating-row {
-  display: flex;
-  align-items: center;
+// Two-card grid — stacked on mobile, side-by-side on tablet+
+.civ-review-cards {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--space-4);
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-.civ-rating-label {
-  font-size: 0.875rem;
-  font-weight: 500;
+// Individual user card
+.civ-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-1);
+
+  // Helen's card — warm cream tone matching recipe page
+  &--helen {
+    background: #f5ede0;
+  }
+}
+
+.civ-review-card__name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+}
+
+.civ-review-card__stars-display {
+  font-size: 1.5rem;
+  color: var(--color-tertiary);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.civ-review-card__notes {
+  font-size: 0.9375rem;
   color: var(--color-text-primary);
-  min-width: 48px;
+  margin: 0;
+  line-height: 1.5;
 }
 
+.civ-review-card__no-rating {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.civ-review-card__last-cooked {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+// Stars row within a card
 .civ-stars {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .civ-star-btn {
@@ -375,22 +417,17 @@
   fill: var(--color-tertiary);
 }
 
-// Per-user notes textarea
-.civ-review-field {
-  display: flex;
-  flex-direction: column;
-}
-
+// Textarea inside each card — transparent bg to show card colour
 .civ-textarea {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-3);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-family: inherit;
   color: var(--color-text-primary);
-  background: var(--color-surface-0);
+  background: transparent;
   resize: vertical;
   line-height: 1.5;
 
@@ -412,10 +449,10 @@
   margin: 0;
 }
 
-// Save review button
+// Submit review button — full width on mobile, auto on desktop
 .civ-btn-save-review {
-  align-self: flex-start;
-  height: 48px;
+  width: 100%;
+  height: 52px;
   padding: 0 var(--space-6);
   background: var(--color-primary);
   color: var(--color-on-primary);
@@ -430,6 +467,11 @@
   justify-content: center;
   gap: var(--space-2);
   transition: opacity 0.15s ease;
+
+  @media (min-width: 600px) {
+    width: auto;
+    align-self: flex-start;
+  }
 
   &:hover:not(:disabled) {
     opacity: 0.9;
