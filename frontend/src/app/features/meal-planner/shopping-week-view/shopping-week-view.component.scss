@@ -189,6 +189,14 @@
   text-overflow: ellipsis;
 }
 
+.sw-label--mobile { display: none; }
+
+@media (max-width: 767px) {
+  .sw-stepper__label { min-width: 48px; }
+  .sw-label--full   { display: none; }
+  .sw-label--mobile { display: inline; }
+}
+
 /* ============================================================
    GENERATE BUTTON
    Right-aligned on tablet+, full-width on mobile

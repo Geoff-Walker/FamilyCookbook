@@ -237,13 +237,40 @@
   border: 0;
 }
 
-// Mobile responsive (AC8)
+// Desktop-only / mobile-only visibility helpers
+.ch__date--short        { display: none; }
+.ch__rating-num         { display: none; }
+.ch__col-label--short   { display: none; }
+
+// Mobile responsive
 @media (max-width: 767px) {
   .ch__row {
-    grid-template-columns: 0.8fr 1fr 1fr 48px 48px;
+    grid-template-columns: 1fr 36px 36px 44px 44px;
   }
 
-  .ch__cell--rating {
+  // Date: show short, hide full
+  .ch__date--full       { display: none; }
+  .ch__date--short      { display: inline; }
+
+  // Ratings: show yellow number, hide stars
+  .ch__stars            { display: none; }
+  .ch__rating-num       {
+    display: inline;
+    color: #f59e0b;
     font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  // Header labels: show initial, hide full
+  .ch__col-label--full  { display: none; }
+  .ch__col-label--short { display: inline; }
+
+  // Badges: hidden on mobile
+  .ch__promoted-badge,
+  .ch__original-badge   { display: none; }
+
+  .ch__cell--rating {
+    justify-content: center;
+    padding: 0;
   }
 }
