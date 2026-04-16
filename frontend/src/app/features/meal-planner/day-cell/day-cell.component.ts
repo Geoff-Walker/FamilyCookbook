@@ -6,6 +6,7 @@ import {
   Output
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { MealPlanSlotDto } from '../../../core/models/meal-planner.models';
 import { MealSlotChipComponent } from '../meal-slot-chip/meal-slot-chip.component';
 
@@ -33,7 +34,7 @@ export interface DeleteSlotEvent {
 @Component({
   selector: 'app-day-cell',
   standalone: true,
-  imports: [CommonModule, MealSlotChipComponent],
+  imports: [CommonModule, MatIconModule, MealSlotChipComponent],
   templateUrl: './day-cell.component.html',
   styleUrl: './day-cell.component.scss'
 })

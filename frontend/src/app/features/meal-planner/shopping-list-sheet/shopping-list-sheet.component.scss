@@ -218,6 +218,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+
+  &--ifits {
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
 }
 
 /* Quantity */
@@ -232,21 +237,13 @@
    FOOTER
    ============================================================ */
 .sls-footer {
+  height: 64px;
   flex-shrink: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-4) var(--space-5);
+  padding: 0 var(--space-5);
   border-top: 1px solid var(--color-border);
-}
-
-.sls-footer__ifits {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  margin: 0;
 }
 
 .sls-footer__note {

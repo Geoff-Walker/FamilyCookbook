@@ -33,13 +33,16 @@ export interface ShoppingItem {
 export class ShoppingListSheetComponent implements OnInit {
   @Input({ required: true }) items: ShoppingItem[] = [];
   @Input({ required: true }) windowRangeLabel!: string;
-  @Input() ifItsCount = 0;
+  /** Display labels for "If it's" slots — each rendered as a tickable line item. */
+  @Input() ifItsItems: string[] = [];
 
   /** Emitted when the user closes the sheet. */
   @Output() closed = new EventEmitter<void>();
 
   /** Tracks which ingredientId+unitId keys are ticked. */
   checkedKeys = new Set<string>();
+  /** Tracks which "If it's" labels are ticked. */
+  checkedIfIts = new Set<string>();
 
   /** Animate in on init. */
   visible = false;
@@ -76,6 +79,19 @@ export class ShoppingListSheetComponent implements OnInit {
     // Round to 2 decimal places, strip trailing zeros
     const rounded = parseFloat(item.totalAmount.toFixed(2));
     return abbr ? `${rounded} ${abbr}` : String(rounded);
+  }
+
+  isCheckedIfIt(label: string): boolean {
+    return this.checkedIfIts.has(label);
+  }
+
+  toggleCheckIfIt(label: string): void {
+    if (this.checkedIfIts.has(label)) {
+      this.checkedIfIts.delete(label);
+    } else {
+      this.checkedIfIts.add(label);
+    }
+    this.checkedIfIts = new Set(this.checkedIfIts);
   }
 
   close(): void {
