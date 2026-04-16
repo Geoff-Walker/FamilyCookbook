@@ -12,6 +12,12 @@ export interface RecipeSuggestionDto {
   recipeName: string | null;
 }
 
+export interface CreateSuggestionPayload {
+  suggestedBy: number;
+  suggestionUrl: string | null;
+  suggestionText: string | null;
+}
+
 export interface AcceptSuggestionPayload {
   requestingUserId: number;
 }

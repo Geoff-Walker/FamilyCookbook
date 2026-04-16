@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import {
   AcceptSuggestionPayload,
   AcceptSuggestionResponse,
+  CreateSuggestionPayload,
   RecipeSuggestionDto,
   SuggestionStatus
 } from '../models/geoff-filter.models';
@@ -16,6 +17,10 @@ export class GeoffFilterApiService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private readonly http: HttpClient) {}
+
+  createSuggestion(payload: CreateSuggestionPayload): Observable<RecipeSuggestionDto> {
+    return this.http.post<RecipeSuggestionDto>(`${this.baseUrl}/recipe-suggestions`, payload);
+  }
 
   getSuggestions(status: SuggestionStatus): Observable<RecipeSuggestionDto[]> {
     const params = new HttpParams().set('status', status);

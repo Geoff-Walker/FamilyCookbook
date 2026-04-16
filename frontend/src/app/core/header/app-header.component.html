@@ -29,4 +29,11 @@
 <app-side-panel
   [isOpen]="isPanelOpen"
   (closed)="closePanel()"
+  (suggestClicked)="onSuggestClick()"
 />
+
+@if (isSuggestionDialogOpen) {
+  <app-submit-suggestion-dialog
+    (dismissed)="onSuggestionDialogDismissed()"
+  />
+}
