@@ -29,6 +29,23 @@ public static class ReviewEndpoints
             .Produces<List<ReviewDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
+        // -----------------------------------------------------------------------
+        // Admin endpoints — flat list of all reviews + hard delete
+        // -----------------------------------------------------------------------
+
+        // GET /api/reviews
+        app.MapGet("/api/reviews", GetAllReviews)
+            .WithTags("Reviews")
+            .WithSummary("Admin: list all reviews across all recipes, ordered by created_at descending")
+            .Produces<List<AdminReviewDto>>(StatusCodes.Status200OK);
+
+        // DELETE /api/reviews/{id}
+        app.MapDelete("/api/reviews/{id:int}", DeleteReview)
+            .WithTags("Reviews")
+            .WithSummary("Admin: hard-delete a review by ID")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound);
+
         return app;
     }
 
@@ -135,5 +152,39 @@ public static class ReviewEndpoints
             .ToListAsync();
 
         return Results.Ok(reviews);
+    }
+
+    private static async Task<IResult> GetAllReviews(WalkerDbContext db)
+    {
+        var reviews = await db.RecipeReviews
+            .Include(rr => rr.User)
+            .Include(rr => rr.Recipe)
+            .OrderByDescending(rr => rr.CreatedAt)
+            .Select(rr => new AdminReviewDto
+            {
+                Id          = rr.Id,
+                RecipeId    = rr.RecipeId,
+                RecipeTitle = rr.Recipe.Title,
+                UserId      = rr.UserId,
+                UserName    = rr.User.Name,
+                Rating      = rr.Rating,
+                Notes       = rr.Notes,
+                MadeOn      = rr.MadeOn,
+                CreatedAt   = rr.CreatedAt,
+            })
+            .ToListAsync();
+
+        return Results.Ok(reviews);
+    }
+
+    private static async Task<IResult> DeleteReview(int id, WalkerDbContext db)
+    {
+        var review = await db.RecipeReviews.FindAsync(id);
+        if (review is null)
+            return Results.NotFound();
+
+        db.RecipeReviews.Remove(review);
+        await db.SaveChangesAsync();
+        return Results.NoContent();
     }
 }
