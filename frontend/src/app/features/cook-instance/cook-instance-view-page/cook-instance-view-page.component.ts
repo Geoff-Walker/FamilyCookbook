@@ -67,11 +67,6 @@ export class CookInstanceViewPageComponent implements OnInit {
   // Inline review form state (AC9)
   // ---------------------------------------------------------------------------
 
-  /** Whether the "leave a review" section should be shown. */
-  get showReviewForm(): boolean {
-    return !!this.cookInstance && this.cookInstance.reviews.length === 0;
-  }
-
   userRatings: UserRating[] = [];
   readonly starValues = [1, 2, 3, 4, 5];
   reviewRatingError: string | null = null;
@@ -155,18 +150,6 @@ export class CookInstanceViewPageComponent implements OnInit {
     return this.cookInstance.reviews.length > 0
       ? 'status-pill--completed'
       : 'status-pill--awaiting';
-  }
-
-  // ---------------------------------------------------------------------------
-  // Header ratings row (AC2)
-  // ---------------------------------------------------------------------------
-
-  get hasRatings(): boolean {
-    return !!this.cookInstance && this.cookInstance.reviews.length > 0;
-  }
-
-  get ratings(): CookInstanceReviewSummaryDto[] {
-    return this.cookInstance?.reviews ?? [];
   }
 
   /** Look up a submitted review for a specific user, or null if not reviewed. */
