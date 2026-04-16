@@ -28,23 +28,28 @@
 
   <!-- Add buttons row — bottom of cell -->
   <div class="day-cell__add-row" aria-label="Add meal to this day">
+    <!-- Add Recipe — text label per original design -->
     <button
       type="button"
-      class="day-cell__add-btn"
+      class="day-cell__add-btn day-cell__add-btn--text"
       (click)="onAddRecipe()"
       aria-label="Add recipe"
     >+ Recipe</button>
+    <!-- Add If it's — shopping cart icon -->
     <button
       type="button"
-      class="day-cell__add-btn"
+      class="day-cell__add-btn day-cell__add-btn--icon"
       (click)="onAddIfIts()"
-      aria-label="Add if it's"
-    >+ If it's</button>
+      aria-label="Add if it's slot"
+      title="If it's…"
+    ><mat-icon aria-hidden="true">shopping_cart</mat-icon></button>
+    <!-- Add TBD — fast food icon -->
     <button
       type="button"
-      class="day-cell__add-btn"
+      class="day-cell__add-btn day-cell__add-btn--icon"
       (click)="onAddTbd()"
       aria-label="Add TBD slot"
-    >+ TBD</button>
+      title="TBD"
+    ><mat-icon aria-hidden="true">fastfood</mat-icon></button>
   </div>
 </div>

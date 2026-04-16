@@ -31,7 +31,7 @@
 
   <!-- Item list / empty state -->
   <div class="sls-content">
-    @if (items.length === 0) {
+    @if (items.length === 0 && ifItsItems.length === 0) {
       <p class="sls-empty">
         No Recipe slots in this week's plan. Add some meals first.
       </p>
@@ -42,7 +42,6 @@
             class="sls-item"
             [class.sls-item--checked]="isChecked(item)"
           >
-            <!-- Checkbox -->
             <button
               type="button"
               class="sls-item__checkbox"
@@ -57,14 +56,32 @@
                 </svg>
               }
             </button>
-
-            <!-- Name -->
             <span class="sls-item__name">{{ item.ingredientName }}</span>
-
-            <!-- Quantity -->
             @if (formatQuantity(item)) {
               <span class="sls-item__qty">{{ formatQuantity(item) }}</span>
             }
+          </li>
+        }
+        @for (ifIt of ifItsItems; track ifIt) {
+          <li
+            class="sls-item"
+            [class.sls-item--checked]="isCheckedIfIt(ifIt)"
+          >
+            <button
+              type="button"
+              class="sls-item__checkbox"
+              role="checkbox"
+              [attr.aria-checked]="isCheckedIfIt(ifIt)"
+              [attr.aria-label]="'Mark ' + ifIt + ' as collected'"
+              (click)="toggleCheckIfIt(ifIt)"
+            >
+              @if (isCheckedIfIt(ifIt)) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              }
+            </button>
+            <span class="sls-item__name sls-item__name--ifits">{{ ifIt }}</span>
           </li>
         }
       </ul>

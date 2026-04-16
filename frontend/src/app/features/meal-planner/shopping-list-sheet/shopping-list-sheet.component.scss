@@ -218,6 +218,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+
+  &--ifits {
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
 }
 
 /* Quantity */

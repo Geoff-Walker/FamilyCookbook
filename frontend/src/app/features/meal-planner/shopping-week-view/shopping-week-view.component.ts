@@ -98,6 +98,7 @@ export class ShoppingWeekViewComponent implements OnInit, OnDestroy {
   dialogDate: string | null = null;
   showShoppingList = false;
   shoppingItems: ShoppingItem[] = [];
+  ifItsItems: string[] = [];
   isGenerating = false;
 
   // -------------------------------------------------------------------------
@@ -354,6 +355,9 @@ export class ShoppingWeekViewComponent implements OnInit, OnDestroy {
       });
 
       this.shoppingItems = this.aggregateIngredients(recipeSlots);
+      this.ifItsItems = this.slots
+        .filter(s => s.slotType === 'if_its')
+        .map(s => s.notes?.trim() || 'If it\'s…');
       this.isGenerating = false;
       this.showShoppingList = true;
     });
